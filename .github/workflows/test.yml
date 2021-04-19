@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]        # add other OSes later
-        dotnet: ['5.x']
+        dotnet: ['5.0.x']
 
     steps:
       - name: Git Checkout
