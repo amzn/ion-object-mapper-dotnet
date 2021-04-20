@@ -148,6 +148,12 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
+            if (item is object) 
+            {
+                new IonObjectSerializer(this, item.GetType()).Serialize(writer, item);
+                return;
+            }
+
             throw new NotSupportedException("Do not know how to serialize type " + typeof(T));
         }
 
@@ -248,6 +254,11 @@ namespace Amazon.Ion.ObjectMapper
             if (ionType == IonType.List) 
             {
                 return NewIonListSerializer(type).Deserialize(reader);
+            }
+
+            if (ionType == IonType.Struct) 
+            {
+                return new IonObjectSerializer(this, type).Deserialize(reader);
             }
 
             throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
