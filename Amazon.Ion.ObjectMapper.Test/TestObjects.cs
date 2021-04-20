@@ -3,6 +3,17 @@ using Amazon.Ion.ObjectMapper;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
+    public static class TestObjects {
+        public static Car honda = new Car 
+        { 
+            Make = "Honda", 
+            Model = "Civic", 
+            Year = 2010, 
+            Weight = new Random().NextDouble(),
+            Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") } 
+        };
+    }
+
     public class Car
     {
         private string color;
