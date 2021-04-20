@@ -8,7 +8,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         { 
             Make = "Honda", 
             Model = "Civic", 
-            Year = 2010, 
+            YearOfManufacture = 2010, 
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") } 
         };
@@ -20,7 +20,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public string Make { get; init; }
         public string Model { get; init; }
-        public int Year { get; init; }
+        public int YearOfManufacture { get; init; }
         public Engine Engine { get; init; }
         
         [IonIgnore]
@@ -41,7 +41,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public override string ToString()
         {
-            return "<Car>{ Make: " + Make + ", Model: " + Model + ", Year: " + Year + " }";
+            return "<Car>{ Make: " + Make + ", Model: " + Model + ", YearOfManufacture: " + YearOfManufacture + " }";
         }
     }
 

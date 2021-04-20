@@ -31,18 +31,28 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
         public static T Serde<T>(T item) 
         {
-            var stream = new IonSerializer().Serialize(item);
-            return new IonSerializer().Deserialize<T>(stream);
+            return Serde(new IonSerializer(), item);
+        }
+
+        public static T Serde<T>(IonSerializer ionSerializer, T item) 
+        {
+            var stream = ionSerializer.Serialize(item);
+            return ionSerializer.Deserialize<T>(stream);
         }
 
         public static void Check<T>(T item)
         {
+            Check(new IonSerializer(), item);
+        }
+
+        public static void Check<T>(IonSerializer ionSerializer, T item)
+        {
             if (item == null) 
             {
-                Assert.AreEqual(null, Serde((object) null));
+                Assert.AreEqual(null, Serde(ionSerializer, (object) null));
                 return;
             }
-            Assert.AreEqual(item.ToString(), Serde(item).ToString());
+            Assert.AreEqual(item.ToString(), Serde(ionSerializer, item).ToString());
         }
         
         public static void Check<T>(Stream actual, T expected)

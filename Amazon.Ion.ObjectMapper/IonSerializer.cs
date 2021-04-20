@@ -34,6 +34,7 @@ namespace Amazon.Ion.ObjectMapper
         public readonly IonPropertyNamingConvention NamingConvention { get; init; }
         public readonly IonSerializationFormat Format;
         public readonly int MaxDepth;
+        public readonly bool AnnotateGuids { get; init; }
         public readonly bool IncludeFields;
         public readonly bool IgnoreNulls;
         public readonly bool IgnoreReadOnlyFields;
@@ -55,7 +56,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public IonSerializer() : this(IonSerializationOptions.DEFAULT) 
         {
-            
+
         }
 
         public IonSerializer(IonSerializationOptions options)
@@ -160,6 +161,12 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
+            if (item is Guid) 
+            {
+                new IonGuidSerializer(options).Serialize(writer, (Guid)(object)item);
+                return;
+            }
+
             if (item is object) 
             {
                 new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
@@ -240,6 +247,11 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.Blob) 
             {
+                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
+                    || type.IsAssignableTo(typeof(Guid)))
+                {
+                    return new IonGuidSerializer(options).Deserialize(reader);
+                }
                 return new IonByteArraySerializer().Deserialize(reader);
             }
 

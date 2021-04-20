@@ -186,4 +186,30 @@ namespace Amazon.Ion.ObjectMapper
             writer.WriteClob(Encoding.UTF8.GetBytes(item));
         }
     }
+
+    public class IonGuidSerializer : IonSerializer<Guid>
+    {
+        internal static readonly string ANNOTATION = "guid128";
+        private IonSerializationOptions options;
+
+        public IonGuidSerializer(IonSerializationOptions options)
+        {
+            this.options = options;
+        }
+
+        public Guid Deserialize(IIonReader reader)
+        {
+            byte[] blob = new byte[reader.GetLobByteSize()];
+            reader.GetBytes(blob);
+            return new Guid(blob);
+        }
+
+        public void Serialize(IIonWriter writer, Guid item)
+        {
+            if (options.AnnotateGuids) {
+                writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
+            }
+            writer.WriteBlob(item.ToByteArray());
+        }
+    }
 }
