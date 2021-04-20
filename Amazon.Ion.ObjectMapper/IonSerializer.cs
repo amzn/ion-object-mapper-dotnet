@@ -142,7 +142,28 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
+            if (item is System.Collections.IList) 
+            {
+                new IonListSerializer(this, item.GetType(), GetListElementType(item.GetType())).Serialize(writer, (System.Collections.IList)(object)item);
+                return;
+            }
+
             throw new NotSupportedException("Do not know how to serialize type " + typeof(T));
+        }
+
+        private Type GetListElementType(Type type)
+        {
+            if (type.IsArray)
+            {
+                return type.GetElementType();
+            }
+            
+            if (type.IsAssignableTo(typeof(System.Collections.IList)))
+            {
+                return type.GetGenericArguments()[0];
+            }
+            
+            throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + type);
         }
 
 
@@ -218,6 +239,11 @@ namespace Amazon.Ion.ObjectMapper
             if (ionType == IonType.Clob) 
             {
                 return new IonClobSerializer().Deserialize(reader);
+            }
+
+            if (ionType == IonType.List) 
+            {
+                return new IonListSerializer(this, type, GetListElementType(type)).Deserialize(reader);
             }
 
             throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
