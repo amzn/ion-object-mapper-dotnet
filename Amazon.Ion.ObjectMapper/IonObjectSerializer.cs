@@ -7,11 +7,13 @@ namespace Amazon.Ion.ObjectMapper
     public class IonObjectSerializer : IonSerializer<object>
     {
         private readonly IonSerializer ionSerializer;
+        private readonly IonSerializationOptions options;
         private readonly Type targetType;
 
-        public IonObjectSerializer(IonSerializer ionSerializer, Type targetType)
+        public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
+            this.options = options;
             this.targetType = targetType;
         }
 
@@ -23,7 +25,7 @@ namespace Amazon.Ion.ObjectMapper
             IonType ionType;
             while ((ionType  = reader.MoveNext()) != IonType.None)
             {
-                var name = AsIonFieldName(reader.CurrentFieldName);
+                var name = options.NamingConvention.ToProperty(reader.CurrentFieldName);
                 var property = targetType.GetProperty(name);
                 if (property != null)
                 {
@@ -44,20 +46,10 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     continue;
                 }
-                writer.SetFieldName(AsPropertyName(property.Name));
+                writer.SetFieldName(options.NamingConvention.FromProperty(property.Name));
                 ionSerializer.Serialize(writer, property.GetValue(item));
             }
             writer.StepOut();
-        }
-
-        private String AsPropertyName(string property) 
-        {
-            return property.Substring(0, 1).ToLowerInvariant() + property.Substring(1);
-        }
-
-        private String AsIonFieldName(string property) 
-        {
-            return property.Substring(0, 1).ToUpperInvariant() + property.Substring(1);
         }
     }
 }

@@ -24,19 +24,24 @@ namespace Amazon.Ion.ObjectMapper
         PRETTY_TEXT
     }
 
-    public class IonSerializationOptions
+    public readonly struct IonSerializationOptions
     {
-        public IonPropertyNamingConvention NamingConvention;
-        public IonSerializationFormat Format;
-        public int MaxDepth;
-        public bool IncludeFields;
-        public bool IgnoreNulls;
-        public bool IgnoreReadOnlyFields;
-        public bool IgnoreReadOnlyProperties;
-        public bool PropertyNameCaseInsensitive;
-        public bool IgnoreDefaults;
-        public bool IncludeTypeInformation;
-        public bool PermissiveMode;
+        public static IonSerializationOptions DEFAULT = new IonSerializationOptions
+        {
+            NamingConvention = new CamelCaseNamingConvention()
+        };
+
+        public readonly IonPropertyNamingConvention NamingConvention { get; init; }
+        public readonly IonSerializationFormat Format;
+        public readonly int MaxDepth;
+        public readonly bool IncludeFields;
+        public readonly bool IgnoreNulls;
+        public readonly bool IgnoreReadOnlyFields;
+        public readonly bool IgnoreReadOnlyProperties;
+        public readonly bool PropertyNameCaseInsensitive;
+        public readonly bool IgnoreDefaults;
+        public readonly bool IncludeTypeInformation;
+        public readonly bool PermissiveMode;
     }
 
     public interface IonSerializerFactory<T, TContext> where TContext : IonSerializationContext
@@ -46,6 +51,18 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
+        private readonly IonSerializationOptions options; 
+
+        public IonSerializer() : this(IonSerializationOptions.DEFAULT) 
+        {
+            
+        }
+
+        public IonSerializer(IonSerializationOptions options)
+        {
+            this.options = options;
+        }
+
         public Stream Serialize<T>(T item)
         {
             var stream = new MemoryStream();
@@ -145,7 +162,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (item is object) 
             {
-                new IonObjectSerializer(this, item.GetType()).Serialize(writer, item);
+                new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
                 return;
             }
 
@@ -253,7 +270,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.Struct) 
             {
-                return new IonObjectSerializer(this, type).Deserialize(reader);
+                return new IonObjectSerializer(this, options, type).Deserialize(reader);
             }
 
             throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
