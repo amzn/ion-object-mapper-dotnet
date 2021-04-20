@@ -40,7 +40,7 @@ namespace Amazon.Ion.ObjectMapper
             writer.StepIn(IonType.Struct);
             foreach (var property in item.GetType().GetProperties())
             {
-                if (property.GetCustomAttributes(true).Any(it => it is IonSerdeIgnore))
+                if (property.GetCustomAttributes(true).Any(it => it is IonIgnore))
                 {
                     continue;
                 }

@@ -12,11 +12,6 @@ namespace Amazon.Ion.ObjectMapper
         T Deserialize(IIonReader reader);
     }
 
-    public interface IonPropertyNamingConvention
-    {
-
-    }
-
     public interface IonSerializationContext
     {
 

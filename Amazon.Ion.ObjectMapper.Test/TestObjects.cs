@@ -12,7 +12,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public int Year { get; init; }
         public Engine Engine { get; init; }
         
-        [IonSerdeIgnore]
+        [IonIgnore]
         public double Speed { get { return new Random().NextDouble(); } }
 
         [IonPropertyName("weightInKg")]

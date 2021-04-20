@@ -2,7 +2,7 @@ using System;
 
 namespace Amazon.Ion.ObjectMapper
 {
-    public class IonSerdeIgnore : Attribute
+    public class IonIgnore : Attribute
     {
     }
 
