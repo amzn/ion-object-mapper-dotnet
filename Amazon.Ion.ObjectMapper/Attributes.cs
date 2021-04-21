@@ -28,11 +28,15 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonPropertyName : Attribute
     {
-        public IonPropertyName(string v)
+        public IonPropertyName(string name)
         {
-            V = v;
+            Name = name;
         }
 
-        public string V { get; }
+        public string Name { get; }
+    }
+
+    public class IonField : Attribute
+    {
     }
 }

@@ -95,8 +95,10 @@ namespace Amazon.Ion.ObjectMapper.Test
             Model = "Civic", 
             YearOfManufacture = 2010, 
             Weight = new Random().NextDouble(),
-            Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") } 
+            Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
+
+        public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
     }
 
     public class Car
@@ -138,6 +140,51 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return "<Engine>{ Cylinders: " + Cylinders + ", ManufactureDate: " + ManufactureDate + " }";
+        }
+    }
+
+    public class Registration
+    {
+        [IonField]
+        private LicensePlate license;
+
+        public Registration()
+        {
+        }
+
+        public Registration(LicensePlate license)
+        {
+            this.license = license;
+        }
+
+        public override string ToString()
+        {
+            return "<LicensePlate>{ license: " + license + " }";
+        }
+    }
+
+    public class LicensePlate
+    {
+        [IonPropertyName("licenseCode")]
+        [IonField]
+        private readonly string code;
+
+        [IonField]
+        DateTime expires;
+
+        public LicensePlate()
+        {
+        }
+
+        public LicensePlate(string code, DateTime expires)
+        {
+            this.code = code;
+            this.expires = expires;
+        }
+
+        public override string ToString()
+        {
+            return "<LicensePlate>{ code: " + code + ", expires: " + expires +  " }";
         }
     }
 

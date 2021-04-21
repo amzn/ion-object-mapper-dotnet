@@ -17,6 +17,12 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesAndDeserializesFields()
+        {
+            Check(TestObjects.registration);
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
             Check(
@@ -28,22 +34,22 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void RespectAnnotationInheritance()
         {
             var serializer = new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("testing") });
-            // AssertHasAnnotation("testing.Plane", serializer.Serialize(new Plane()));
-            // AssertHasNoAnnotations(serializer.Serialize(new Yacht()));
-            // AssertHasAnnotation("testing.Catamaran", serializer.Serialize(new Catamaran()));
-            // AssertHasAnnotation("testing.Jet", serializer.Serialize(new Jet()));
-            // AssertHasAnnotation("testing.Boeing", serializer.Serialize(new Boeing()));
+            AssertHasAnnotation("testing.Plane", serializer.Serialize(new Plane()));
+            AssertHasNoAnnotations(serializer.Serialize(new Yacht()));
+            AssertHasAnnotation("testing.Catamaran", serializer.Serialize(new Catamaran()));
+            AssertHasAnnotation("testing.Jet", serializer.Serialize(new Jet()));
+            AssertHasAnnotation("testing.Boeing", serializer.Serialize(new Boeing()));
         }
 
         [TestMethod]
         public void RespectAnnotationPrefixes()
         {
-            // AssertHasAnnotation(
-            //     "my.prefix.Truck", 
-            //     new IonSerializer(new IonSerializationOptions { IncludeTypeInformation = true, TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("my.prefix") }).Serialize(new Truck()));
-            // AssertHasAnnotation(
-            //     "my.universal.namespace.BussyMcBusface", 
-            //     new IonSerializer().Serialize(new Bus()));
+            AssertHasAnnotation(
+                "my.prefix.Truck", 
+                new IonSerializer(new IonSerializationOptions { IncludeTypeInformation = true, TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("my.prefix") }).Serialize(new Truck()));
+            AssertHasAnnotation(
+                "my.universal.namespace.BussyMcBusface", 
+                new IonSerializer().Serialize(new Bus()));
         }
     }
 }

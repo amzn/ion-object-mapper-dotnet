@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {
+        private const BindingFlags fieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
@@ -28,10 +30,16 @@ namespace Amazon.Ion.ObjectMapper
             {
                 var name = options.NamingConvention.ToProperty(reader.CurrentFieldName);
                 var property = targetType.GetProperty(name);
+                FieldInfo field;
                 if (property != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
                     property.SetValue(targetObject, deserialized);
+                }
+                else if ((field = FindField(reader.CurrentFieldName)) != null)
+                {
+                    var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
+                    field.SetValue(targetObject, deserialized);
                 }
             }
             reader.StepOut();
@@ -51,7 +59,51 @@ namespace Amazon.Ion.ObjectMapper
                 writer.SetFieldName(options.NamingConvention.FromProperty(property.Name));
                 ionSerializer.Serialize(writer, property.GetValue(item));
             }
+
+            foreach (var field in IonFields())
+            {
+                writer.SetFieldName(GetFieldName(field));
+                ionSerializer.Serialize(writer, field.GetValue(item));
+            }
             writer.StepOut();
+        }
+
+        private FieldInfo FindField(string name)
+        {
+            var exact = targetType.GetField(name, fieldBindings);
+            if (exact != null && IsIonField(exact))
+            {
+                return exact;
+            }
+            return IonFields().FirstOrDefault(f => 
+            {
+                var propertyName = f.GetCustomAttribute(typeof(IonPropertyName));
+                if (propertyName != null)
+                {
+                    return name == ((IonPropertyName)propertyName).Name;
+                }
+                return false;
+            });
+        }
+
+        private static bool IsIonField(FieldInfo field)
+        {
+            return field.GetCustomAttribute(typeof(IonField)) != null;
+        }
+
+        private IEnumerable<FieldInfo> IonFields()
+        {
+            return targetType.GetFields(fieldBindings).Where(IsIonField);
+        }
+
+        private string GetFieldName(FieldInfo field)
+        {
+            var propertyName = field.GetCustomAttribute(typeof(IonPropertyName));
+            if (propertyName != null)
+            {
+                return ((IonPropertyName)propertyName).Name;
+            }
+            return field.Name;
         }
     }
 }
