@@ -99,6 +99,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         };
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
+
+        public static Radio fmRadio = new Radio { Band = "FM" };
     }
 
     public class Car
@@ -185,6 +187,17 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return "<LicensePlate>{ code: " + code + ", expires: " + expires +  " }";
+        }
+    }
+
+    public class Radio
+    {
+        [IonPropertyName("broadcastMethod")]
+        public string Band { get; init; }
+
+        public override string ToString()
+        {
+            return "<Radio>{ Band: " + Band + " }";
         }
     }
 

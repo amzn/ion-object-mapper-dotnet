@@ -23,6 +23,12 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesAndDeserializesCustomPropertyNamed()
+        {
+            Check(TestObjects.fmRadio);
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
             Check(

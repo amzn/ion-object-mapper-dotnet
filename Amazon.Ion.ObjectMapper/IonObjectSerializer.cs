@@ -28,8 +28,8 @@ namespace Amazon.Ion.ObjectMapper
             IonType ionType;
             while ((ionType  = reader.MoveNext()) != IonType.None)
             {
-                var name = options.NamingConvention.ToProperty(reader.CurrentFieldName);
-                var property = targetType.GetProperty(name);
+                
+                var property = FindProperty(reader.CurrentFieldName);
                 FieldInfo field;
                 if (property != null)
                 {
@@ -56,7 +56,7 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     continue;
                 }
-                writer.SetFieldName(options.NamingConvention.FromProperty(property.Name));
+                writer.SetFieldName(IonFieldNameFromProperty(property));
                 ionSerializer.Serialize(writer, property.GetValue(item));
             }
 
@@ -68,6 +68,35 @@ namespace Amazon.Ion.ObjectMapper
             writer.StepOut();
         }
 
+        private string IonFieldNameFromProperty(PropertyInfo property)
+        {
+            var ionPropertyName = property.GetCustomAttribute(typeof(IonPropertyName));
+            if (ionPropertyName != null) 
+            {
+                return ((IonPropertyName)ionPropertyName).Name;
+            }
+            return options.NamingConvention.FromProperty(property.Name);
+        }
+
+        private PropertyInfo FindProperty(string readName)
+        {
+            var exact = IonNamedProperties().FirstOrDefault(p => 
+                {
+                    var ionPropertyName = p.GetCustomAttribute<IonPropertyName>();
+                    if (ionPropertyName != null)
+                    {
+                        return p.GetCustomAttribute<IonPropertyName>().Name == readName;
+                    }
+                    return false;
+                });
+            if (exact != null)
+            {
+                return exact;
+            }
+
+            var name = options.NamingConvention.ToProperty(readName);
+            return targetType.GetProperty(name);
+        }
         private FieldInfo FindField(string name)
         {
             var exact = targetType.GetField(name, fieldBindings);
@@ -91,9 +120,19 @@ namespace Amazon.Ion.ObjectMapper
             return field.GetCustomAttribute(typeof(IonField)) != null;
         }
 
+        private static bool IsIonNamedProperty(PropertyInfo property)
+        {
+            return property.GetCustomAttribute(typeof(IonPropertyName)) != null;
+        }
+
         private IEnumerable<FieldInfo> IonFields()
         {
             return targetType.GetFields(fieldBindings).Where(IsIonField);
+        }
+
+        private IEnumerable<PropertyInfo> IonNamedProperties()
+        {
+            return targetType.GetProperties().Where(IsIonNamedProperty);
         }
 
         private string GetFieldName(FieldInfo field)
