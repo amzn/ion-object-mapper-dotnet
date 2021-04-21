@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Amazon.IonDotnet;
 
@@ -19,7 +20,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader)
         {
-            var targetObject = Activator.CreateInstance(targetType);
+            var targetObject = options.ObjectFactory.Create(options, reader, targetType);
             reader.StepIn();
 
             IonType ionType;
@@ -39,8 +40,9 @@ namespace Amazon.Ion.ObjectMapper
 
         public void Serialize(IIonWriter writer, object item)
         {
+            options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
-            foreach (var property in item.GetType().GetProperties())
+            foreach (var property in targetType.GetProperties())
             {
                 if (property.GetCustomAttributes(true).Any(it => it is IonIgnore))
                 {

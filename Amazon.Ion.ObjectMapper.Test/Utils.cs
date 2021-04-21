@@ -1,6 +1,9 @@
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Amazon.IonDotnet.Builders;
+using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Amazon.Ion.ObjectMapper.Test
@@ -40,6 +43,12 @@ namespace Amazon.Ion.ObjectMapper.Test
             return ionSerializer.Deserialize<T>(stream);
         }
 
+        public static IIonValue ToIonValue<T>(IonSerializer ionSerializer, T item) 
+        {
+            var stream = ionSerializer.Serialize(item);
+            return IonLoader.Default.Load(stream).GetElementAt(0);
+        }
+
         public static void Check<T>(T item)
         {
             Check(new IonSerializer(), item);
@@ -53,6 +62,23 @@ namespace Amazon.Ion.ObjectMapper.Test
                 return;
             }
             Assert.AreEqual(item.ToString(), Serde(ionSerializer, item).ToString());
+        }
+
+        public static void AssertHasAnnotation(string annotation, Stream stream)
+        {
+            AssertHasAnnotation(annotation, IonLoader.Default.Load(Copy(stream)).GetElementAt(0));
+        }
+
+        public static void AssertHasAnnotation(string annotation, IIonValue ionValue)
+        {
+            var annotations = string.Join(",", ionValue.GetTypeAnnotationSymbols().Select(a => a.Text));
+            Assert.IsTrue(ionValue.HasAnnotation(annotation), "seeking " + annotation + " in [" + annotations + "]");
+        }
+
+        public static void AssertHasNoAnnotations(Stream stream)
+        {
+            var count = IonLoader.Default.Load(Copy(stream)).GetElementAt(0).GetTypeAnnotationSymbols().Count;
+            Assert.IsTrue(count == 0, "Has " + count + " annotations");
         }
         
         public static void Check<T>(Stream actual, T expected)
