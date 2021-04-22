@@ -51,7 +51,10 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void Check<T>(T item)
         {
-            Check(new IonSerializer(), item);
+            // Check for each serialization format
+            Check(new IonSerializer(new IonSerializationOptions { Format = IonSerializationFormat.BINARY }), item);
+            Check(new IonSerializer(new IonSerializationOptions { Format = IonSerializationFormat.TEXT }), item);
+            Check(new IonSerializer(new IonSerializationOptions { Format = IonSerializationFormat.PRETTY_TEXT }), item);
         }
 
         public static void Check<T>(IonSerializer ionSerializer, T item)
