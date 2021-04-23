@@ -25,6 +25,44 @@ namespace Amazon.Ion.ObjectMapper
         PRETTY_TEXT
     }
 
+    public interface IonReaderFactory
+    {
+        IIonReader Create(Stream stream);
+    }
+
+    public class DefaultIonReaderFactory : IonReaderFactory
+    {
+        public IIonReader Create(Stream stream)
+        {
+            return IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
+        }
+    }
+    
+    public interface IonWriterFactory
+    {
+        IIonWriter Create(IonSerializationOptions options, Stream stream);
+    }
+
+    public class DefaultIonWriterFactory : IonWriterFactory
+    {
+        public IIonWriter Create(IonSerializationOptions options, Stream stream)
+        {
+            if (options.Format == IonSerializationFormat.BINARY)
+            {
+                return IonBinaryWriterBuilder.Build(stream);
+            }
+
+            var sw = new StreamWriter(stream);
+            if (options.Format == IonSerializationFormat.TEXT)
+            {
+                return IonTextWriterBuilder.Build(sw);
+            }
+
+            // PRETTY_TEXT format
+            return IonTextWriterBuilder.Build(sw, new IonTextOptions {PrettyPrint = true});
+        }
+    }
+
     public interface ObjectFactory
     {
         object Create(IonSerializationOptions options, IIonReader reader, Type targetType);
@@ -53,7 +91,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializationOptions
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public IonSerializationFormat Format;
+        public IonSerializationFormat Format { get; init; } = IonSerializationFormat.PRETTY_TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
         public readonly bool IncludeFields;
@@ -65,6 +103,10 @@ namespace Amazon.Ion.ObjectMapper
         public bool IncludeTypeInformation { get; init; } = false;
         public TypeAnnotationPrefix TypeAnnotationPrefix { get; init; } = new NamespaceTypeAnnotationPrefix();
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
+
+        public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
+        public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory();
+
         public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
         public string[] AnnotatedTypeAssemblies { get; init; } = new string[] {};
 
@@ -99,31 +141,10 @@ namespace Amazon.Ion.ObjectMapper
         }
         public void Serialize<T>(Stream stream, T item)
         {
-            IIonWriter writer;
-            switch (this.options.Format)
-            {
-                case IonSerializationFormat.BINARY:
-                    writer = IonBinaryWriterBuilder.Build(stream);
-                    Serialize(writer, item);
-                    writer.Finish();
-                    break;
-                case IonSerializationFormat.TEXT:
-                    var sw = new StreamWriter(stream);
-                    writer = IonTextWriterBuilder.Build(sw);
-                    Serialize(writer, item);
-                    writer.Finish();
-                    sw.Flush();
-                    break;
-                case IonSerializationFormat.PRETTY_TEXT:
-                    sw = new StreamWriter(stream);
-                    writer = IonTextWriterBuilder.Build(sw, new IonTextOptions {PrettyPrint = true});
-                    Serialize(writer, item);
-                    writer.Finish();
-                    sw.Flush();
-                    break;
-            }
+            IIonWriter writer = options.WriterFactory.Create(options, stream);
+            Serialize(writer, item);
+            writer.Finish();
         }
-
 
         public void Serialize<T>(IIonWriter writer, T item)
         {
@@ -242,7 +263,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public T Deserialize<T>(Stream stream)
         {
-            return Deserialize<T>(IonReaderBuilder.Build(stream, new ReaderOptions { Format=ReaderFormat.Detect }));
+            return Deserialize<T>(options.ReaderFactory.Create(stream));
         }
 
         public object Deserialize(IIonReader reader, Type type)
