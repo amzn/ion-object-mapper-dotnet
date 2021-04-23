@@ -40,19 +40,18 @@ namespace Amazon.Ion.ObjectMapper
     
     public interface IonWriterFactory
     {
-        IIonWriter Create(IonSerializationOptions options, Stream stream);
+        IIonWriter Create(IonSerializationOptions options, Stream stream, StreamWriter sw);
     }
 
     public class DefaultIonWriterFactory : IonWriterFactory
     {
-        public IIonWriter Create(IonSerializationOptions options, Stream stream)
+        public IIonWriter Create(IonSerializationOptions options, Stream stream, StreamWriter sw)
         {
             if (options.Format == IonSerializationFormat.BINARY)
             {
                 return IonBinaryWriterBuilder.Build(stream);
             }
-
-            var sw = new StreamWriter(stream);
+            
             if (options.Format == IonSerializationFormat.TEXT)
             {
                 return IonTextWriterBuilder.Build(sw);
@@ -141,9 +140,11 @@ namespace Amazon.Ion.ObjectMapper
         }
         public void Serialize<T>(Stream stream, T item)
         {
-            IIonWriter writer = options.WriterFactory.Create(options, stream);
+            var sw = new StreamWriter(stream);
+            IIonWriter writer = options.WriterFactory.Create(options, stream, sw);
             Serialize(writer, item);
             writer.Finish();
+            sw.Flush();
         }
 
         public void Serialize<T>(IIonWriter writer, T item)

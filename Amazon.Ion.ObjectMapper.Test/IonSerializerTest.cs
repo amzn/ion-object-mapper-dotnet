@@ -23,8 +23,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Check(567.9876543m); // decimal
             Check(BigDecimal.Parse("2.71828"));
             Check(DateTime.Parse("2009-10-10T13:15:21Z")); 
-            Check("Civic");
-            Check(new SymbolToken("my symbol", SymbolToken.UnknownSid));
+            Check("Civic"); 
+            Check(new SymbolToken("my symbol", SymbolToken.UnknownSid)); 
             Check(Encoding.UTF8.GetBytes("This is an Ion blob")); // blob
             Check(MakeIonClob("This is an Ion clob"), "This is an Ion clob"); // clob
             Check(Guid.NewGuid()); // guid
