@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
+using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
 
 namespace Amazon.Ion.ObjectMapper
 {
@@ -47,18 +48,19 @@ namespace Amazon.Ion.ObjectMapper
     {
         public IIonWriter Create(IonSerializationOptions options, Stream stream, StreamWriter sw)
         {
-            if (options.Format == IonSerializationFormat.BINARY)
+            switch (options.Format)
             {
-                return IonBinaryWriterBuilder.Build(stream);
+                case BINARY:
+                    return IonBinaryWriterBuilder.Build(stream);
+                case TEXT:
+                case PRETTY_TEXT:
+                    var ionTextOptions = new IonTextOptions();
+                    ionTextOptions.PrettyPrint = (options.Format == PRETTY_TEXT);
+                    return IonTextWriterBuilder.Build(sw, ionTextOptions);
+                default:
+                    // unreachable because switch is fully exhaustive.
+                    return null;
             }
-            
-            if (options.Format == IonSerializationFormat.TEXT)
-            {
-                return IonTextWriterBuilder.Build(sw);
-            }
-
-            // PRETTY_TEXT format
-            return IonTextWriterBuilder.Build(sw, new IonTextOptions {PrettyPrint = true});
         }
     }
 
@@ -90,7 +92,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializationOptions
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public IonSerializationFormat Format { get; init; } = IonSerializationFormat.PRETTY_TEXT;
+        public IonSerializationFormat Format { get; init; } = PRETTY_TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
         public readonly bool IncludeFields;
