@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Amazon.IonDotnet;
@@ -46,7 +45,11 @@ namespace Amazon.Ion.ObjectMapper
 
     public class DefaultIonWriterFactory : IonWriterFactory
     {
-        private IonSerializationFormat format;
+        private IonSerializationFormat format = TEXT;
+
+        public DefaultIonWriterFactory()
+        {
+        }
 
         public DefaultIonWriterFactory(IonSerializationFormat format)
         {
@@ -55,18 +58,15 @@ namespace Amazon.Ion.ObjectMapper
 
         public IIonWriter Create(Stream stream)
         {
-            switch (format)
+            if (format == BINARY)
             {
-                case BINARY:
-                    return IonBinaryWriterBuilder.Build(stream);
-                case TEXT:
-                case PRETTY_TEXT:
-                    var ionTextOptions = new IonTextOptions();
-                    ionTextOptions.PrettyPrint = (format == PRETTY_TEXT);
-                    return IonTextWriterBuilder.Build(new StreamWriter(stream), ionTextOptions);
-                default:
-                    throw new InvalidOperationException("Format not supported");
+                return IonBinaryWriterBuilder.Build(stream);
             }
+            
+            // format must be either TEXT or PRETTY_TEXT
+
+            var ionTextOptions = new IonTextOptions {PrettyPrint = (format == PRETTY_TEXT)};
+            return IonTextWriterBuilder.Build(new StreamWriter(stream), ionTextOptions);
         }
     }
 
@@ -98,7 +98,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializationOptions
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public static IonSerializationFormat Format { get; } = TEXT;
+        public IonSerializationFormat Format { get; } = TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
         public readonly bool IncludeFields;
@@ -112,7 +112,7 @@ namespace Amazon.Ion.ObjectMapper
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
 
         public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
-        public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory(Format);
+        public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory();
 
         public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
         public string[] AnnotatedTypeAssemblies { get; init; } = new string[] {};
