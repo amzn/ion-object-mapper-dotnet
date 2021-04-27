@@ -65,7 +65,7 @@ namespace Amazon.Ion.ObjectMapper
                     ionTextOptions.PrettyPrint = (format == PRETTY_TEXT);
                     return IonTextWriterBuilder.Build(new StreamWriter(stream), ionTextOptions);
                 default:
-                    throw new InvalidOperationException("unreachable because switch should be fully exhaustive");
+                    throw new InvalidOperationException("Format not supported");
             }
         }
     }
