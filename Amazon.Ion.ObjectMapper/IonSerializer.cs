@@ -41,26 +41,45 @@ namespace Amazon.Ion.ObjectMapper
     
     public interface IonWriterFactory
     {
-        IIonWriter Create(IonSerializationOptions options, Stream stream, StreamWriter sw);
+        IIonWriter Create();
+        void SetFormat(IonSerializationFormat format);
+        void SetStream(Stream stream);
     }
 
     public class DefaultIonWriterFactory : IonWriterFactory
     {
-        public IIonWriter Create(IonSerializationOptions options, Stream stream, StreamWriter sw)
+        private Stream stream;
+        private IonSerializationFormat format = TEXT;
+
+        public IIonWriter Create()
         {
-            switch (options.Format)
+            if (stream == null)
+            {
+                throw new InvalidOperationException("stream is null");
+            }
+            
+            switch (format)
             {
                 case BINARY:
                     return IonBinaryWriterBuilder.Build(stream);
                 case TEXT:
                 case PRETTY_TEXT:
                     var ionTextOptions = new IonTextOptions();
-                    ionTextOptions.PrettyPrint = (options.Format == PRETTY_TEXT);
-                    return IonTextWriterBuilder.Build(sw, ionTextOptions);
+                    ionTextOptions.PrettyPrint = (format == PRETTY_TEXT);
+                    return IonTextWriterBuilder.Build(new StreamWriter(stream), ionTextOptions);
                 default:
-                    // unreachable because switch is fully exhaustive.
-                    return null;
+                    throw new InvalidOperationException("unreachable because switch should be fully exhaustive");
             }
+        }
+        
+        public void SetFormat(IonSerializationFormat format)
+        {
+            this.format = format;
+        }
+
+        public void SetStream(Stream stream)
+        {
+            this.stream = stream;
         }
     }
 
@@ -92,7 +111,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializationOptions
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public IonSerializationFormat Format { get; init; } = PRETTY_TEXT;
+        public IonSerializationFormat Format { get; init; } = TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
         public readonly bool IncludeFields;
@@ -142,11 +161,12 @@ namespace Amazon.Ion.ObjectMapper
         }
         public void Serialize<T>(Stream stream, T item)
         {
-            var sw = new StreamWriter(stream);
-            IIonWriter writer = options.WriterFactory.Create(options, stream, sw);
+            options.WriterFactory.SetStream(stream);
+            options.WriterFactory.SetFormat(options.Format);
+            IIonWriter writer = options.WriterFactory.Create();
             Serialize(writer, item);
             writer.Finish();
-            sw.Flush();
+            writer.Flush();
         }
 
         public void Serialize<T>(IIonWriter writer, T item)
