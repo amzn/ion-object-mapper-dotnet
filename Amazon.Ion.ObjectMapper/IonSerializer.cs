@@ -58,15 +58,18 @@ namespace Amazon.Ion.ObjectMapper
 
         public IIonWriter Create(Stream stream)
         {
-            if (format == BINARY)
+            switch (format)
             {
-                return IonBinaryWriterBuilder.Build(stream);
+                case BINARY:
+                    return IonBinaryWriterBuilder.Build(stream);
+                case TEXT:
+                    return IonTextWriterBuilder.Build(new StreamWriter(stream));
+                case PRETTY_TEXT:
+                    return IonTextWriterBuilder.Build(new StreamWriter(stream),
+                        new IonTextOptions {PrettyPrint = true});
+                default:
+                    throw new InvalidOperationException($"Format {format} not supported");
             }
-            
-            // format must be either TEXT or PRETTY_TEXT
-
-            var ionTextOptions = new IonTextOptions {PrettyPrint = (format == PRETTY_TEXT)};
-            return IonTextWriterBuilder.Build(new StreamWriter(stream), ionTextOptions);
         }
     }
 
@@ -98,7 +101,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializationOptions
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public IonSerializationFormat Format { get; } = TEXT;
+        public IonSerializationFormat Format { get; init; } = TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
         public readonly bool IncludeFields;
