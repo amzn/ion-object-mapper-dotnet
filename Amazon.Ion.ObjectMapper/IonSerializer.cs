@@ -42,14 +42,18 @@ namespace Amazon.Ion.ObjectMapper
     public interface IonWriterFactory
     {
         IIonWriter Create();
-        void SetFormat(IonSerializationFormat format);
-        void SetStream(Stream stream);
     }
 
     public class DefaultIonWriterFactory : IonWriterFactory
     {
         private Stream stream;
-        private IonSerializationFormat format = TEXT;
+        private IonSerializationFormat format;
+
+        public DefaultIonWriterFactory(Stream stream, IonSerializationFormat format)
+        {
+            this.stream = stream;
+            this.format = format;
+        }
 
         public IIonWriter Create()
         {
@@ -70,16 +74,6 @@ namespace Amazon.Ion.ObjectMapper
                 default:
                     throw new InvalidOperationException("unreachable because switch should be fully exhaustive");
             }
-        }
-        
-        public void SetFormat(IonSerializationFormat format)
-        {
-            this.format = format;
-        }
-
-        public void SetStream(Stream stream)
-        {
-            this.stream = stream;
         }
     }
 
@@ -125,7 +119,7 @@ namespace Amazon.Ion.ObjectMapper
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
 
         public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
-        public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory();
+        public IonWriterFactory WriterFactory { get; set; } = null;
 
         public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
         public string[] AnnotatedTypeAssemblies { get; init; } = new string[] {};
@@ -155,14 +149,13 @@ namespace Amazon.Ion.ObjectMapper
         public Stream Serialize<T>(T item)
         {
             var stream = new MemoryStream();
+            options.WriterFactory = new DefaultIonWriterFactory(stream, options.Format);
             Serialize(stream, item);
             stream.Position = 0;
             return stream;
         }
         public void Serialize<T>(Stream stream, T item)
         {
-            options.WriterFactory.SetStream(stream);
-            options.WriterFactory.SetFormat(options.Format);
             IIonWriter writer = options.WriterFactory.Create();
             Serialize(writer, item);
             writer.Finish();
