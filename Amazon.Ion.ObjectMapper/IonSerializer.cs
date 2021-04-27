@@ -41,27 +41,20 @@ namespace Amazon.Ion.ObjectMapper
     
     public interface IonWriterFactory
     {
-        IIonWriter Create();
+        IIonWriter Create(Stream stream);
     }
 
     public class DefaultIonWriterFactory : IonWriterFactory
     {
-        private Stream stream;
         private IonSerializationFormat format;
 
-        public DefaultIonWriterFactory(Stream stream, IonSerializationFormat format)
+        public DefaultIonWriterFactory(IonSerializationFormat format)
         {
-            this.stream = stream;
             this.format = format;
         }
 
-        public IIonWriter Create()
+        public IIonWriter Create(Stream stream)
         {
-            if (stream == null)
-            {
-                throw new InvalidOperationException("stream is null");
-            }
-            
             switch (format)
             {
                 case BINARY:
@@ -105,7 +98,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializationOptions
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public IonSerializationFormat Format { get; init; } = TEXT;
+        public static IonSerializationFormat Format { get; } = TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
         public readonly bool IncludeFields;
@@ -119,7 +112,7 @@ namespace Amazon.Ion.ObjectMapper
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
 
         public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
-        public IonWriterFactory WriterFactory { get; set; } = null;
+        public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory(Format);
 
         public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
         public string[] AnnotatedTypeAssemblies { get; init; } = new string[] {};
@@ -134,7 +127,7 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        private readonly IonSerializationOptions options; 
+        private readonly IonSerializationOptions options;
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
@@ -149,14 +142,14 @@ namespace Amazon.Ion.ObjectMapper
         public Stream Serialize<T>(T item)
         {
             var stream = new MemoryStream();
-            options.WriterFactory = new DefaultIonWriterFactory(stream, options.Format);
             Serialize(stream, item);
             stream.Position = 0;
             return stream;
         }
+
         public void Serialize<T>(Stream stream, T item)
         {
-            IIonWriter writer = options.WriterFactory.Create();
+            IIonWriter writer = options.WriterFactory.Create(stream);
             Serialize(writer, item);
             writer.Finish();
             writer.Flush();
