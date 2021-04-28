@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper
@@ -28,7 +29,6 @@ namespace Amazon.Ion.ObjectMapper
             IonType ionType;
             while ((ionType  = reader.MoveNext()) != IonType.None)
             {
-                
                 var property = FindProperty(reader.CurrentFieldName);
                 FieldInfo field;
                 if (property != null)
@@ -60,7 +60,7 @@ namespace Amazon.Ion.ObjectMapper
                 ionSerializer.Serialize(writer, property.GetValue(item));
             }
 
-            foreach (var field in IonFields())
+            foreach (var field in Fields())
             {
                 writer.SetFieldName(GetFieldName(field));
                 ionSerializer.Serialize(writer, field.GetValue(item));
@@ -100,11 +100,12 @@ namespace Amazon.Ion.ObjectMapper
         private FieldInfo FindField(string name)
         {
             var exact = targetType.GetField(name, fieldBindings);
-            if (exact != null && IsIonField(exact))
+            if (exact != null && IsField(exact))
             {
                 return exact;
             }
-            return IonFields().FirstOrDefault(f => 
+
+            return Fields().FirstOrDefault(f => 
             {
                 var propertyName = f.GetCustomAttribute(typeof(IonPropertyName));
                 if (propertyName != null)
@@ -113,6 +114,12 @@ namespace Amazon.Ion.ObjectMapper
                 }
                 return false;
             });
+        }
+
+        private static bool IsPropertyField(FieldInfo field)
+        {
+            // A property's underlying field has the CompilerGeneratedAttribute
+            return field.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
         }
 
         private static bool IsIonField(FieldInfo field)
@@ -124,9 +131,25 @@ namespace Amazon.Ion.ObjectMapper
         {
             return property.GetCustomAttribute(typeof(IonPropertyName)) != null;
         }
-
-        private IEnumerable<FieldInfo> IonFields()
+        
+        private bool IsField(FieldInfo field)
         {
+            if (options.IncludeFields)
+            {
+                return !IsPropertyField(field);
+            }
+
+            return IsIonField(field);
+        }
+
+        private IEnumerable<FieldInfo> Fields()
+        {
+            if (options.IncludeFields)
+            {
+                // We only want the fields that do not belong to a property
+                return targetType.GetFields(fieldBindings).Where(f => !IsPropertyField(f));
+            }
+            
             return targetType.GetFields(fieldBindings).Where(IsIonField);
         }
 

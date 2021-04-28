@@ -104,7 +104,8 @@ namespace Amazon.Ion.ObjectMapper
         public IonSerializationFormat Format { get; init; } = TEXT;
         public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
-        public readonly bool IncludeFields;
+
+        public bool IncludeFields { get; init; } = false;
         public readonly bool IgnoreNulls;
         public readonly bool IgnoreReadOnlyFields;
         public readonly bool IgnoreReadOnlyProperties;
