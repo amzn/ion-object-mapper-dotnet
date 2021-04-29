@@ -104,10 +104,10 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         private static Teacher[] faculty =
         {
-            new Teacher { firstName = "Edward", lastName = "Kyler", department = "Math" },
-            new Teacher { firstName = "Rachel", lastName = "Ford", department = "Chemistry" }
+            new Teacher("Edward", "Kyler", "Math", DateTime.Parse("08/18/1962")),
+            new Teacher("Rachel", "Ford", "Chemistry", DateTime.Parse("04/29/1985"))
         };
-        public static School fieldAcademy = new School{address = "1234 Fictional Ave", studentCount = 150, faculty = new List<Teacher>(faculty)};
+        public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
     }
 
     public class Car
@@ -219,16 +219,46 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class School
     {
-        public string address;
+        public readonly string address;
         public int studentCount;
         public List<Teacher> faculty;
+
+        public School()
+        {
+            this.address = null;
+            this.studentCount = 0;
+            this.faculty = new List<Teacher>();
+        }
+        
+        public School(string address, int studentCount, List<Teacher> faculty)
+        {
+            this.address = address;
+            this.studentCount = studentCount;
+            this.faculty = faculty;
+        }
     }
 
     public class Teacher
     {
-        public string firstName;
-        public string lastName;
+        public readonly string firstName;
+        public readonly string lastName;
         public string department;
-        private DateTime birthDate;
+        private readonly DateTime? birthDate;
+
+        public Teacher()
+        {
+            this.firstName = null;
+            this.lastName = null;
+            this.department = null;
+            this.birthDate = null;
+        }
+        
+        public Teacher(string firstName, string lastName, string department, DateTime birthDate)
+        {
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.department = department;
+            this.birthDate = birthDate;
+        }
     }
 }
