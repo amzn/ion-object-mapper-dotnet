@@ -236,6 +236,11 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.studentCount = studentCount;
             this.faculty = faculty;
         }
+        
+        public override string ToString()
+        {
+            return "<School>{ address: " + address + ", studentCount: " + studentCount + ", faculty: " + faculty + " }";
+        }
     }
 
     public class Teacher
@@ -259,6 +264,11 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.lastName = lastName;
             this.department = department;
             this.birthDate = birthDate;
+        }
+        
+        public override string ToString()
+        {
+            return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + ", birthDate: " + birthDate + " }";
         }
     }
 }
