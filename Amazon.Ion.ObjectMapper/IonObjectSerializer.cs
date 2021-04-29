@@ -116,12 +116,6 @@ namespace Amazon.Ion.ObjectMapper
             });
         }
 
-        private static bool IsPropertyField(FieldInfo field)
-        {
-            // A property's underlying field has the CompilerGeneratedAttribute
-            return field.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
-        }
-
         private static bool IsIonField(FieldInfo field)
         {
             return field.GetCustomAttribute(typeof(IonField)) != null;
@@ -136,7 +130,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (options.IncludeFields)
             {
-                return !IsPropertyField(field);
+                return true;
             }
 
             return IsIonField(field);
@@ -144,13 +138,7 @@ namespace Amazon.Ion.ObjectMapper
 
         private IEnumerable<FieldInfo> Fields()
         {
-            if (options.IncludeFields)
-            {
-                // We only want the fields that do not belong to a property
-                return targetType.GetFields(fieldBindings).Where(f => !IsPropertyField(f));
-            }
-            
-            return targetType.GetFields(fieldBindings).Where(IsIonField);
+            return targetType.GetFields(fieldBindings).Where(IsField);
         }
 
         private IEnumerable<PropertyInfo> IonNamedProperties()

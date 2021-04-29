@@ -15,6 +15,12 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             Check(TestObjects.honda);
         }
+        
+        [TestMethod]
+        public void SerializesAndDeserializesObjectsWithIncludeFields()
+        {
+            CheckWithOptions(TestObjects.honda, new IonSerializationOptions { IncludeFields = true });
+        }
 
         [TestMethod]
         public void SerializesAndDeserializesFields()
@@ -23,7 +29,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void SerializesAndDeserializesCustomPropertyNamed()
+        public void SerializesAndDeserializesCustomPropertyNames()
         {
             Check(TestObjects.fmRadio);
         }
@@ -31,9 +37,19 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
-            Check(
-                new IonSerializer(new IonSerializationOptions { AnnotatedTypeAssemblies = new string[] { typeof(Vehicle).Assembly.GetName().Name } }),
-                new List<Vehicle>() { new Plane(), new Boat(), new Helicopter() });
+            CheckWithOptions(
+                new List<Vehicle>()
+                {
+                    new Plane(), new Boat(), new Helicopter()
+                }, 
+                new IonSerializationOptions
+                {
+                    AnnotatedTypeAssemblies = new string[]
+                    {
+                        typeof(Vehicle).Assembly.GetName().Name
+                    }
+                }
+            );
         }
 
         [TestMethod]

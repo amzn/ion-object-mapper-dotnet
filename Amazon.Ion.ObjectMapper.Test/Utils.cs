@@ -53,6 +53,11 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             Check(new IonSerializer(), item);
         }
+        
+        public static void CheckWithOptions<T>(T item, IonSerializationOptions options)
+        {
+            Check(new IonSerializer(options), item);
+        }
 
         public static void Check<T>(IonSerializer ionSerializer, T item)
         {

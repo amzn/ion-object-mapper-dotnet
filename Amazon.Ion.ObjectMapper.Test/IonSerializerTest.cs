@@ -28,7 +28,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Check(Encoding.UTF8.GetBytes("This is an Ion blob")); // blob
             Check(MakeIonClob("This is an Ion clob"), "This is an Ion clob"); // clob
             Check(Guid.NewGuid()); // guid
-            Check(new IonSerializer(new IonSerializationOptions { AnnotateGuids = true }), Guid.NewGuid()); // guid
+            CheckWithOptions(Guid.NewGuid(), new IonSerializationOptions { AnnotateGuids = true }); // guid
         }
 
         [TestMethod]
