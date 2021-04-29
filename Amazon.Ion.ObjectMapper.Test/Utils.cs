@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -49,14 +48,10 @@ namespace Amazon.Ion.ObjectMapper.Test
             return IonLoader.Default.Load(stream).GetElementAt(0);
         }
 
-        public static void Check<T>(T item)
+        public static void Check<T>(T item, IonSerializationOptions options = null)
         {
-            Check(new IonSerializer(), item);
-        }
-        
-        public static void CheckWithOptions<T>(T item, IonSerializationOptions options)
-        {
-            Check(new IonSerializer(options), item);
+            IonSerializer serializer = (options == null) ? new IonSerializer() : new IonSerializer(options);
+            Check(serializer, item);
         }
 
         public static void Check<T>(IonSerializer ionSerializer, T item)

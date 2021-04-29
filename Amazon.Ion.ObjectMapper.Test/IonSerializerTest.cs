@@ -1,5 +1,4 @@
 using System;
-using System.Numerics;
 using System.Text;
 using Amazon.IonDotnet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -28,7 +27,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Check(Encoding.UTF8.GetBytes("This is an Ion blob")); // blob
             Check(MakeIonClob("This is an Ion clob"), "This is an Ion clob"); // clob
             Check(Guid.NewGuid()); // guid
-            CheckWithOptions(Guid.NewGuid(), new IonSerializationOptions { AnnotateGuids = true }); // guid
+            Check(Guid.NewGuid(), new IonSerializationOptions { AnnotateGuids = true }); // guid
         }
 
         [TestMethod]

@@ -1,5 +1,5 @@
 using System;
-using Amazon.Ion.ObjectMapper;
+using System.Collections.Generic;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -101,6 +101,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
         public static Radio fmRadio = new Radio { Band = "FM" };
+
+        private static Teacher[] faculty =
+        {
+            new Teacher { firstName = "Edward", lastName = "Kyler", department = "Math" },
+            new Teacher { firstName = "Rachel", lastName = "Ford", department = "Chemistry" }
+        };
+        public static School fieldAcademy = new School{address = "1234 Fictional Ave", studentCount = 150, faculty = new List<Teacher>(faculty)};
     }
 
     public class Car
@@ -208,5 +215,20 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
 
         }
+    }
+
+    public class School
+    {
+        public string address;
+        public int studentCount;
+        public List<Teacher> faculty;
+    }
+
+    public class Teacher
+    {
+        public string firstName;
+        public string lastName;
+        public string department;
+        private DateTime birthDate;
     }
 }

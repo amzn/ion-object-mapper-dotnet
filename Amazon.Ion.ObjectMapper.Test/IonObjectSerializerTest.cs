@@ -19,7 +19,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesObjectsWithIncludeFields()
         {
-            CheckWithOptions(TestObjects.honda, new IonSerializationOptions { IncludeFields = true });
+            Check(TestObjects.fieldAcademy, new IonSerializationOptions { IncludeFields = true });
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
-            CheckWithOptions(
+            Check(
                 new List<Vehicle>()
                 {
                     new Plane(), new Boat(), new Helicopter()
