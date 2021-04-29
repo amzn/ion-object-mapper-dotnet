@@ -106,7 +106,7 @@ namespace Amazon.Ion.ObjectMapper
         public bool AnnotateGuids { get; init; } = false;
 
         public bool IncludeFields { get; init; } = false;
-        public readonly bool IgnoreNulls;
+        public bool IgnoreNulls { get; init; } = false;
         public readonly bool IgnoreReadOnlyFields;
         public readonly bool IgnoreReadOnlyProperties;
         public readonly bool PropertyNameCaseInsensitive;

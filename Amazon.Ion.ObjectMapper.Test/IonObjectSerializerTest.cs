@@ -23,6 +23,12 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesAndDeserializesObjectsWithIgnoreNulls()
+        {
+            Check(new Car { }, new IonSerializationOptions { IgnoreNulls = true });
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesFields()
         {
             Check(TestObjects.registration);

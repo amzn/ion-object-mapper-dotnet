@@ -55,14 +55,27 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     continue;
                 }
+                
+                var propertyValue = property.GetValue(item);
+                if (options.IgnoreNulls && propertyValue == null)
+                {
+                    continue;
+                }
+
                 writer.SetFieldName(IonFieldNameFromProperty(property));
-                ionSerializer.Serialize(writer, property.GetValue(item));
+                ionSerializer.Serialize(writer, propertyValue);
             }
 
             foreach (var field in Fields())
             {
+                var fieldValue = field.GetValue(item);
+                if (options.IgnoreNulls && fieldValue == null)
+                {
+                    continue;
+                }
+
                 writer.SetFieldName(GetFieldName(field));
-                ionSerializer.Serialize(writer, field.GetValue(item));
+                ionSerializer.Serialize(writer, fieldValue);
             }
             writer.StepOut();
         }

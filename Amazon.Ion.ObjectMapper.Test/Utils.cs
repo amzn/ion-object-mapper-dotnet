@@ -48,9 +48,10 @@ namespace Amazon.Ion.ObjectMapper.Test
             return IonLoader.Default.Load(stream).GetElementAt(0);
         }
 
-        public static void Check<T>(T item)
+        public static void Check<T>(T item, IonSerializationOptions options = null)
         {
-            Check(new IonSerializer(), item);
+            IonSerializer serializer = (options == null) ? new IonSerializer() : new IonSerializer(options);
+            Check(serializer, item);
         }
         
         public static void Check<T>(T item, IonSerializationOptions options)
