@@ -219,9 +219,9 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class School
     {
-        public readonly string address;
-        public int studentCount;
-        public List<Teacher> faculty;
+        private readonly string address;
+        private int studentCount;
+        private List<Teacher> faculty;
 
         public School()
         {
@@ -246,8 +246,8 @@ namespace Amazon.Ion.ObjectMapper.Test
     public class Teacher
     {
         public readonly string firstName;
-        public readonly string lastName;
-        public string department;
+        private readonly string lastName;
+        private string department;
         private readonly DateTime? birthDate;
 
         public Teacher()
