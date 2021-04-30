@@ -28,8 +28,10 @@ namespace Amazon.Ion.ObjectMapper.Test
             var stream = serializer.Serialize(new Motorcycle());
 
             IIonReader reader = IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
+            reader.MoveNext();
+            reader.StepIn();
             
-            // Verify Ion is not reading the null property and field
+            // Verify Ion is not reading the null property and the null field
             while (reader.MoveNext() != IonType.None)
             {
                 Assert.AreNotEqual("brand", reader.CurrentFieldName);
