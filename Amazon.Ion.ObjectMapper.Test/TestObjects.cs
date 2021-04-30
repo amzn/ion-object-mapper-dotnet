@@ -46,6 +46,19 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
     
+    public class Motorcycle : Vehicle
+    {
+        public string brand { get; init; }
+
+        [IonField]
+        private string color;
+        
+        public override string ToString()
+        {
+            return "<Motorcycle>{ brand: " + brand + ", color: " + color + " }";
+        }
+    }
+    
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
     {

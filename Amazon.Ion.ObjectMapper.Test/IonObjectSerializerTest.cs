@@ -1,7 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using Amazon.IonDotnet;
+using Amazon.IonDotnet.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.Ion.ObjectMapper.Test.Utils;
 
@@ -25,7 +24,17 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesObjectsWithIgnoreNulls()
         {
-            Check(new Car { }, new IonSerializationOptions { IgnoreNulls = true });
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreNulls = true});
+            var stream = serializer.Serialize(new Motorcycle());
+
+            IIonReader reader = IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
+            
+            // Verify Ion is not reading the null property and field
+            while (reader.MoveNext() != IonType.None)
+            {
+                Assert.AreNotEqual("brand", reader.CurrentFieldName);
+                Assert.AreNotEqual("color", reader.CurrentFieldName);
+            }
         }
 
         [TestMethod]
