@@ -1,6 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -83,6 +84,35 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             var count = IonLoader.Default.Load(Copy(stream)).GetElementAt(0).GetTypeAnnotationSymbols().Count;
             Assert.IsTrue(count == 0, "Has " + count + " annotations");
+        }
+
+        private static bool SerializesField<T>(T item, IonSerializer serializer, string fieldName)
+        {
+            var stream = serializer.Serialize(item);
+
+            IIonReader reader = IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
+            reader.MoveNext();
+            reader.StepIn();
+            
+            while (reader.MoveNext() != IonType.None)
+            {
+                if (fieldName == reader.CurrentFieldName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        public static void AssertSerializesField<T>(T item, IonSerializer serializer, string fieldName)
+        {
+            Assert.IsTrue(SerializesField(item, serializer, fieldName));
+        }
+        
+        public static void AssertDoesNotSerializeField<T>(T item, IonSerializer serializer, string fieldName)
+        {
+            Assert.IsFalse(SerializesField(item, serializer, fieldName));
         }
         
         public static void Check<T>(Stream actual, T expected)
