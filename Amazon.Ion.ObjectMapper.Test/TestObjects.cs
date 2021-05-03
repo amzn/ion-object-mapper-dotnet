@@ -58,7 +58,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public override string ToString()
         {
-            return "<Motorcycle>{ brand: " + brand + ", color: " + color + " }";
+            return "<Motorcycle>{ brand: " + brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
     
