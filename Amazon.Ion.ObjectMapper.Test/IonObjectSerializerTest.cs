@@ -27,7 +27,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             var serializedFields = SerializedFields(motorcycle, serializer);
 
-            Assert.IsFalse(serializedFields.Contains("brand"));
+            Assert.IsFalse(serializedFields.Contains("Brand"));
             Assert.IsFalse(serializedFields.Contains("color"));
             Assert.IsTrue(serializedFields.Contains("canOffroad"));
         }

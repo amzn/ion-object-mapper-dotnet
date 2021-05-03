@@ -48,7 +48,7 @@ namespace Amazon.Ion.ObjectMapper.Test
     
     public class Motorcycle : Vehicle
     {
-        public string brand { get; init; }
+        public string Brand { get; init; }
 
         [IonField]
         private string color;
@@ -58,7 +58,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public override string ToString()
         {
-            return "<Motorcycle>{ brand: " + brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
+            return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
     
