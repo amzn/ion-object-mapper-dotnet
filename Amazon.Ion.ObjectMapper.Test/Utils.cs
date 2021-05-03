@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -86,35 +87,23 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsTrue(count == 0, "Has " + count + " annotations");
         }
 
-        private static bool SerializesField<T>(T item, IonSerializer serializer, string fieldName)
+        public static List<string> SerializedFields<T>(T item, IonSerializer serializer)
         {
             var stream = serializer.Serialize(item);
 
             IIonReader reader = IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
             reader.MoveNext();
             reader.StepIn();
-            
+
+            var serializedFields = new List<string>();
             while (reader.MoveNext() != IonType.None)
             {
-                if (fieldName == reader.CurrentFieldName)
-                {
-                    return true;
-                }
+                serializedFields.Add(reader.CurrentFieldName);
             }
 
-            return false;
+            return serializedFields;
         }
-        
-        public static void AssertSerializesField<T>(T item, IonSerializer serializer, string fieldName)
-        {
-            Assert.IsTrue(SerializesField(item, serializer, fieldName));
-        }
-        
-        public static void AssertDoesNotSerializeField<T>(T item, IonSerializer serializer, string fieldName)
-        {
-            Assert.IsFalse(SerializesField(item, serializer, fieldName));
-        }
-        
+
         public static void Check<T>(Stream actual, T expected)
         {
             Assert.AreEqual(expected.ToString(), new IonSerializer().Deserialize<string>(actual));
