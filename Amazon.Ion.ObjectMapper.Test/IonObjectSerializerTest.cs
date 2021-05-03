@@ -27,6 +27,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             AssertDoesNotSerializeField(motorcycle, serializer, "brand");
             AssertDoesNotSerializeField(motorcycle, serializer, "color");
+            AssertSerializesField(motorcycle, serializer, "canOffroad");
         }
 
         [TestMethod]
