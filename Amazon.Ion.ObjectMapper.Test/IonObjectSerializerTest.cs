@@ -25,11 +25,11 @@ namespace Amazon.Ion.ObjectMapper.Test
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreNulls = true});
             var motorcycle = new Motorcycle {canOffroad = true};
 
-            var serializedFields = SerializedFields(motorcycle, serializer);
+            var serializedFields = SerializedFields(serializer.Serialize(motorcycle));
 
-            Assert.IsFalse(serializedFields.Contains("Brand"));
-            Assert.IsFalse(serializedFields.Contains("color"));
-            Assert.IsTrue(serializedFields.Contains("canOffroad"));
+            Assert.IsFalse(serializedFields.ContainsField("Brand"));
+            Assert.IsFalse(serializedFields.ContainsField("color"));
+            Assert.IsTrue(serializedFields.ContainsField("canOffroad"));
         }
 
         [TestMethod]

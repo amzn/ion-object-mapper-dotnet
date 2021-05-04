@@ -1,16 +1,18 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 using Amazon.IonDotnet.Tree;
+using Amazon.IonDotnet.Tree.Impl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
     public static class Utils
     {
+        private static readonly IValueFactory ValueFactory = new ValueFactory();
+        
         public static Stream Copy(Stream source) {
             var copy = new MemoryStream();
             source.CopyTo(copy);
@@ -87,26 +89,24 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsTrue(count == 0, "Has " + count + " annotations");
         }
 
-        public static List<string> SerializedFields<T>(T item, IonSerializer serializer)
+        public static void Check<T>(Stream actual, T expected)
         {
-            var stream = serializer.Serialize(item);
-
+            Assert.AreEqual(expected.ToString(), new IonSerializer().Deserialize<string>(actual));
+        }
+        
+        public static IIonStruct SerializedFields(Stream stream)
+        {
             IIonReader reader = IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
             reader.MoveNext();
             reader.StepIn();
 
-            var serializedFields = new List<string>();
+            IIonStruct serializedFields = ValueFactory.NewEmptyStruct();
             while (reader.MoveNext() != IonType.None)
             {
-                serializedFields.Add(reader.CurrentFieldName);
+                serializedFields.SetField(reader.CurrentFieldName, ValueFactory.NewBool(true));
             }
 
             return serializedFields;
-        }
-
-        public static void Check<T>(Stream actual, T expected)
-        {
-            Assert.AreEqual(expected.ToString(), new IonSerializer().Deserialize<string>(actual));
         }
     }
 }
