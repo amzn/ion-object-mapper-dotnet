@@ -3,15 +3,12 @@ using System.Linq;
 using System.Text;
 using Amazon.IonDotnet.Builders;
 using Amazon.IonDotnet.Tree;
-using Amazon.IonDotnet.Tree.Impl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
     public static class Utils
     {
-        private static readonly IValueFactory ValueFactory = new ValueFactory();
-        
         public static Stream Copy(Stream source) {
             var copy = new MemoryStream();
             source.CopyTo(copy);
