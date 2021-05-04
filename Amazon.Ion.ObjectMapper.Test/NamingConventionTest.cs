@@ -1,5 +1,3 @@
-using System;
-using Amazon.IonDotnet.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Amazon.Ion.ObjectMapper.Test
@@ -37,8 +35,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void CanUseTheNamingConventionOnAnObject()
         {
             var stream = new IonSerializer(new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention() }).Serialize(TestObjects.honda);
-            var serialized = IonLoader.Default.Load(stream);
-            Assert.AreEqual(2010, serialized.GetElementAt(0).GetField("year_of_manufacture").IntValue);
+            var serialized = Utils.IonFromStream(stream);
+            Assert.AreEqual(2010, serialized.GetField("year_of_manufacture").IntValue);
         }
     }
 }

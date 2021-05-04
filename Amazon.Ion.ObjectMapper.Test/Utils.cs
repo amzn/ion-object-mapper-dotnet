@@ -1,7 +1,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 using Amazon.IonDotnet.Tree;
 using Amazon.IonDotnet.Tree.Impl;
@@ -49,7 +48,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static IIonValue ToIonValue<T>(IonSerializer ionSerializer, T item) 
         {
             var stream = ionSerializer.Serialize(item);
-            return IonLoader.Default.Load(stream).GetElementAt(0);
+            return IonFromStream(stream);
         }
 
         public static void Check<T>(T item)
@@ -74,7 +73,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void AssertHasAnnotation(string annotation, Stream stream)
         {
-            AssertHasAnnotation(annotation, IonLoader.Default.Load(Copy(stream)).GetElementAt(0));
+            AssertHasAnnotation(annotation, IonFromStream(Copy(stream)));
         }
 
         public static void AssertHasAnnotation(string annotation, IIonValue ionValue)
@@ -85,7 +84,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void AssertHasNoAnnotations(Stream stream)
         {
-            var count = IonLoader.Default.Load(Copy(stream)).GetElementAt(0).GetTypeAnnotationSymbols().Count;
+            var count = IonFromStream(Copy(stream)).GetTypeAnnotationSymbols().Count;
             Assert.IsTrue(count == 0, "Has " + count + " annotations");
         }
 
@@ -94,19 +93,9 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(expected.ToString(), new IonSerializer().Deserialize<string>(actual));
         }
         
-        public static IIonStruct SerializedFields(Stream stream)
+        public static IIonValue IonFromStream(Stream stream)
         {
-            IIonReader reader = IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
-            reader.MoveNext();
-            reader.StepIn();
-
-            IIonStruct serializedFields = ValueFactory.NewEmptyStruct();
-            while (reader.MoveNext() != IonType.None)
-            {
-                serializedFields.SetField(reader.CurrentFieldName, ValueFactory.NewBool(true));
-            }
-
-            return serializedFields;
+            return IonLoader.Default.Load(stream).GetElementAt(0);
         }
     }
 }

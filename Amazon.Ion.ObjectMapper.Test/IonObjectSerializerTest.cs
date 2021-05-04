@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.Ion.ObjectMapper.Test.Utils;
 
@@ -25,11 +26,11 @@ namespace Amazon.Ion.ObjectMapper.Test
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreNulls = true});
             var motorcycle = new Motorcycle {canOffroad = true};
 
-            var serializedFields = SerializedFields(serializer.Serialize(motorcycle));
+            IIonStruct serialized = IonFromStream(serializer.Serialize(motorcycle));
 
-            Assert.IsFalse(serializedFields.ContainsField("Brand"));
-            Assert.IsFalse(serializedFields.ContainsField("color"));
-            Assert.IsTrue(serializedFields.ContainsField("canOffroad"));
+            Assert.IsFalse(serialized.ContainsField("Brand"));
+            Assert.IsFalse(serialized.ContainsField("color"));
+            Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
 
         [TestMethod]
