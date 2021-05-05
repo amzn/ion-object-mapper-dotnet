@@ -33,6 +33,12 @@ namespace Amazon.Ion.ObjectMapper
                 if (property != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
+                    
+                    if (options.IgnoreDefaults && deserialized == default)
+                    {
+                        continue;
+                    }
+                    
                     property.SetValue(targetObject, deserialized);
                 }
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
@@ -43,7 +49,11 @@ namespace Amazon.Ion.ObjectMapper
                     {
                         continue;
                     }
-                    
+                    if (options.IgnoreDefaults && deserialized == default)
+                    {
+                        continue;
+                    }
+
                     field.SetValue(targetObject, deserialized);
                 }
             }
@@ -67,6 +77,10 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     continue;
                 }
+                if (options.IgnoreDefaults && propertyValue == default)
+                {
+                    continue;
+                }
 
                 writer.SetFieldName(IonFieldNameFromProperty(property));
                 ionSerializer.Serialize(writer, propertyValue);
@@ -80,6 +94,10 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
                 if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+                {
+                    continue;
+                }
+                if (options.IgnoreDefaults && fieldValue == default)
                 {
                     continue;
                 }

@@ -61,6 +61,30 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesObjectsWithIgnoreDefaults()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle {canOffroad = true}));
+
+            Assert.IsFalse(serialized.ContainsField("Brand"));
+            Assert.IsFalse(serialized.ContainsField("color"));
+            Assert.IsTrue(serialized.ContainsField("canOffroad"));
+        }
+        
+        [TestMethod]
+        public void DeserializesObjectsWithIgnoreDefaults()
+        {
+            var stream = new IonSerializer().Serialize(new Motorcycle {canOffroad = true});
+
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
+            var deserialized = serializer.Deserialize<Motorcycle>(stream);
+            
+            Assert.IsNull(deserialized.Brand);
+            Assert.IsNull(deserialized.color);
+            Assert.IsNotNull(deserialized.canOffroad);
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesFields()
         {
             Check(TestObjects.registration);
