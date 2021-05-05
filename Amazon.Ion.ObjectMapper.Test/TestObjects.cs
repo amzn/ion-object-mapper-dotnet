@@ -46,12 +46,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
     
+    [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Motorcycle : Vehicle
     {
         public string Brand { get; init; }
 
         [IonField]
-        private string color;
+        public string color;
 
         [IonField]
         public bool canOffroad; 

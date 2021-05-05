@@ -110,7 +110,7 @@ namespace Amazon.Ion.ObjectMapper
         public bool IgnoreReadOnlyFields { get; init; } = false;
         public readonly bool IgnoreReadOnlyProperties;
         public readonly bool PropertyNameCaseInsensitive;
-        public readonly bool IgnoreDefaults;
+        public bool IgnoreDefaults { get; init; } = false;
         public bool IncludeTypeInformation { get; init; } = false;
         public TypeAnnotationPrefix TypeAnnotationPrefix { get; init; } = new NamespaceTypeAnnotationPrefix();
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
