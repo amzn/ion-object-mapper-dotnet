@@ -45,7 +45,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static IIonValue ToIonValue<T>(IonSerializer ionSerializer, T item) 
         {
             var stream = ionSerializer.Serialize(item);
-            return IonFromStream(stream);
+            return StreamToIonValue(stream);
         }
 
         public static void Check<T>(T item)
@@ -70,7 +70,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void AssertHasAnnotation(string annotation, Stream stream)
         {
-            AssertHasAnnotation(annotation, IonFromStream(Copy(stream)));
+            AssertHasAnnotation(annotation, StreamToIonValue(Copy(stream)));
         }
 
         public static void AssertHasAnnotation(string annotation, IIonValue ionValue)
@@ -81,7 +81,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void AssertHasNoAnnotations(Stream stream)
         {
-            var count = IonFromStream(Copy(stream)).GetTypeAnnotationSymbols().Count;
+            var count = StreamToIonValue(Copy(stream)).GetTypeAnnotationSymbols().Count;
             Assert.IsTrue(count == 0, "Has " + count + " annotations");
         }
 
@@ -90,7 +90,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(expected.ToString(), new IonSerializer().Deserialize<string>(actual));
         }
         
-        public static IIonValue IonFromStream(Stream stream)
+        public static IIonValue StreamToIonValue(Stream stream)
         {
             return IonLoader.Default.Load(stream).GetElementAt(0);
         }
