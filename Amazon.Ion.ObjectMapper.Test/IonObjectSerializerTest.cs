@@ -32,6 +32,33 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
+        
+        [TestMethod]
+        public void SerializesObjectsWithIgnoreReadOnlyFields()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyFields = true, IncludeFields = true});
+
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.drKyler));
+            
+            Assert.IsFalse(serialized.ContainsField("firstName"));
+            Assert.IsFalse(serialized.ContainsField("lastName"));
+            Assert.IsTrue(serialized.ContainsField("department"));
+            Assert.IsFalse(serialized.ContainsField("birthDate"));
+        }
+        
+        [TestMethod]
+        public void DeserializesObjectsWithIgnoreReadOnlyFields()
+        {
+            var stream = new IonSerializer(new IonSerializationOptions {IncludeFields = true}).Serialize(TestObjects.drKyler);
+
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyFields = true, IncludeFields = true});
+            var deserialized = serializer.Deserialize<Teacher>(stream);
+            
+            Assert.IsNull(deserialized.firstName);
+            Assert.IsNull(deserialized.lastName);
+            Assert.IsNotNull(deserialized.department);
+            Assert.IsNull(deserialized.birthDate);
+        }
 
         [TestMethod]
         public void SerializesAndDeserializesFields()
