@@ -26,7 +26,7 @@ namespace Amazon.Ion.ObjectMapper
             reader.StepIn();
 
             IonType ionType;
-            while ((ionType  = reader.MoveNext()) != IonType.None)
+            while ((ionType = reader.MoveNext()) != IonType.None)
             {
                 var property = FindProperty(reader.CurrentFieldName);
                 FieldInfo field;
@@ -38,6 +38,12 @@ namespace Amazon.Ion.ObjectMapper
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
+                    
+                    if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+                    {
+                        continue;
+                    }
+                    
                     field.SetValue(targetObject, deserialized);
                 }
             }
@@ -70,6 +76,10 @@ namespace Amazon.Ion.ObjectMapper
             {
                 var fieldValue = field.GetValue(item);
                 if (options.IgnoreNulls && fieldValue == null)
+                {
+                    continue;
+                }
+                if (options.IgnoreReadOnlyFields && field.IsInitOnly)
                 {
                     continue;
                 }

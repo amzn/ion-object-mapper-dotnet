@@ -118,11 +118,9 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static Radio fmRadio = new Radio { Band = "FM" };
 
-        private static Teacher[] faculty =
-        {
-            new Teacher("Edward", "Kyler", "Math", DateTime.Parse("08/18/1962")),
-            new Teacher("Rachel", "Ford", "Chemistry", DateTime.Parse("04/29/1985"))
-        };
+        public static Teacher drKyler = new Teacher("Edward", "Kyler", "Math", DateTime.Parse("08/18/1962"));
+        public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.Parse("04/29/1985"));
+        private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
     }
 
@@ -262,9 +260,9 @@ namespace Amazon.Ion.ObjectMapper.Test
     public class Teacher
     {
         public readonly string firstName;
-        private readonly string lastName;
-        private string department;
-        private readonly DateTime? birthDate;
+        public readonly string lastName;
+        public string department;
+        public readonly DateTime? birthDate;
 
         public Teacher()
         {
