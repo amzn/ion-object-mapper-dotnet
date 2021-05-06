@@ -168,12 +168,13 @@ namespace Amazon.Ion.ObjectMapper
 
         public void Serialize<T>(IIonWriter writer, T item)
         {
-            if (currentDepth + 1 >= options.MaxDepth)
+            currentDepth++;
+            if (currentDepth >= options.MaxDepth)
             {
+                currentDepth = 0;
                 throw new NotSupportedException($"Can not serialize further as max object tree depth {options.MaxDepth} is reached");
             }
-            currentDepth++;
-            
+
             if (item == null)
             {
                 new IonNullSerializer().Serialize(writer, (object)null);
@@ -274,11 +275,12 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
-            if (currentDepth + 1 >= options.MaxDepth)
+            currentDepth++;
+            if (currentDepth >= options.MaxDepth)
             {
+                currentDepth = 0;
                 throw new NotSupportedException($"Can not deserialize further as max object tree depth {options.MaxDepth} is reached");
             }
-            currentDepth++;
 
             object deserialized;
             switch (ionType)
