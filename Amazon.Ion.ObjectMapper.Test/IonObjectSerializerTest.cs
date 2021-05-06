@@ -28,7 +28,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(motorcycle));
 
-            Assert.IsFalse(serialized.ContainsField("Brand"));
+            Assert.IsFalse(serialized.ContainsField("brand"));
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
@@ -66,7 +66,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle {canOffroad = true}));
 
-            Assert.IsFalse(serialized.ContainsField("Brand"));
+            Assert.IsFalse(serialized.ContainsField("brand"));
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
@@ -82,6 +82,30 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNull(deserialized.Brand);
             Assert.IsNull(deserialized.color);
             Assert.IsNotNull(deserialized.canOffroad);
+        }
+        
+        [TestMethod]
+        public void SerializesObjectsWithCaseInsensitiveProperties()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle {Brand = "Harley", color = "Black", canOffroad = true}));
+
+            Assert.IsTrue(serialized.ContainsField("Brand"));
+            Assert.IsTrue(serialized.ContainsField("color"));
+            Assert.IsTrue(serialized.ContainsField("canOffroad"));
+        }
+        
+        [TestMethod]
+        public void DeserializesObjectsWithCaseInsensitiveProperties()
+        {
+            var stream = new IonSerializer().Serialize(new Motorcycle {Brand = "Harley", color = "Black", canOffroad = true});
+
+            var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
+            var deserialized = serializer.Deserialize<MOTORCYCLE>(stream);
+            
+            Assert.AreEqual("Harley", deserialized.BRAND);
+            Assert.IsNull(deserialized.COLOR);
+            Assert.IsFalse(deserialized.CANOFFROAD);
         }
 
         [TestMethod]
