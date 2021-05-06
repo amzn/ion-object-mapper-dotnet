@@ -62,6 +62,22 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
+
+    public class MOTORCYCLE : Vehicle
+    {
+        public string BRAND { get; init; }
+
+        [IonField]
+        public string COLOR;
+
+        [IonField]
+        public bool CANOFFROAD; 
+        
+        public override string ToString()
+        {
+            return "<MOTORCYCLE>{ BRAND: " + BRAND + ", COLOR: " + COLOR + ", CANOFFROAD: " + CANOFFROAD + " }";
+        }
+    }
     
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
