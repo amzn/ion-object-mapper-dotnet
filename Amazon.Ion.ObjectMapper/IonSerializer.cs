@@ -172,7 +172,7 @@ namespace Amazon.Ion.ObjectMapper
             if (currentDepth >= options.MaxDepth)
             {
                 currentDepth = 0;
-                throw new NotSupportedException($"Can not serialize further as max object tree depth {options.MaxDepth} is reached");
+                throw new NotSupportedException($"Cannot serialize further as max object tree depth {options.MaxDepth} is reached");
             }
 
             if (item == null)
@@ -237,7 +237,7 @@ namespace Amazon.Ion.ObjectMapper
             }
             else
             {
-                throw new NotSupportedException("Do not know how to serialize type " + typeof(T));
+                throw new NotSupportedException($"{typeof(T)} is not supported for serialization");
             }
 
             currentDepth--;
@@ -279,7 +279,7 @@ namespace Amazon.Ion.ObjectMapper
             if (currentDepth >= options.MaxDepth)
             {
                 currentDepth = 0;
-                throw new NotSupportedException($"Can not deserialize further as max object tree depth {options.MaxDepth} is reached");
+                throw new NotSupportedException($"Cannot deserialize further as max object tree depth {options.MaxDepth} is reached");
             }
 
             object deserialized;
@@ -352,7 +352,7 @@ namespace Amazon.Ion.ObjectMapper
                     deserialized = new IonObjectSerializer(this, options, type).Deserialize(reader);
                     break;
                 default:
-                    throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
+                    throw new NotSupportedException($"Don't know how to Deserialize this Ion data. Last IonType was: {ionType}");
             }
 
             currentDepth--;
