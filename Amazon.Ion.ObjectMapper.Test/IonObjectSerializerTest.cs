@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -125,6 +126,22 @@ namespace Amazon.Ion.ObjectMapper.Test
                     }
                 }
             );
+        }
+
+        [TestMethod]
+        public void SerializeMaxDepthException()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 3});
+            Assert.ThrowsException<NotSupportedException>(() => serializer.Serialize(TestObjects.honda));
+        }
+        
+        [TestMethod]
+        public void DeserializeMaxDepthException()
+        {
+            var stream = new IonSerializer().Serialize(TestObjects.honda);
+            
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 3});
+            Assert.ThrowsException<NotSupportedException>(() => serializer.Deserialize<Car>(stream));
         }
 
         [TestMethod]
