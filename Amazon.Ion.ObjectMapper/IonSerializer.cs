@@ -330,7 +330,7 @@ namespace Amazon.Ion.ObjectMapper
                     case IonType.Struct:
                         return new IonObjectSerializer(this, options, type).Deserialize(reader);
                     default:
-                        throw new NotSupportedException($"Don't know how to Deserialize this Ion data. Last IonType was: {ionType}");
+                        throw new NotSupportedException($"{ionType} is not supported for deserialization");
                 }
             }
             finally
