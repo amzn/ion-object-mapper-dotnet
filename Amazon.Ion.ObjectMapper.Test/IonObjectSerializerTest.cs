@@ -88,7 +88,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesObjectsWithCaseInsensitiveProperties()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
-            IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle {Brand = "Harley", color = "Black", canOffroad = true}));
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.harley));
 
             Assert.IsTrue(serialized.ContainsField("Brand"));
             Assert.IsTrue(serialized.ContainsField("color"));
@@ -98,7 +98,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializesObjectsWithCaseInsensitiveProperties()
         {
-            var stream = new IonSerializer().Serialize(new Motorcycle {Brand = "Harley", color = "Black", canOffroad = true});
+            var stream = new IonSerializer().Serialize(TestObjects.harley);
 
             var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
             var deserialized = serializer.Deserialize<MOTORCYCLE>(stream);
