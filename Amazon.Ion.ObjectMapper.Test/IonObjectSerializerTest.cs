@@ -90,7 +90,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.harley));
 
-            Assert.IsTrue(serialized.ContainsField("Brand"));
+            Assert.IsTrue(serialized.ContainsField("brand"));
             Assert.IsTrue(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }

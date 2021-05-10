@@ -116,11 +116,6 @@ namespace Amazon.Ion.ObjectMapper
                 return ((IonPropertyName)ionPropertyName).Name;
             }
 
-            if (options.PropertyNameCaseInsensitive)
-            {
-                return property.Name;
-            }
-            
             return options.NamingConvention.FromProperty(property.Name);
         }
 
