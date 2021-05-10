@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,13 +25,14 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesObjectsWithIgnoreNulls()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreNulls = true});
-            var motorcycle = new Motorcycle {canOffroad = true};
+            var motorcycle = new Motorcycle(default, default, true, default);
 
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(motorcycle));
 
             Assert.IsFalse(serialized.ContainsField("Brand"));
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
+            Assert.IsTrue(serialized.ContainsField("<PurchaseDate>k__BackingField"));
         }
         
         [TestMethod]
@@ -61,20 +63,41 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesObjectsWithIgnoreReadOnlyProperties()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.harley));
+            
+            Assert.IsFalse(serialized.ContainsField("<PurchaseDate>k__BackingField"));
+        }
+        
+        [TestMethod]
+        public void DeserializesObjectsWithIgnoreReadOnlyProperties()
+        {
+            var stream = new IonSerializer().Serialize(TestObjects.harley);
+
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
+            var deserialized = serializer.Deserialize<Motorcycle>(stream);
+            
+            Assert.AreNotEqual(TestObjects.harley.PurchaseDate, deserialized.PurchaseDate);
+        }
+
+        [TestMethod]
         public void SerializesObjectsWithIgnoreDefaults()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
-            IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle {canOffroad = true}));
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle(default, default, true, DateTime.Now)));
 
             Assert.IsFalse(serialized.ContainsField("Brand"));
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
+            Assert.IsTrue(serialized.ContainsField("<PurchaseDate>k__BackingField"));
         }
         
         [TestMethod]
         public void DeserializesObjectsWithIgnoreDefaults()
         {
-            var stream = new IonSerializer().Serialize(new Motorcycle {canOffroad = true});
+            var stream = new IonSerializer().Serialize(new Motorcycle(default, default, true, DateTime.Now));
 
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
             var deserialized = serializer.Deserialize<Motorcycle>(stream);
@@ -82,6 +105,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNull(deserialized.Brand);
             Assert.IsNull(deserialized.color);
             Assert.IsNotNull(deserialized.canOffroad);
+            Assert.IsNotNull(deserialized.PurchaseDate);
         }
 
         [TestMethod]

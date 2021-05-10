@@ -12,12 +12,18 @@ namespace Amazon.Ion.ObjectMapper
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
+        private readonly IEnumerable<PropertyInfo> readOnlyProperties;
 
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
             this.options = options;
             this.targetType = targetType;
+
+            if (!this.options.IgnoreReadOnlyProperties && !this.options.IncludeFields)
+            {
+                this.readOnlyProperties = ReadOnlyProperties(this.targetType);
+            }
         }
 
         public object Deserialize(IIonReader reader)
@@ -32,8 +38,12 @@ namespace Amazon.Ion.ObjectMapper
                 FieldInfo field;
                 if (property != null)
                 {
+                    if (!property.CanWrite)
+                    {
+                        continue;
+                    }
+
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-                    
                     if (options.IgnoreDefaults && deserialized == default)
                     {
                         continue;
@@ -44,7 +54,6 @@ namespace Amazon.Ion.ObjectMapper
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
-                    
                     if (options.IgnoreReadOnlyFields && field.IsInitOnly)
                     {
                         continue;
@@ -71,7 +80,12 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     continue;
                 }
-                
+
+                if (options.IgnoreReadOnlyProperties && !property.CanWrite)
+                {
+                    continue;
+                }
+
                 var propertyValue = property.GetValue(item);
                 if (options.IgnoreNulls && propertyValue == null)
                 {
@@ -88,12 +102,13 @@ namespace Amazon.Ion.ObjectMapper
 
             foreach (var field in Fields())
             {
-                var fieldValue = field.GetValue(item);
-                if (options.IgnoreNulls && fieldValue == null)
+                if (options.IgnoreReadOnlyFields && field.IsInitOnly)
                 {
                     continue;
                 }
-                if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+
+                var fieldValue = field.GetValue(item);
+                if (options.IgnoreNulls && fieldValue == null)
                 {
                     continue;
                 }
@@ -137,6 +152,12 @@ namespace Amazon.Ion.ObjectMapper
             var name = options.NamingConvention.ToProperty(readName);
             return targetType.GetProperty(name);
         }
+
+        private IEnumerable<PropertyInfo> ReadOnlyProperties(Type targetType)
+        {
+            return targetType.GetProperties().Where(p => !p.CanWrite);
+        }
+        
         private FieldInfo FindField(string name)
         {
             var exact = targetType.GetField(name, fieldBindings);
@@ -169,6 +190,12 @@ namespace Amazon.Ion.ObjectMapper
         private bool IsField(FieldInfo field)
         {
             if (options.IncludeFields)
+            {
+                return true;
+            }
+
+            if (!options.IgnoreReadOnlyProperties && 
+                readOnlyProperties.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
             {
                 return true;
             }
