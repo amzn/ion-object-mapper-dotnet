@@ -25,7 +25,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesObjectsWithIgnoreNulls()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreNulls = true});
-            var motorcycle = new Motorcycle(default, default, true, default);
+            var motorcycle = new Motorcycle(null, null, true, DateTime.Now);
 
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(motorcycle));
 
