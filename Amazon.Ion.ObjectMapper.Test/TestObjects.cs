@@ -51,16 +51,34 @@ namespace Amazon.Ion.ObjectMapper.Test
     public class Motorcycle : Vehicle
     {
         public string Brand { get; init; }
+        
+        public long PurchaseDate { get; }
 
         [IonField]
         public string color;
 
         [IonField]
-        public bool canOffroad; 
-        
+        public bool canOffroad;
+
+        public Motorcycle()
+        {
+            this.Brand = default;
+            this.color = default;
+            this.canOffroad = default;
+            this.PurchaseDate = DateTime.Now.Ticks;
+        }
+
+        public Motorcycle(string brand, string color, bool offroad, DateTime date)
+        {
+            this.Brand = brand;
+            this.color = color;
+            this.canOffroad = offroad;
+            this.PurchaseDate = date.Ticks;
+        }
+
         public override string ToString()
         {
-            return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
+            return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + ", PurchaseDate: " + PurchaseDate + " }";
         }
     }
     
@@ -141,6 +159,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
+        
+        public static Motorcycle harley = new Motorcycle("Harley", "Black", true, DateTime.MinValue);
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
