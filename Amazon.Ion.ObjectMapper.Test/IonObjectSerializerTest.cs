@@ -83,29 +83,32 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNull(deserialized.color);
             Assert.IsNotNull(deserialized.canOffroad);
         }
-        
-        [TestMethod]
-        public void SerializesObjectsWithCaseInsensitiveProperties()
-        {
-            var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
-            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.harley));
 
-            Assert.IsTrue(serialized.ContainsField("make"));
-            Assert.IsTrue(serialized.ContainsField("color"));
-            Assert.IsTrue(serialized.ContainsField("canOffroad"));
-        }
-        
         [TestMethod]
-        public void DeserializesObjectsWithCaseInsensitiveProperties()
+        public void SerializesAndDeserializesObjectsWithCaseInsensitiveProperties()
         {
-            var stream = new IonSerializer().Serialize(TestObjects.harley);
+            var serializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });
+            var stream = serializer.Serialize(TestObjects.Harley);
 
-            var serializer = new IonSerializer(new IonSerializationOptions {PropertyNameCaseInsensitive = true});
-            var deserialized = serializer.Deserialize<MOTORCYCLE>(stream);
+            var deserialized1 = serializer.Deserialize<MOTORCYCLE>(stream);
             
-            Assert.AreEqual("Harley", deserialized.MAKE);
-            Assert.IsNull(deserialized.COLOR);
-            Assert.IsFalse(deserialized.CANOFFROAD);
+            Assert.AreEqual(TestObjects.Harley.Make, deserialized1.MAKE);
+            Assert.IsNull(deserialized1.COLOR);
+            Assert.IsFalse(deserialized1.CANOFFROAD);
+
+            stream.Position = 0;
+            var deserialized2 = serializer.Deserialize<motorcycle>(stream);
+            
+            Assert.AreEqual(TestObjects.Harley.Make, deserialized2.make);
+            Assert.IsNotNull(deserialized2.color);
+            Assert.IsFalse(deserialized2.canoffroad);
+            
+            stream.Position = 0;
+            var deserialized3 = serializer.Deserialize<MoToRcYcLe>(stream);
+            
+            Assert.AreEqual(TestObjects.Harley.Make, deserialized3.MaKe);
+            Assert.IsNull(deserialized3.CoLoR);
+            Assert.IsFalse(deserialized3.CaNoFfRoAd);
         }
 
         [TestMethod]
