@@ -19,9 +19,14 @@ namespace Amazon.Ion.ObjectMapper
             this.ionSerializer = ionSerializer;
             this.options = options;
             this.targetType = targetType;
-
+            
             if (!this.options.IgnoreReadOnlyProperties && !this.options.IncludeFields)
             {
+                // If we are serialzing/deserializing readonly properties then we need to serialize/deserialize those
+                // properties' backing fields.
+                // this.readOnlyProperties is used for detecting the appropriate backing fields.
+                // However if we are already including all fields,
+                // then there is no need for this backing field detection logic.
                 this.readOnlyProperties = ReadOnlyProperties(this.targetType);
             }
         }
@@ -40,6 +45,9 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     if (!property.CanWrite)
                     {
+                        // property.SetValue() does not work with a readonly property.
+                        // logic for handling deserializing readonly properties happens during field processing
+                        // when we detect backing fields for the property.
                         continue;
                     }
 
@@ -81,7 +89,7 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                if (options.IgnoreReadOnlyProperties && !property.CanWrite)
+                if (this.options.IgnoreReadOnlyProperties && !property.CanWrite)
                 {
                     continue;
                 }
@@ -200,8 +208,8 @@ namespace Amazon.Ion.ObjectMapper
                 return true;
             }
 
-            if (!options.IgnoreReadOnlyProperties && 
-                readOnlyProperties.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
+            if (!this.options.IgnoreReadOnlyProperties && 
+                this.readOnlyProperties.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
             {
                 return true;
             }
