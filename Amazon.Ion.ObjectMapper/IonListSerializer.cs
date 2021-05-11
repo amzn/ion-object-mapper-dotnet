@@ -69,7 +69,8 @@ namespace Amazon.Ion.ObjectMapper
                 System.Collections.IList typedList;
                 if (this.listType.IsGenericType)
                 {
-                    typedList = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(this.elementType));
+                    typedList = (System.Collections.IList)Activator.CreateInstance(
+                        typeof(List<>).MakeGenericType(this.elementType));
                 }
                 else
                 {

@@ -102,7 +102,8 @@ namespace Amazon.Ion.ObjectMapper
             if (annotations.Length > 0)
             {
                 var typeName = annotations[0];
-                var assemblyName = options.AnnotatedTypeAssemblies.First(a => Type.GetType(FullName(typeName, a)) != null);
+                var assemblyName =
+                    options.AnnotatedTypeAssemblies.First(a => Type.GetType(FullName(typeName, a)) != null);
                 return Activator.CreateInstance(Type.GetType(FullName(typeName, assemblyName)));
             }
 
@@ -302,7 +303,8 @@ namespace Amazon.Ion.ObjectMapper
                 return new IonListSerializer(this, listType);
             }
 
-            throw new NotSupportedException($"Encountered an Ion list but the desired deserialized type was not an IList, it was: {listType}");
+            throw new NotSupportedException(
+                $"Encountered an Ion list but the desired deserialized type was not an IList, it was: {listType}");
         }
 
         public T Deserialize<T>(Stream stream)

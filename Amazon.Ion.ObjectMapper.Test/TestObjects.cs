@@ -129,7 +129,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") },
         };
 
-        public static readonly Registration Registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
+        public static readonly Registration Registration = new Registration(
+            new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
         public static readonly Radio FmRadio = new Radio { Band = "FM" };
 

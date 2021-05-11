@@ -83,7 +83,8 @@ namespace Amazon.Ion.ObjectMapper
             {
                 if (((IonDoNotAnnotateType)doNotAnnotateAttributes[0]).ExcludeDescendants && targetType != currentType)
                 {
-                    // this is not the target type, it is a parent, and this annotation does not apply to children, keep going up
+                    // this is not the target type, it is a parent,
+                    // and this annotation does not apply to children, keep going up
                     return this.ShouldAnnotate(targetType, currentType.BaseType);
                 }
 
@@ -97,7 +98,8 @@ namespace Amazon.Ion.ObjectMapper
                 var attribute = (IonAnnotateType)annotateAttributes[0];
                 if (attribute.ExcludeDescendants && targetType != currentType)
                 {
-                    // this is not the target type, it is a parent, and this annotation does not apply to children, keep going up
+                    // this is not the target type, it is a parent,
+                    // and this annotation does not apply to children, keep going up
                     return this.ShouldAnnotate(targetType, currentType.BaseType);
                 }
 

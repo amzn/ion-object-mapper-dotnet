@@ -51,7 +51,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesObjectsWithIgnoreReadOnlyFields()
         {
-            var serializer = new IonSerializer(new IonSerializationOptions { IgnoreReadOnlyFields = true, IncludeFields = true });
+            var serializer = new IonSerializer(
+                new IonSerializationOptions { IgnoreReadOnlyFields = true, IncludeFields = true });
 
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.DrKyler));
 
@@ -64,9 +65,11 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializesObjectsWithIgnoreReadOnlyFields()
         {
-            var stream = new IonSerializer(new IonSerializationOptions { IncludeFields = true }).Serialize(TestObjects.DrKyler);
+            var stream = new IonSerializer(new IonSerializationOptions { IncludeFields = true })
+                .Serialize(TestObjects.DrKyler);
 
-            var serializer = new IonSerializer(new IonSerializationOptions { IgnoreReadOnlyFields = true, IncludeFields = true });
+            var serializer = new IonSerializer(
+                new IonSerializationOptions { IgnoreReadOnlyFields = true, IncludeFields = true });
             var deserialized = serializer.Deserialize<Teacher>(stream);
 
             Assert.IsNull(deserialized.firstName);
@@ -131,7 +134,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void RespectAnnotationInheritance()
         {
-            var serializer = new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("testing") });
+            var serializer = new IonSerializer(
+                new IonSerializationOptions { TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("testing") });
             AssertHasAnnotation("testing.Plane", serializer.Serialize(new Plane()));
             AssertHasNoAnnotations(serializer.Serialize(new Yacht()));
             AssertHasAnnotation("testing.Catamaran", serializer.Serialize(new Catamaran()));
@@ -144,7 +148,11 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             AssertHasAnnotation(
                 "my.prefix.Truck",
-                new IonSerializer(new IonSerializationOptions { IncludeTypeInformation = true, TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("my.prefix") }).Serialize(new Truck()));
+                new IonSerializer(new IonSerializationOptions
+                {
+                    IncludeTypeInformation = true,
+                    TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("my.prefix"),
+                }).Serialize(new Truck()));
             AssertHasAnnotation(
                 "my.universal.namespace.BussyMcBusface",
                 new IonSerializer().Serialize(new Bus()));

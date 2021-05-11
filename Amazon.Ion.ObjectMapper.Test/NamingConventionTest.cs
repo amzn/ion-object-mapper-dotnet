@@ -43,13 +43,17 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual("weird_i", new SnakeCaseNamingConvention().FromProperty("WeirdI"));
             Assert.AreEqual("lots_o_f_capitals", new SnakeCaseNamingConvention().FromProperty("LotsOFCapitals"));
             Assert.AreEqual("EndsInAnUnderscore", new SnakeCaseNamingConvention().ToProperty("ends_in_an_underscore_"));
-            Assert.AreEqual("StartsWithAnUnderscore", new SnakeCaseNamingConvention().ToProperty("_starts_with_an_underscore"));
+            Assert.AreEqual(
+                "StartsWithAnUnderscore",
+                new SnakeCaseNamingConvention().ToProperty("_starts_with_an_underscore"));
         }
 
         [TestMethod]
         public void CanUseTheNamingConventionOnAnObject()
         {
-            var stream = new IonSerializer(new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention() }).Serialize(TestObjects.Honda);
+            var stream = new IonSerializer(
+                new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention() })
+                .Serialize(TestObjects.Honda);
             var serialized = Utils.StreamToIonValue(stream);
             Assert.AreEqual(2010, serialized.GetField("year_of_manufacture").IntValue);
         }
