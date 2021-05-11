@@ -55,7 +55,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string color;
 
         [IonField]
-        public bool canOffroad; 
+        public bool canOffroad;
         
         public override string ToString()
         {
@@ -63,6 +63,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    // For testing case insensitive deserialization.
     public class MOTORCYCLE : Vehicle
     {
         public string MAKE { get; init; }
@@ -71,11 +72,45 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string COLOR;
 
         [IonField]
-        public bool CANOFFROAD; 
+        public bool CANOFFROAD;
         
         public override string ToString()
         {
             return $"<MOTORCYCLE>{{ MAKE: {this.MAKE}, COLOR: {this.COLOR}, CANOFFROAD: {this.CANOFFROAD} }}";
+        }
+    }
+    
+    // For testing case insensitive deserialization.
+    public class motorcycle : Vehicle
+    {
+        public string make { get; init; }
+
+        [IonField]
+        public string color;
+
+        [IonField]
+        public bool canoffroad;
+        
+        public override string ToString()
+        {
+            return $"<motorcycle>{{ make: {this.make}, color: {this.color}, canoffroad: {this.canoffroad} }}";
+        }
+    }
+    
+    // For testing case insensitive deserialization.
+    public class MoToRcYcLe : Vehicle
+    {
+        public string MaKe { get; init; }
+
+        [IonField]
+        public string CoLoR;
+
+        [IonField]
+        public bool CaNoFfRoAd;
+        
+        public override string ToString()
+        {
+            return $"<MoToRcYcLe>{{ MaKe: {this.MaKe}, CoLoR: {this.CoLoR}, CaNoFfRoAd: {this.CaNoFfRoAd} }}";
         }
     }
     
@@ -131,7 +166,12 @@ namespace Amazon.Ion.ObjectMapper.Test
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
-        public static Motorcycle harley = new Motorcycle {Make = "Harley", color = "Black", canOffroad = true};
+        public static readonly Motorcycle Harley = new Motorcycle
+        {
+            Make = "Harley",
+            color = "Black",
+            canOffroad = true,
+        };
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
