@@ -66,7 +66,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesObjectsWithIgnoreReadOnlyProperties()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
-            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.harley));
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.Harley));
             
             Assert.IsFalse(serialized.ContainsField("<PurchaseDate>k__BackingField"));
         }
@@ -74,12 +74,12 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializesObjectsWithIgnoreReadOnlyProperties()
         {
-            var stream = new IonSerializer().Serialize(TestObjects.harley);
+            var stream = new IonSerializer().Serialize(TestObjects.Harley);
 
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
             var deserialized = serializer.Deserialize<Motorcycle>(stream);
             
-            Assert.AreNotEqual(TestObjects.harley.PurchaseDate, deserialized.PurchaseDate);
+            Assert.AreNotEqual(TestObjects.Harley.PurchaseDate, deserialized.PurchaseDate);
         }
 
         [TestMethod]
