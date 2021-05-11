@@ -49,7 +49,7 @@ namespace Amazon.Ion.ObjectMapper.Test
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Motorcycle : Vehicle
     {
-        public string Brand { get; init; }
+        public string Make { get; init; }
 
         [IonField]
         public string color;
@@ -59,13 +59,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public override string ToString()
         {
-            return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
+            return $"<Motorcycle>{{ Make: {this.Make}, color: {this.color}, canOffroad: {this.canOffroad} }}";
         }
     }
 
     public class MOTORCYCLE : Vehicle
     {
-        public string BRAND { get; init; }
+        public string MAKE { get; init; }
 
         [IonField]
         public string COLOR;
@@ -75,7 +75,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public override string ToString()
         {
-            return "<MOTORCYCLE>{ BRAND: " + BRAND + ", COLOR: " + COLOR + ", CANOFFROAD: " + CANOFFROAD + " }";
+            return $"<MOTORCYCLE>{{ MAKE: {this.MAKE}, COLOR: {this.COLOR}, CANOFFROAD: {this.CANOFFROAD} }}";
         }
     }
     
@@ -131,7 +131,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
-        public static Motorcycle harley = new Motorcycle {Brand = "Harley", color = "Black", canOffroad = true};
+        public static Motorcycle harley = new Motorcycle {Make = "Harley", color = "Black", canOffroad = true};
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
