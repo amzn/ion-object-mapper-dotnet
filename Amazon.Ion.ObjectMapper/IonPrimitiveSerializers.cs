@@ -1,11 +1,25 @@
-using System;
-using System.Collections.Generic; 
-using System.Numerics;
-using System.Text;
-using Amazon.IonDotnet;
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 namespace Amazon.Ion.ObjectMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Amazon.IonDotnet;
+
     public class IonNullSerializer : IonSerializer<object>
     {
         public object Deserialize(IIonReader reader)
@@ -33,6 +47,7 @@ namespace Amazon.Ion.ObjectMapper
             writer.WriteBlob(item);
         }
     }
+
     public class IonStringSerializer : IonSerializer<string>
     {
         public string Deserialize(IIonReader reader)
@@ -74,6 +89,7 @@ namespace Amazon.Ion.ObjectMapper
             writer.WriteInt(item);
         }
     }
+
     public class IonBooleanSerializer : IonSerializer<bool>
     {
         public bool Deserialize(IIonReader reader)
@@ -135,7 +151,6 @@ namespace Amazon.Ion.ObjectMapper
 
         public float Deserialize(IIonReader reader)
         {
-            
             return Convert.ToSingle(reader.DoubleValue());
         }
 
@@ -190,7 +205,7 @@ namespace Amazon.Ion.ObjectMapper
     public class IonGuidSerializer : IonSerializer<Guid>
     {
         internal static readonly string ANNOTATION = "guid128";
-        private IonSerializationOptions options;
+        private readonly IonSerializationOptions options;
 
         public IonGuidSerializer(IonSerializationOptions options)
         {
@@ -206,9 +221,11 @@ namespace Amazon.Ion.ObjectMapper
 
         public void Serialize(IIonWriter writer, Guid item)
         {
-            if (options.AnnotateGuids) {
+            if (this.options.AnnotateGuids)
+            {
                 writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             }
+
             writer.WriteBlob(item.ToByteArray());
         }
     }

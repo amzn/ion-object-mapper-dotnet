@@ -1,14 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Amazon.IonDotnet;
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 
 namespace Amazon.Ion.ObjectMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using Amazon.IonDotnet;
+
     public class IonObjectSerializer : IonSerializer<object>
     {
-        private const BindingFlags fieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+        private const BindingFlags FieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
@@ -22,34 +37,35 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader)
         {
-            var targetObject = options.ObjectFactory.Create(options, reader, targetType);
+            var targetObject = this.options.ObjectFactory.Create(this.options, reader, this.targetType);
             reader.StepIn();
 
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
-                var property = FindProperty(reader.CurrentFieldName);
+                var property = this.FindProperty(reader.CurrentFieldName);
                 FieldInfo field;
                 if (property != null)
                 {
-                    var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-                    
-                    if (options.IgnoreDefaults && deserialized == default)
+                    var deserialized = this.ionSerializer.Deserialize(reader, property.PropertyType, ionType);
+
+                    if (this.options.IgnoreDefaults && deserialized == default)
                     {
                         continue;
                     }
-                    
+
                     property.SetValue(targetObject, deserialized);
                 }
-                else if ((field = FindField(reader.CurrentFieldName)) != null)
+                else if ((field = this.FindField(reader.CurrentFieldName)) != null)
                 {
-                    var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
-                    
-                    if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+                    var deserialized = this.ionSerializer.Deserialize(reader, field.FieldType, ionType);
+
+                    if (this.options.IgnoreReadOnlyFields && field.IsInitOnly)
                     {
                         continue;
                     }
-                    if (options.IgnoreDefaults && deserialized == default)
+
+                    if (this.options.IgnoreDefaults && deserialized == default)
                     {
                         continue;
                     }
@@ -57,76 +73,83 @@ namespace Amazon.Ion.ObjectMapper
                     field.SetValue(targetObject, deserialized);
                 }
             }
+
             reader.StepOut();
             return targetObject;
         }
 
         public void Serialize(IIonWriter writer, object item)
         {
-            options.TypeAnnotator.Apply(options, writer, targetType);
+            this.options.TypeAnnotator.Apply(this.options, writer, this.targetType);
             writer.StepIn(IonType.Struct);
-            foreach (var property in targetType.GetProperties())
+            foreach (var property in this.targetType.GetProperties())
             {
                 if (property.GetCustomAttributes(true).Any(it => it is IonIgnore))
                 {
                     continue;
                 }
-                
+
                 var propertyValue = property.GetValue(item);
-                if (options.IgnoreNulls && propertyValue == null)
-                {
-                    continue;
-                }
-                if (options.IgnoreDefaults && propertyValue == default)
+                if (this.options.IgnoreNulls && propertyValue == null)
                 {
                     continue;
                 }
 
-                writer.SetFieldName(IonFieldNameFromProperty(property));
-                ionSerializer.Serialize(writer, propertyValue);
+                if (this.options.IgnoreDefaults && propertyValue == default)
+                {
+                    continue;
+                }
+
+                writer.SetFieldName(this.IonFieldNameFromProperty(property));
+                this.ionSerializer.Serialize(writer, propertyValue);
             }
 
-            foreach (var field in Fields())
+            foreach (var field in this.Fields())
             {
                 var fieldValue = field.GetValue(item);
-                if (options.IgnoreNulls && fieldValue == null)
-                {
-                    continue;
-                }
-                if (options.IgnoreReadOnlyFields && field.IsInitOnly)
-                {
-                    continue;
-                }
-                if (options.IgnoreDefaults && fieldValue == default)
+                if (this.options.IgnoreNulls && fieldValue == null)
                 {
                     continue;
                 }
 
-                writer.SetFieldName(GetFieldName(field));
-                ionSerializer.Serialize(writer, fieldValue);
+                if (this.options.IgnoreReadOnlyFields && field.IsInitOnly)
+                {
+                    continue;
+                }
+
+                if (this.options.IgnoreDefaults && fieldValue == default)
+                {
+                    continue;
+                }
+
+                writer.SetFieldName(this.GetFieldName(field));
+                this.ionSerializer.Serialize(writer, fieldValue);
             }
+
             writer.StepOut();
         }
 
         private string IonFieldNameFromProperty(PropertyInfo property)
         {
             var ionPropertyName = property.GetCustomAttribute(typeof(IonPropertyName));
-            if (ionPropertyName != null) 
+            if (ionPropertyName != null)
             {
                 return ((IonPropertyName)ionPropertyName).Name;
             }
-            return options.NamingConvention.FromProperty(property.Name);
+
+            return this.options.NamingConvention.FromProperty(property.Name);
         }
 
         private PropertyInfo FindProperty(string readName)
         {
-            var exact = IonNamedProperties().FirstOrDefault(p => 
+            var exact = this.IonNamedProperties().FirstOrDefault(p =>
                 {
                     var ionPropertyName = p.GetCustomAttribute<IonPropertyName>();
                     if (ionPropertyName != null)
                     {
                         return p.GetCustomAttribute<IonPropertyName>().Name == readName;
                     }
+
                     return false;
                 });
             if (exact != null)
@@ -134,24 +157,26 @@ namespace Amazon.Ion.ObjectMapper
                 return exact;
             }
 
-            var name = options.NamingConvention.ToProperty(readName);
-            return targetType.GetProperty(name);
+            var name = this.options.NamingConvention.ToProperty(readName);
+            return this.targetType.GetProperty(name);
         }
+
         private FieldInfo FindField(string name)
         {
-            var exact = targetType.GetField(name, fieldBindings);
-            if (exact != null && IsField(exact))
+            var exact = this.targetType.GetField(name, FieldBindings);
+            if (exact != null && this.IsField(exact))
             {
                 return exact;
             }
 
-            return Fields().FirstOrDefault(f => 
+            return this.Fields().FirstOrDefault(f =>
             {
                 var propertyName = f.GetCustomAttribute(typeof(IonPropertyName));
                 if (propertyName != null)
                 {
                     return name == ((IonPropertyName)propertyName).Name;
                 }
+
                 return false;
             });
         }
@@ -165,10 +190,10 @@ namespace Amazon.Ion.ObjectMapper
         {
             return property.GetCustomAttribute(typeof(IonPropertyName)) != null;
         }
-        
+
         private bool IsField(FieldInfo field)
         {
-            if (options.IncludeFields)
+            if (this.options.IncludeFields)
             {
                 return true;
             }
@@ -178,12 +203,12 @@ namespace Amazon.Ion.ObjectMapper
 
         private IEnumerable<FieldInfo> Fields()
         {
-            return targetType.GetFields(fieldBindings).Where(IsField);
+            return this.targetType.GetFields(FieldBindings).Where(this.IsField);
         }
 
         private IEnumerable<PropertyInfo> IonNamedProperties()
         {
-            return targetType.GetProperties().Where(IsIonNamedProperty);
+            return this.targetType.GetProperties().Where(IsIonNamedProperty);
         }
 
         private string GetFieldName(FieldInfo field)
@@ -193,6 +218,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 return ((IonPropertyName)propertyName).Name;
             }
+
             return field.Name;
         }
     }
