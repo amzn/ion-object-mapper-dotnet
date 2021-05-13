@@ -65,10 +65,10 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string Brand { get; init; }
 
         [IonField]
-        public string color;
+        internal string color;
 
         [IonField]
-        public bool canOffroad;
+        internal bool canOffroad;
 
         public override string ToString()
         {
@@ -278,10 +278,10 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Teacher
     {
-        public readonly string firstName;
-        public readonly string lastName;
-        public string department;
-        public readonly DateTime? birthDate;
+        internal readonly string firstName;
+        internal readonly string lastName;
+        internal string department;
+        internal readonly DateTime? birthDate;
 
         public Teacher()
         {
