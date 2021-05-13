@@ -107,7 +107,6 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             stream.Position = 0;
             var deserialized = serializer.Deserialize<Car>(stream);
-            Assert.IsNotNull(deserialized.color);
             Assert.AreEqual(TestObjects.honda.GetColor(), deserialized.color);
         }
 
