@@ -28,10 +28,12 @@ namespace Amazon.Ion.ObjectMapper
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
-                var property = FindProperty(reader.CurrentFieldName);
+                PropertyInfo property;
                 FieldInfo field;
                 MethodInfo method;
-                if (property != null)
+                
+                // Check if current ion field is a .NET property
+                if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
                     
@@ -42,6 +44,7 @@ namespace Amazon.Ion.ObjectMapper
                     
                     property.SetValue(targetObject, deserialized);
                 }
+                // Check if current ion field is a .NET field
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
@@ -57,7 +60,8 @@ namespace Amazon.Ion.ObjectMapper
 
                     field.SetValue(targetObject, deserialized);
                 }
-                else if ((method = FindSetterMethod(reader.CurrentFieldName)) != null)
+                // Check if current ion field has a setter method
+                else if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, method.GetParameters()[0].ParameterType, ionType);
                     method.Invoke(targetObject, new[]{ deserialized });
@@ -71,6 +75,8 @@ namespace Amazon.Ion.ObjectMapper
         {
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
+            
+            // Serialize any properties that satisfy the options/attributes
             foreach (var property in targetType.GetProperties())
             {
                 if (property.GetCustomAttributes(true).Any(it => it is IonIgnore))
@@ -92,6 +98,7 @@ namespace Amazon.Ion.ObjectMapper
                 ionSerializer.Serialize(writer, propertyValue);
             }
 
+            // Serialize any fields that satisfy the options/attributes
             foreach (var field in Fields())
             {
                 var fieldValue = field.GetValue(item);
@@ -112,6 +119,8 @@ namespace Amazon.Ion.ObjectMapper
                 ionSerializer.Serialize(writer, fieldValue);
             }
 
+            // Serialize the values returned from getter methods
+            // as long as they have zero arguments and are annotated with the IonPropertyGetter attribute.
             foreach (var method in targetType.GetMethods())
             {
                 var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
@@ -176,10 +185,11 @@ namespace Amazon.Ion.ObjectMapper
             });
         }
 
-        private MethodInfo FindSetterMethod(string name)
+        private MethodInfo FindSetter(string name)
         {
             return targetType.GetMethods().FirstOrDefault(m =>
             {
+                // A setter should be a one argument void method with the IonPropertySetter attribute
                 var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
                 return setMethod != null && 
                        setMethod.FieldName == name &&
