@@ -181,7 +181,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Car
     {
-        public string color;
+        internal string color;
 
         public string Make { get; init; }
         public string Model { get; init; }
