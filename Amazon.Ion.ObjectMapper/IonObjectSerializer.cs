@@ -30,6 +30,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 var property = FindProperty(reader.CurrentFieldName);
                 FieldInfo field;
+                MethodInfo method;
                 if (property != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
@@ -55,6 +56,11 @@ namespace Amazon.Ion.ObjectMapper
                     }
 
                     field.SetValue(targetObject, deserialized);
+                }
+                else if ((method = FindSetterMethod(reader.CurrentFieldName)) != null)
+                {
+                    var deserialized = ionSerializer.Deserialize(reader, method.GetParameters()[0].ParameterType, ionType);
+                    method.Invoke(targetObject, new[]{ deserialized });
                 }
             }
             reader.StepOut();
@@ -105,6 +111,20 @@ namespace Amazon.Ion.ObjectMapper
                 writer.SetFieldName(GetFieldName(field));
                 ionSerializer.Serialize(writer, fieldValue);
             }
+
+            foreach (var method in targetType.GetMethods())
+            {
+                var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
+                if (getMethod?.FieldName == null || method.GetParameters().Length != 0)
+                {
+                    continue;
+                }
+
+                writer.SetFieldName(getMethod.FieldName);
+                var getValue = method.Invoke(item, Array.Empty<object>());
+                ionSerializer.Serialize(writer, getValue);
+            }
+            
             writer.StepOut();
         }
 
@@ -159,6 +179,19 @@ namespace Amazon.Ion.ObjectMapper
                     return name == ((IonPropertyName)propertyName).Name;
                 }
                 return false;
+            });
+        }
+
+        private MethodInfo FindSetterMethod(string name)
+        {
+            return targetType.GetMethods().FirstOrDefault(m =>
+            {
+                var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
+                return setMethod != null && 
+                       setMethod.FieldName == name &&
+                       m.ReturnParameter != null && 
+                       m.ReturnParameter.ParameterType == typeof(void) && 
+                       m.GetParameters().Length == 1;
             });
         }
 

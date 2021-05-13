@@ -110,6 +110,21 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesAndDeserializesGetterAndSetterMethods()
+        {
+            var serializer = new IonSerializer();
+
+            var stream = serializer.Serialize(TestObjects.honda);
+            IIonStruct serialized = StreamToIonValue(stream);
+            Assert.IsTrue(serialized.ContainsField("color"));
+
+            stream.Position = 0;
+            var deserialized = serializer.Deserialize<Car>(stream);
+            Assert.IsNotNull(deserialized.color);
+            Assert.AreEqual(TestObjects.honda.GetColor(), deserialized.color);
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
             Check(

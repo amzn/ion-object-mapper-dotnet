@@ -181,7 +181,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Car
     {
-        private string color;
+        public string color;
 
         public string Make { get; init; }
         public string Model { get; init; }
@@ -194,11 +194,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         [IonPropertyName("weightInKg")]
         public double Weight { get; init; }
 
+        [IonPropertyGetter("color")]
         public string GetColor() 
         {
             return "#FF0000";
         }
 
+        [IonPropertySetter("color")]
         public void SetColor(string input) 
         {
             this.color = input;

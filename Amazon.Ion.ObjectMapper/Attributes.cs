@@ -36,6 +36,26 @@ namespace Amazon.Ion.ObjectMapper
         public string Name { get; }
     }
 
+    public class IonPropertyGetter : Attribute
+    {
+        public IonPropertyGetter(string fieldName)
+        {
+            this.FieldName = fieldName;
+        }
+
+        public string FieldName { get; }
+    }
+    
+    public class IonPropertySetter : Attribute
+    {
+        public IonPropertySetter(string fieldName)
+        {
+            FieldName = fieldName;
+        }
+
+        public string FieldName { get; }
+    }
+
     public class IonField : Attribute
     {
     }
