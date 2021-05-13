@@ -32,7 +32,7 @@ namespace Amazon.Ion.ObjectMapper
                 FieldInfo field;
                 MethodInfo method;
                 
-                // Check if current ion field is a .NET property
+                // Check if current Ion field is a .NET property
                 if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
@@ -44,7 +44,7 @@ namespace Amazon.Ion.ObjectMapper
                     
                     property.SetValue(targetObject, deserialized);
                 }
-                // Check if current ion field is a .NET field
+                // Check if current Ion field is a .NET field
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
@@ -60,7 +60,7 @@ namespace Amazon.Ion.ObjectMapper
 
                     field.SetValue(targetObject, deserialized);
                 }
-                // Check if current ion field has a setter method
+                // Check if current Ion field has a setter method
                 else if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
                     // A setter should be a void method
