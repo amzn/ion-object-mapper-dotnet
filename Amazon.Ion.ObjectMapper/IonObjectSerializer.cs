@@ -63,7 +63,20 @@ namespace Amazon.Ion.ObjectMapper
                 // Check if current ion field has a setter method
                 else if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
-                    var deserialized = ionSerializer.Deserialize(reader, method.GetParameters()[0].ParameterType, ionType);
+                    // A setter should be a void method
+                    if (method.ReturnParameter == null || method.ReturnParameter.ParameterType != typeof(void))
+                    {
+                        continue;
+                    }
+
+                    // A setter should have exactly one argument
+                    var parameters = method.GetParameters();
+                    if (parameters.Length != 1)
+                    {
+                        continue;
+                    }
+
+                    var deserialized = ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
                     method.Invoke(targetObject, new[]{ deserialized });
                 }
             }
@@ -189,13 +202,8 @@ namespace Amazon.Ion.ObjectMapper
         {
             return targetType.GetMethods().FirstOrDefault(m =>
             {
-                // A setter should be a one argument void method with the IonPropertySetter attribute
                 var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
-                return setMethod != null && 
-                       setMethod.FieldName == name &&
-                       m.ReturnParameter != null && 
-                       m.ReturnParameter.ParameterType == typeof(void) && 
-                       m.GetParameters().Length == 1;
+                return setMethod != null && setMethod.FieldName == name;
             });
         }
 
