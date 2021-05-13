@@ -118,7 +118,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             IIonStruct serialized = StreamToIonValue(stream);
             Assert.IsTrue(serialized.ContainsField("color"));
 
-            stream.Position = 0;
             var deserialized = serializer.Deserialize<Car>(stream);
             Assert.AreEqual(TestObjects.honda.GetColor(), deserialized.color);
         }
