@@ -131,10 +131,10 @@ namespace Amazon.Ion.ObjectMapper
 
         private string IonFieldNameFromProperty(PropertyInfo property)
         {
-            var ionPropertyName = property.GetCustomAttribute(typeof(IonPropertyName));
+            var ionPropertyName = (IonPropertyName)property.GetCustomAttribute(typeof(IonPropertyName));
             if (ionPropertyName != null)
             {
-                return ((IonPropertyName)ionPropertyName).Name;
+                return ionPropertyName.Name;
             }
 
             return this.options.NamingConvention.FromProperty(property.Name);
@@ -171,13 +171,8 @@ namespace Amazon.Ion.ObjectMapper
 
             return this.Fields().FirstOrDefault(f =>
             {
-                var propertyName = f.GetCustomAttribute(typeof(IonPropertyName));
-                if (propertyName != null)
-                {
-                    return name == ((IonPropertyName)propertyName).Name;
-                }
-
-                return false;
+                var propertyName = (IonPropertyName)f.GetCustomAttribute(typeof(IonPropertyName));
+                return name == propertyName?.Name;
             });
         }
 
@@ -213,13 +208,8 @@ namespace Amazon.Ion.ObjectMapper
 
         private string GetFieldName(FieldInfo field)
         {
-            var propertyName = field.GetCustomAttribute(typeof(IonPropertyName));
-            if (propertyName != null)
-            {
-                return ((IonPropertyName)propertyName).Name;
-            }
-
-            return field.Name;
+            var propertyName = (IonPropertyName)field.GetCustomAttribute(typeof(IonPropertyName));
+            return propertyName != null ? propertyName.Name : field.Name;
         }
     }
 }
