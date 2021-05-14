@@ -22,7 +22,18 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader)
         {
-            var targetObject = options.ObjectFactory.Create(options, reader, targetType);
+            object targetObject;
+            
+            var constructor = targetType.GetConstructors().FirstOrDefault(IsIonConstructor);
+            if (constructor != null)
+            {
+                targetObject = constructor.Invoke(new object[constructor.GetParameters().Length]);
+            }
+            else
+            {
+                targetObject = options.ObjectFactory.Create(options, reader, targetType);
+            }
+
             reader.StepIn();
 
             IonType ionType;
@@ -154,6 +165,11 @@ namespace Amazon.Ion.ObjectMapper
                 }
                 return false;
             });
+        }
+
+        private static bool IsIonConstructor(ConstructorInfo constructor)
+        {
+            return constructor.GetCustomAttribute(typeof(IonConstructor)) != null;
         }
 
         private static bool IsIonField(FieldInfo field)

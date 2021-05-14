@@ -225,10 +225,17 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Wheel
     {
+        internal string specification;
+
+        public Wheel()
+        {
+            this.specification = "default";
+        }
+
         [IonConstructor]
         public Wheel([IonPropertyName("specification")] string specification)
         {
-
+            this.specification = $"Specification: {specification}";
         }
     }
 
