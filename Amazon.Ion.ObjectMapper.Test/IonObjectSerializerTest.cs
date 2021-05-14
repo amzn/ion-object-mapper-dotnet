@@ -108,6 +108,18 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             Check(TestObjects.fmRadio);
         }
+        
+        [TestMethod]
+        public void SerializesAndDeserializesObjectsWithIonConstructor()
+        {
+            var serializer = new IonSerializer();
+            var wheel = new Wheel();
+            
+            var stream = serializer.Serialize(wheel);
+            var deserialized = serializer.Deserialize<Wheel>(stream);
+            
+            Assert.AreNotEqual(wheel.specification, deserialized.specification);
+        }
 
         [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
