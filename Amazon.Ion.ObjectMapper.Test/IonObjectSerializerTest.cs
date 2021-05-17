@@ -105,7 +105,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             var stream = serializer.Serialize(wheel);
             var deserialized = serializer.Deserialize<Wheel>(stream);
             
-            Assert.AreNotEqual(wheel.specification, deserialized.specification);
+            Assert.AreEqual($"Specification: {wheel.specification}", deserialized.specification);
         }
 
         [TestMethod]
