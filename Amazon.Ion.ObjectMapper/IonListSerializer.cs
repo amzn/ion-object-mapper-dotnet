@@ -68,10 +68,10 @@ namespace Amazon.Ion.ObjectMapper
             throw new NotSupportedException("Don't know how to make a list of type " + listType + " with element type " + elementType);
         }
 
-        public void Serialize(IIonWriter writer, System.Collections.IList item)
+        public void Serialize(IIonWriter writer, object item)
         {
             writer.StepIn(IonType.List);
-            foreach (var i in item)
+            foreach (var i in (System.Collections.IList)item)
             {
                 serializer.Serialize(writer, i);
             }

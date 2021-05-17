@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Amazon.IonDotnet;
@@ -9,7 +10,7 @@ namespace Amazon.Ion.ObjectMapper
 {
     public interface IonSerializer<T>
     {
-        void Serialize(IIonWriter writer, T item);
+        void Serialize(IIonWriter writer, object item);
         T Deserialize(IIonReader reader);
     }
 
@@ -132,15 +133,30 @@ namespace Amazon.Ion.ObjectMapper
     public class IonSerializer
     {
         private readonly IonSerializationOptions options;
+        private Dictionary<Type, dynamic> IonSerializers { get; init; }
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
-
         }
 
         public IonSerializer(IonSerializationOptions options)
         {
             this.options = options;
+            this.IonSerializers = new Dictionary<Type, dynamic>()
+            {
+                {typeof(bool), new IonBooleanSerializer()},
+                {typeof(int), new IonIntSerializer()},
+                {typeof(long), new IonLongSerializer()},
+                {typeof(float), new IonFloatSerializer()},
+                {typeof(double), new IonDoubleSerializer()},
+                {typeof(decimal), new IonDecimalSerializer()},
+                {typeof(BigDecimal), new IonBigDecimalSerializer()},
+                {typeof(byte[]), new IonByteArraySerializer()},
+                {typeof(string), new IonStringSerializer()},
+                {typeof(SymbolToken), new IonSymbolSerializer()},
+                {typeof(DateTime), new IonDateTimeSerializer()},
+                {typeof(Guid), new IonGuidSerializer(this.options.AnnotateGuids)},
+            };
         }
 
         public Stream Serialize<T>(T item)
@@ -163,91 +179,27 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (item == null)
             {
-                new IonNullSerializer().Serialize(writer, (object)null);
+                new IonNullSerializer().Serialize(writer, null);
                 return;
             }
 
-            if (item is bool)
+            Type type = item.GetType();
+            if (this.IonSerializers.ContainsKey(type))
             {
-                new IonBooleanSerializer().Serialize(writer, Convert.ToBoolean(item));
-                return;
-            }
-
-            if (item is int)
-            {
-                new IonIntSerializer().Serialize(writer, Convert.ToInt32(item));
-                return;
-            }
-
-            if (item is long)
-            {
-                new IonLongSerializer().Serialize(writer, Convert.ToInt64(item));
-                return;
-            }
-
-            if (item is float)
-            {
-                new IonFloatSerializer().Serialize(writer, Convert.ToSingle(item));
-                return;
-            }
-
-            if (item is double)
-            {
-                new IonDoubleSerializer().Serialize(writer, Convert.ToDouble(item));
-                return;
-            }
-
-            if (item is decimal)
-            {
-                new IonDecimalSerializer().Serialize(writer, Convert.ToDecimal(item));
-                return;
-            }
-
-            if (item is BigDecimal)
-            {
-                new IonBigDecimalSerializer().Serialize(writer, (BigDecimal)(object)item);
-                return;
-            }
-
-            if (item is byte[])
-            {
-                new IonByteArraySerializer().Serialize(writer, (byte[])(object)item);
-                return;
-            }
-
-            if (item is string)
-            {
-                new IonStringSerializer().Serialize(writer, item as string);
-                return;
-            }
-
-            if (item is SymbolToken)
-            {
-                new IonSymbolSerializer().Serialize(writer, (SymbolToken)(object)item);
-                return;
-            }
-
-            if (item is DateTime)
-            {
-                new IonDateTimeSerializer().Serialize(writer, (DateTime)(object)item);
+                var serializer = this.IonSerializers[type];
+                serializer.Serialize(writer, item);
                 return;
             }
 
             if (item is System.Collections.IList) 
             {
-                NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)(object)item);
-                return;
-            }
-
-            if (item is Guid) 
-            {
-                new IonGuidSerializer(options).Serialize(writer, (Guid)(object)item);
+                NewIonListSerializer(type).Serialize(writer, item);
                 return;
             }
 
             if (item is object) 
             {
-                new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
+                new IonObjectSerializer(this, options, type).Serialize(writer, item);
                 return;
             }
 
@@ -328,7 +280,7 @@ namespace Amazon.Ion.ObjectMapper
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                     || type.IsAssignableTo(typeof(Guid)))
                 {
-                    return new IonGuidSerializer(options).Deserialize(reader);
+                    return new IonGuidSerializer(this.options.AnnotateGuids).Deserialize(reader);
                 }
                 return new IonByteArraySerializer().Deserialize(reader);
             }
