@@ -22,54 +22,56 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader)
         {
-            object targetObject;
-            
-            var constructor = targetType.GetConstructors().FirstOrDefault(IsIonConstructor);
-            if (constructor != null)
+            try
             {
-                targetObject = constructor.Invoke(new object[constructor.GetParameters().Length]);
-            }
-            else
-            {
-                targetObject = options.ObjectFactory.Create(options, reader, targetType);
-            }
-
-            reader.StepIn();
-
-            IonType ionType;
-            while ((ionType = reader.MoveNext()) != IonType.None)
-            {
-                var property = FindProperty(reader.CurrentFieldName);
-                FieldInfo field;
-                if (property != null)
+                reader.StepIn();
+                
+                var ionConstructor = targetType.GetConstructors().FirstOrDefault(IsIonConstructor);
+                if (ionConstructor != null)
                 {
-                    var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-                    
-                    if (options.IgnoreDefaults && deserialized == default)
-                    {
-                        continue;
-                    }
-                    
-                    property.SetValue(targetObject, deserialized);
+                    return InvokeIonConstructor(ionConstructor, reader);
                 }
-                else if ((field = FindField(reader.CurrentFieldName)) != null)
-                {
-                    var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
-                    
-                    if (options.IgnoreReadOnlyFields && field.IsInitOnly)
-                    {
-                        continue;
-                    }
-                    if (options.IgnoreDefaults && deserialized == default)
-                    {
-                        continue;
-                    }
 
-                    field.SetValue(targetObject, deserialized);
+                var targetObject = options.ObjectFactory.Create(options, reader, targetType);
+
+                IonType ionType;
+                while ((ionType = reader.MoveNext()) != IonType.None)
+                {
+                    var property = FindProperty(reader.CurrentFieldName);
+                    FieldInfo field;
+                    if (property != null)
+                    {
+                        var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
+                        
+                        if (options.IgnoreDefaults && deserialized == default)
+                        {
+                            continue;
+                        }
+                        
+                        property.SetValue(targetObject, deserialized);
+                    }
+                    else if ((field = FindField(reader.CurrentFieldName)) != null)
+                    {
+                        var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
+                        
+                        if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+                        {
+                            continue;
+                        }
+                        if (options.IgnoreDefaults && deserialized == default)
+                        {
+                            continue;
+                        }
+
+                        field.SetValue(targetObject, deserialized);
+                    }
                 }
+                return targetObject;
             }
-            reader.StepOut();
-            return targetObject;
+            finally
+            {
+                reader.StepOut();
+            }
         }
 
         public void Serialize(IIonWriter writer, object item)
@@ -117,6 +119,44 @@ namespace Amazon.Ion.ObjectMapper
                 ionSerializer.Serialize(writer, fieldValue);
             }
             writer.StepOut();
+        }
+
+        private object InvokeIonConstructor(ConstructorInfo ionConstructor, IIonReader reader)
+        {
+            var parameters = ionConstructor.GetParameters();
+            
+            // Compute mapping between parameter names and index in parameter array
+            var paramIndexMap = new Dictionary<string, int>();
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var paramName = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
+                if (paramName != null)
+                {
+                    paramIndexMap.Add(paramName.Name, i);
+                }
+                else
+                {
+                    throw new NotSupportedException(
+                        "Not all parameters are specified with the [IonPropertyName] attribute " +
+                        $"for {targetType.Name}'s IonConstructor");
+                }
+            }
+                    
+            var arguments = new object[parameters.Length];
+            
+            // Iterate through reader to determine argument values to pass into constructor
+            IonType ionType;
+            while ((ionType = reader.MoveNext()) != IonType.None)
+            {
+                if (paramIndexMap.ContainsKey(reader.CurrentFieldName))
+                {
+                    var index = paramIndexMap[reader.CurrentFieldName];
+                    var deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                    arguments[index] = deserialized;
+                }
+            }
+
+            return ionConstructor.Invoke(arguments);
         }
 
         private string IonFieldNameFromProperty(PropertyInfo property)

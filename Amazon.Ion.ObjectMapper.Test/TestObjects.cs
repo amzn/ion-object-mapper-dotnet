@@ -225,6 +225,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Wheel
     {
+        [IonField]
         internal string specification;
 
         public Wheel()
