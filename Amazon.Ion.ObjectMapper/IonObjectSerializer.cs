@@ -129,10 +129,10 @@ namespace Amazon.Ion.ObjectMapper
             var paramIndexMap = new Dictionary<string, int>();
             for (int i = 0; i < parameters.Length; i++)
             {
-                var paramName = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
-                if (paramName != null)
+                var param = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
+                if (param != null)
                 {
-                    paramIndexMap.Add(paramName.Name, i);
+                    paramIndexMap.Add(param.Name, i);
                 }
                 else
                 {
