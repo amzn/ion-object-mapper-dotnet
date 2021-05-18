@@ -11,7 +11,7 @@ namespace Amazon.Ion.ObjectMapper
 {
     public interface IonSerializer<T>
     {
-        void Serialize(IIonWriter writer, object item);
+        void Serialize(IIonWriter writer, T item);
         T Deserialize(IIonReader reader);
     }
 
