@@ -26,10 +26,15 @@ namespace Amazon.Ion.ObjectMapper
             {
                 reader.StepIn();
                 
-                var ionConstructor = targetType.GetConstructors().FirstOrDefault(IsIonConstructor);
-                if (ionConstructor != null)
+                var ionConstructors = targetType.GetConstructors().Where(IsIonConstructor);
+                switch (ionConstructors.Count())
                 {
-                    return InvokeIonConstructor(ionConstructor, reader);
+                    case 1:
+                        return InvokeIonConstructor(ionConstructors.First(), reader);
+                    case > 1:
+                        throw new NotSupportedException(
+                            $"More than one constructor in class {targetType.Name} " +
+                            "is annotated with the [IonConstructor] attribute");
                 }
 
                 var targetObject = options.ObjectFactory.Create(options, reader, targetType);
