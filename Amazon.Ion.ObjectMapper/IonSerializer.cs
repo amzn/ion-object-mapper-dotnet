@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -132,8 +133,12 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        private readonly IonSerializationOptions options;
-        private Dictionary<Type, dynamic> IonSerializers { get; init; }
+        internal readonly IonSerializationOptions options;
+        private Dictionary<Type, dynamic> primitiveSerializers { get; init; }
+        private IonNullSerializer nullSerializer { get; init; }
+        private IonClobSerializer clobSerializer { get; init; }
+        private IonListSerializer listSerializer { get; init; }
+        private IonObjectSerializer objectSerializer { get; init; }
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
@@ -142,21 +147,25 @@ namespace Amazon.Ion.ObjectMapper
         public IonSerializer(IonSerializationOptions options)
         {
             this.options = options;
-            this.IonSerializers = new Dictionary<Type, dynamic>()
+            this.primitiveSerializers = new Dictionary<Type, dynamic>()
             {
                 {typeof(bool), new IonBooleanSerializer()},
+                {typeof(string), new IonStringSerializer()},
+                {typeof(byte[]), new IonByteArraySerializer()},
                 {typeof(int), new IonIntSerializer()},
                 {typeof(long), new IonLongSerializer()},
                 {typeof(float), new IonFloatSerializer()},
                 {typeof(double), new IonDoubleSerializer()},
                 {typeof(decimal), new IonDecimalSerializer()},
                 {typeof(BigDecimal), new IonBigDecimalSerializer()},
-                {typeof(byte[]), new IonByteArraySerializer()},
-                {typeof(string), new IonStringSerializer()},
                 {typeof(SymbolToken), new IonSymbolSerializer()},
                 {typeof(DateTime), new IonDateTimeSerializer()},
                 {typeof(Guid), new IonGuidSerializer(this.options.AnnotateGuids)},
             };
+            this.nullSerializer = new IonNullSerializer();
+            this.clobSerializer = new IonClobSerializer();
+            this.listSerializer = new IonListSerializer(this);
+            this.objectSerializer = new IonObjectSerializer(this);
         }
 
         public Stream Serialize<T>(T item)
@@ -179,52 +188,31 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (item == null)
             {
-                new IonNullSerializer().Serialize(writer, null);
+                this.nullSerializer.Serialize(writer, null);
                 return;
             }
 
             Type type = item.GetType();
-            if (this.IonSerializers.ContainsKey(type))
+            if (this.primitiveSerializers.ContainsKey(type))
             {
-                var serializer = this.IonSerializers[type];
-                serializer.Serialize(writer, item);
+                this.primitiveSerializers[type].Serialize(writer, item);
                 return;
             }
 
-            if (item is System.Collections.IList) 
+            switch (item)
             {
-                NewIonListSerializer(type).Serialize(writer, item);
-                return;
+                case IList:
+                    this.listSerializer.SetListType(type);
+                    this.listSerializer.Serialize(writer, item);
+                    break;
+                case object:
+                    this.objectSerializer.targetType = type;
+                    this.objectSerializer.Serialize(writer, item);
+                    break;
+                default:
+                    throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
             }
-
-            if (item is object) 
-            {
-                new IonObjectSerializer(this, options, type).Serialize(writer, item);
-                return;
-            }
-
-            throw new NotSupportedException("Do not know how to serialize type " + typeof(T));
         }
-
-        private IonListSerializer NewIonListSerializer(Type listType) 
-        {
-            if (listType.IsArray)
-            {
-                return new IonListSerializer(this, listType, listType.GetElementType());
-            }
-            
-            if (listType.IsAssignableTo(typeof(System.Collections.IList)))
-            {
-                if (listType.IsGenericType)
-                {
-                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0]);
-                }
-                return new IonListSerializer(this, listType);
-            }
-            
-            throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
-        }
-
 
         public T Deserialize<T>(Stream stream)
         {
@@ -238,84 +226,47 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
-            if (ionType == IonType.None || ionType == IonType.Null)
+            switch (ionType)
             {
-                return new IonNullSerializer().Deserialize(reader);
+                case IonType.None:
+                case IonType.Null:
+                    return this.nullSerializer.Deserialize(reader);
+                case IonType.Bool:
+                    return this.primitiveSerializers[typeof(bool)].Deserialize(reader);
+                case IonType.Int when reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)):
+                    return this.primitiveSerializers[typeof(long)].Deserialize(reader);
+                case IonType.Int:
+                    return this.primitiveSerializers[typeof(int)].Deserialize(reader);
+                case IonType.Float when reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)):
+                    return this.primitiveSerializers[typeof(float)].Deserialize(reader);
+                case IonType.Float:
+                    return this.primitiveSerializers[typeof(double)].Deserialize(reader);
+                case IonType.Decimal when reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)):
+                    return this.primitiveSerializers[typeof(decimal)].Deserialize(reader);
+                case IonType.Decimal:
+                    return this.primitiveSerializers[typeof(BigDecimal)].Deserialize(reader);
+                case IonType.Blob when reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
+                                       || type.IsAssignableTo(typeof(Guid)):
+                    return this.primitiveSerializers[typeof(Guid)].Deserialize(reader);
+                case IonType.Blob:
+                    return this.primitiveSerializers[typeof(byte[])].Deserialize(reader);
+                case IonType.String:
+                    return this.primitiveSerializers[typeof(string)].Deserialize(reader);
+                case IonType.Symbol:
+                    return this.primitiveSerializers[typeof(SymbolToken)].Deserialize(reader);
+                case IonType.Timestamp:
+                    return this.primitiveSerializers[typeof(DateTime)].Deserialize(reader);
+                case IonType.Clob:
+                    return this.clobSerializer.Deserialize(reader);
+                case IonType.List:
+                    this.listSerializer.SetListType(type);
+                    return this.listSerializer.Deserialize(reader);
+                case IonType.Struct:
+                    this.objectSerializer.targetType = type;
+                    return this.objectSerializer.Deserialize(reader);
+                default:
+                    throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
             }
-
-            if (ionType == IonType.Bool)
-            {
-                return new IonBooleanSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Int)
-            {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
-                {
-                    return new IonLongSerializer().Deserialize(reader);
-                }
-                return new IonIntSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Float)
-            {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
-                {
-                    return new IonFloatSerializer().Deserialize(reader);
-                }
-                return new IonDoubleSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Decimal)
-            {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
-                {
-                    return new IonDecimalSerializer().Deserialize(reader);
-                }
-                return new IonBigDecimalSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Blob) 
-            {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
-                    || type.IsAssignableTo(typeof(Guid)))
-                {
-                    return new IonGuidSerializer(this.options.AnnotateGuids).Deserialize(reader);
-                }
-                return new IonByteArraySerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.String) 
-            {
-                return new IonStringSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Symbol) 
-            {
-                return new IonSymbolSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Timestamp) 
-            {
-                return new IonDateTimeSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.Clob) 
-            {
-                return new IonClobSerializer().Deserialize(reader);
-            }
-
-            if (ionType == IonType.List) 
-            {
-                return NewIonListSerializer(type).Deserialize(reader);
-            }
-
-            if (ionType == IonType.Struct) 
-            {
-                return new IonObjectSerializer(this, options, type).Deserialize(reader);
-            }
-
-            throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
         }
 
         public T Deserialize<T>(IIonReader reader)

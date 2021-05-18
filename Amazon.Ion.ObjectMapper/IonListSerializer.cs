@@ -1,32 +1,61 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper
 {
-    public class IonListSerializer : IonSerializer<System.Collections.IList>
+    public class IonListSerializer : IonSerializer<IList>
     {
         private readonly IonSerializer serializer;
-        private readonly Type listType;
-        private readonly Type elementType;
-        private readonly bool isGenericList;
+        private Type listType;
+        private Type elementType;
+        private bool isGenericList;
 
-        public IonListSerializer(IonSerializer serializer, Type listType, Type elementType)
+        public IonListSerializer(IonSerializer serializer)
         {
             this.serializer = serializer;
-            this.listType = listType;
-            this.elementType = elementType;
-            this.isGenericList = true;
         }
 
         public IonListSerializer(IonSerializer serializer, Type listType)
         {
             this.serializer = serializer;
+            this.SetListType(listType);
+        }
+        
+        internal void SetListType(Type listType)
+        {
+            if (listType == this.listType)
+            {
+                return;
+            }
+
             this.listType = listType;
-            this.isGenericList = false;
+
+            if (listType.IsArray)
+            {
+                this.elementType = listType.GetElementType();
+                this.isGenericList = true;
+            }
+            else if (listType.IsAssignableTo(typeof(IList)))
+            {
+                if (listType.IsGenericType)
+                {
+                    this.elementType = listType.GetGenericArguments()[0];
+                    this.isGenericList = true;
+                }
+                else
+                {
+                    this.isGenericList = false;
+                }
+            }
+            else
+            {
+                throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
+            }
         }
 
-        public System.Collections.IList Deserialize(IIonReader reader)
+        public IList Deserialize(IIonReader reader)
         {
             reader.StepIn();
             var list = new System.Collections.ArrayList();
