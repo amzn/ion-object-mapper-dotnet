@@ -129,35 +129,37 @@ namespace Amazon.Ion.ObjectMapper
         private object InvokeIonConstructor(ConstructorInfo ionConstructor, IIonReader reader)
         {
             var parameters = ionConstructor.GetParameters();
-            
-            // Compute mapping between parameter names and index in parameter array
-            var paramIndexMap = new Dictionary<string, int>();
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                var param = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
-                if (param != null)
-                {
-                    paramIndexMap.Add(param.Name, i);
-                }
-                else
-                {
-                    throw new NotSupportedException(
-                        $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
-                        $"for {targetType.Name}'s IonConstructor");
-                }
-            }
-                    
             var arguments = new object[parameters.Length];
-            
-            // Iterate through reader to determine argument values to pass into constructor
-            IonType ionType;
-            while ((ionType = reader.MoveNext()) != IonType.None)
+
+            if (parameters.Length > 0)
             {
-                if (paramIndexMap.ContainsKey(reader.CurrentFieldName))
+                // Compute mapping between parameter names and index in parameter array.
+                var paramIndexMap = new Dictionary<string, int>();
+                for (int i = 0; i < parameters.Length; i++)
                 {
-                    var index = paramIndexMap[reader.CurrentFieldName];
-                    var deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
-                    arguments[index] = deserialized;
+                    var param = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
+                    if (param != null)
+                    {
+                        paramIndexMap.Add(param.Name, i);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(
+                            $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
+                            $"for {targetType.Name}'s IonConstructor");
+                    }
+                }
+
+                // Iterate through reader to determine argument values to pass into constructor.
+                IonType ionType;
+                while ((ionType = reader.MoveNext()) != IonType.None)
+                {
+                    if (paramIndexMap.ContainsKey(reader.CurrentFieldName))
+                    {
+                        var index = paramIndexMap[reader.CurrentFieldName];
+                        var deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                        arguments[index] = deserialized;
+                    }
                 }
             }
 
