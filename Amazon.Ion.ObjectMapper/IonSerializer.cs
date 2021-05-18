@@ -265,7 +265,8 @@ namespace Amazon.Ion.ObjectMapper
                     this.objectSerializer.targetType = type;
                     return this.objectSerializer.Deserialize(reader);
                 default:
-                    throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
+                    throw new NotSupportedException(
+                        $"Don't know how to Deserialize this Ion data. Last IonType was: {ionType}");
             }
         }
 
