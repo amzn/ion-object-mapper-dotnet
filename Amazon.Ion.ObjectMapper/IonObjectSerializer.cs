@@ -22,6 +22,11 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader)
         {
+            if (reader == null)
+            {
+                throw new InvalidOperationException("Cannot deserialize with a null Ion reader");
+            }
+            
             try
             {
                 reader.StepIn();
@@ -81,6 +86,11 @@ namespace Amazon.Ion.ObjectMapper
 
         public void Serialize(IIonWriter writer, object item)
         {
+            if (writer == null)
+            {
+                throw new InvalidOperationException("Cannot serialize with a null Ion writer");
+            }
+            
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
             foreach (var property in targetType.GetProperties())
