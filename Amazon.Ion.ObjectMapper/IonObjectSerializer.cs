@@ -137,7 +137,7 @@ namespace Amazon.Ion.ObjectMapper
                 else
                 {
                     throw new NotSupportedException(
-                        "Not all parameters are specified with the [IonPropertyName] attribute " +
+                        $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
                         $"for {targetType.Name}'s IonConstructor");
                 }
             }
