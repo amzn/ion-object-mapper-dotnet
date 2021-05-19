@@ -226,48 +226,67 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
+            dynamic serializer;
             switch (ionType)
             {
                 case IonType.None:
                 case IonType.Null:
-                    return this.nullSerializer.Deserialize(reader);
+                    serializer = this.nullSerializer;
+                    break;
                 case IonType.Bool:
-                    return this.primitiveSerializers[typeof(bool)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(bool)];
+                    break;
                 case IonType.Int when reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)):
-                    return this.primitiveSerializers[typeof(long)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(long)];
+                    break;
                 case IonType.Int:
-                    return this.primitiveSerializers[typeof(int)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(int)];
+                    break;
                 case IonType.Float when reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)):
-                    return this.primitiveSerializers[typeof(float)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(float)];
+                    break;
                 case IonType.Float:
-                    return this.primitiveSerializers[typeof(double)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(double)];
+                    break;
                 case IonType.Decimal when reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)):
-                    return this.primitiveSerializers[typeof(decimal)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(decimal)];
+                    break;
                 case IonType.Decimal:
-                    return this.primitiveSerializers[typeof(BigDecimal)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(BigDecimal)];
+                    break;
                 case IonType.Blob when reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                                        || type.IsAssignableTo(typeof(Guid)):
-                    return this.primitiveSerializers[typeof(Guid)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(Guid)];
+                    break;
                 case IonType.Blob:
-                    return this.primitiveSerializers[typeof(byte[])].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(byte[])];
+                    break;
                 case IonType.String:
-                    return this.primitiveSerializers[typeof(string)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(string)];
+                    break;
                 case IonType.Symbol:
-                    return this.primitiveSerializers[typeof(SymbolToken)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(SymbolToken)];
+                    break;
                 case IonType.Timestamp:
-                    return this.primitiveSerializers[typeof(DateTime)].Deserialize(reader);
+                    serializer = this.primitiveSerializers[typeof(DateTime)];
+                    break;
                 case IonType.Clob:
-                    return this.clobSerializer.Deserialize(reader);
+                    serializer = this.clobSerializer;
+                    break;
                 case IonType.List:
                     this.listSerializer.SetListType(type);
-                    return this.listSerializer.Deserialize(reader);
+                    serializer = this.listSerializer;
+                    break;
                 case IonType.Struct:
                     this.objectSerializer.targetType = type;
-                    return this.objectSerializer.Deserialize(reader);
+                    serializer = this.objectSerializer;
+                    break;
                 default:
                     throw new NotSupportedException(
                         $"Don't know how to Deserialize this Ion data. Last IonType was: {ionType}");
             }
+            
+            return serializer.Deserialize(reader);
         }
 
         public T Deserialize<T>(IIonReader reader)
