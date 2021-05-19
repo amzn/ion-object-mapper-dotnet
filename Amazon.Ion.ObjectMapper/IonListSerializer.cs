@@ -32,21 +32,17 @@ namespace Amazon.Ion.ObjectMapper
 
             this.listType = listType;
 
-            if (listType.IsArray)
+            if (this.listType.IsArray)
             {
-                this.elementType = listType.GetElementType();
+                this.elementType = this.listType.GetElementType();
                 this.isGenericList = true;
             }
-            else if (listType.IsAssignableTo(typeof(IList)))
+            else if (this.listType.IsAssignableTo(typeof(IList)))
             {
-                if (listType.IsGenericType)
+                this.isGenericList = this.listType.IsGenericType;
+                if (this.isGenericList)
                 {
-                    this.elementType = listType.GetGenericArguments()[0];
-                    this.isGenericList = true;
-                }
-                else
-                {
-                    this.isGenericList = false;
+                    this.elementType = this.listType.GetGenericArguments()[0];
                 }
             }
             else
