@@ -32,14 +32,16 @@ namespace Amazon.Ion.ObjectMapper
                 reader.StepIn();
                 
                 var ionConstructors = targetType.GetConstructors().Where(IsIonConstructor);
-                switch (ionConstructors.Count())
+                if (ionConstructors.Any())
                 {
-                    case 1:
-                        return InvokeIonConstructor(ionConstructors.First(), reader);
-                    case > 1:
+                    if (ionConstructors.Count() > 1)
+                    {
                         throw new NotSupportedException(
                             $"More than one constructor in class {targetType.Name} " +
                             "is annotated with the [IonConstructor] attribute");
+                    }
+                    
+                    return InvokeIonConstructor(ionConstructors.First(), reader);
                 }
 
                 var targetObject = options.ObjectFactory.Create(options, reader, targetType);
@@ -148,16 +150,14 @@ namespace Amazon.Ion.ObjectMapper
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     var param = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
-                    if (param != null)
-                    {
-                        paramIndexMap.Add(param.Name, i);
-                    }
-                    else
+                    if (param == null)
                     {
                         throw new NotSupportedException(
                             $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
                             $"for {targetType.Name}'s IonConstructor");
                     }
+                    
+                    paramIndexMap.Add(param.Name, i);
                 }
 
                 // Iterate through reader to determine argument values to pass into constructor.
