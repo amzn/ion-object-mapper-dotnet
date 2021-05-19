@@ -2,7 +2,7 @@
 
 Ion is clumsy to use with QLDB in .NET and [customers have asked](https://amzn-aws.slack.com/archives/G01CFDRUG6R/p1612319039019200) (see Appendix A) for it to be improved. [From our own documentation](https://docs.aws.amazon.com/qldb/latest/developerguide/driver-quickstart-dotnet.html), this is how you create an Ion struct to send an Ion value to the database:
 
-```
+```c#
 IIonValue ionPerson = valueFactory.NewEmptyStruct();
 ionPerson.SetField("firstName", valueFactory.NewString("John"));
 ionPerson.SetField("lastName", valueFactory.NewString("Doe"));
@@ -11,7 +11,7 @@ ionPerson.SetField("age", valueFactory.NewInt(32));
 
 And this is how you read a value from the database:
 
-```
+```c#
 foreach (IIonValue row in selectResult)
 {
     var person = new Person
@@ -25,7 +25,7 @@ foreach (IIonValue row in selectResult)
 
 This is so onerous for one customer that they wrote this code:
 
-```
+```c#
 Execute("insert into myTable {JsonConvert(person).replace("\"", "'")}")
 
 ```
@@ -36,7 +36,7 @@ Which is arguably still clumsy, possibly incorrect, slow, and definitely dangero
 
 Given a `Car` object defined as follows:
 
-```
+```c#
 class Car
 {
     public string Make { get; init; }  // "init" is new keyword meaning you set
@@ -47,7 +47,7 @@ class Car
 
 SQL interactions for sending parameters should look like this:
 
-```
+```c#
 driver.Execute(tx =>
 {
     tx.Execute(
@@ -58,7 +58,7 @@ driver.Execute(tx =>
 
 And interactions for reading results could look like this:
 
-```
+```c#
 var hondaYears = driver.Execute(tx =>
 {
     return from car in tx.Execute("select * from Car").Select<Car>()
@@ -73,7 +73,7 @@ This leverages [Linq](https://docs.microsoft.com/en-us/dotnet/csharp/programming
 
 If finer grained control over the results is required, an alternate incantation is:
 
-```
+```c#
 Func<Stream, Car> myMappingFunc = stream => ... my custom mapping code ...
 IEnumerable<Car> cars = tx.Execute("select * from Car").Select(myMappingFunc);
 ```
@@ -88,7 +88,7 @@ We will enhance the QLDB .NET Driver to allow for .NET objects to be passed to i
 
 To prevent further bloating of the `TransactionExecutor` interface and with a look to the future where Ion or JSON types might be possible to pass in, we will add the functionality to accept arbitrary objects as parameters to `Execute` as an extension method:
 
-```
+```c#
 namespace Amazon.QLDB.Driver
 {
     public static class ObjectMapperExtensions
@@ -103,7 +103,7 @@ namespace Amazon.QLDB.Driver
 
 This permits the varargs usage of the driver as follows:
 
-```
+```c#
 tx.Execute(
     "insert into Car <<?, ?, ?>>>", 
     new Car { Make = "Opel", Model = "Monza", Year = 1997 },
@@ -113,7 +113,7 @@ tx.Execute(
 
 Alternately, one can supply a `List` of `Car` and thus insert multiple objects:
 
-```
+```c#
 tx.Execute(
     "insert into Car ?", new List<Car> {
          new Car { Make = "Opel", Model = "Monza", Year = 1997 },
@@ -123,7 +123,7 @@ tx.Execute(
 
 For mapping query result data from the database, new methods are required on `IResult` as follows:
 
-```
+```c#
 namespace Amazon.QLDB.Driver
 {
     public interface IResult : IEnumerable<IIonValue>
@@ -152,14 +152,14 @@ This is required to open the implementations and provide access to the raw strea
 
 In order to convert from Ion to `object` and back, we need a new Ion mapping library. The simplest interface for this library is:
 
-```
+```c#
 Stream stream = new IonSerializer().Serialize(car);
 Car car = new IonSerializer().Deserialize<Car>(stream);
 ```
 
 Using the generic type information, available at runtime thanks to C# reification, when deserializing, the library will detect that we are attempting to build a `Car` object. It will instantiate a `Car` and then set the properties on the `Car` that it finds in the `Stream`. Similarly it would be possible to deserialize a `List` of `Car` again because the generic type information is present at runtime.
 
-```
+```c#
 List<Car> = new IonSerializer().Deserialize<List<Car>>(stream);
 ```
 
@@ -167,7 +167,7 @@ List<Car> = new IonSerializer().Deserialize<List<Car>>(stream);
 
 We describe the default behavior of the mapping library and later the extension points to customize the defaults. The most natural way to use the library is to declare POCOs (**P**lain-**o**ld **C**LR **O**bjects):
 
-```
+```c#
 public class Car
 {
     public string Make { get; init; }
@@ -193,7 +193,7 @@ In addition to all `object` types these types are supported by default:
 * `List<T>` (also non-generic)
 * Arrays.
 
-```
+```c#
 new IonSerializer().Deserialize<List<Car>>(stream);
 new IonSerializer().Deserialize<Map<string, object>>(stream);
 ```
@@ -202,7 +202,7 @@ new IonSerializer().Deserialize<Map<string, object>>(stream);
 
 It is possible to ignore a property with the `Attribute` `IonIgnore`:
 
-```
+```c#
 public class Car
 {
     [IonIgnore]
@@ -214,7 +214,7 @@ public class Car
 
 Sometimes one will need to deserialize streams of different types which share a common subtype. Alternately, sometimes one might want to coerce the deserialized type to a specific type. For this we lean on Ion annotations and another C# `Attribute` `IonAnnotateType`. This attribute can be set on a class and it will then include their type information. Alternately it can be set on a property.
 
-```
+```c#
 [IonAnnotateType]
 public class Car 
 {    
@@ -234,7 +234,7 @@ new IonSerializer().Deserialize<List<Car>>(stream);
 
 The type information will be included in the Ion stream as an [Ion annotation](https://amzn.github.io/ion-docs/docs/spec.html#annot). This will be the fully qualified class and namespace of the desired type to be created. At deserialization time, if the annotation is found but the type or property specified in the annotation to be deserialized is not marked with the `IonAnnotateType` attribute the annotation is ignored and deserialization carries on as normal. For example, this Ion would be produced:
 
-```
+```c#
 com.amazon.vehicles.Honda::{
     "year": 2010,
 }
@@ -248,7 +248,7 @@ Since `IonAnnotateType` affects the type and all subtypes, there is a counter `I
 
 By default, object property names are converted by changing the first character to be lowercase (camel case):
 
-```
+```c#
  {
    make: "Honda",
    model: "Civic",
@@ -258,7 +258,7 @@ By default, object property names are converted by changing the first character 
 
 This can be customized by specifying an option specified later, or by setting an `Attribute` on the property itself for the exact property name to be used:
 
-```
+```c#
 public class Car
 {
      [IonPropertyName("weightInKg")]
@@ -270,7 +270,7 @@ public class Car
 
 By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name.
 
-```
+```c#
 public class Car
 {
      private string color;
@@ -293,7 +293,7 @@ public class Car
 
 By default, C#fields are ignored. However, they can be annotated with an `Attribute` to be included or by an option specified later. Even private fields may be specified.
 
-```
+```c#
 public class Car
 {
      [IonField]
@@ -307,7 +307,7 @@ The Ion property name will be inferred from the field name and **preserved as is
 
 By default, C# objects are created using the `Activator.CreateInstance(Type)` method which calls the default constructor. If you want to supply a constructor yourself, you can markup a constructor with the `IonConstructor` `Attribute`. Additionally, the parameters to the constructor must be specified using the `IonPropertyName` `Attribute` again:
 
-```
+```c#
 public class Wheel
 {
      private string specification;
@@ -376,7 +376,7 @@ Ion Serialization can be customized in several ways. In order to do this, an `Io
 
 We will provide extension points to allow for arbitrarily fine-grained control over the serialization process. There are a few ways to specify this. To the `IonSerializer`, one can pass in options including a `Dictionary` of `Type` (and Ion type annotation) onto `IonSerializer`. This mapping will take precedence over the default mapping.
 
-```
+```c#
 new IonSerializer(new IonSerializationOptions
 {
      IonSerializers = new Dictionary<Type, IonSerializer>()
@@ -393,7 +393,7 @@ new IonSerializer(new IonSerializationOptions
 
 Note the two possible types here. One can either specify the `IonSerializer` directly which must be an instance of the interface:
 
-```
+```c#
 public interface IonSerializer<T>
 {
     void Serialize(IIonWriter writer, T item);
@@ -403,7 +403,7 @@ public interface IonSerializer<T>
 
 Alternately, to get access to the Ion serialization options as well as the custom context passed in at serialization time, one should supply an `IonSerializerFactory`:
 
-```
+```c#
 public interface IonSerializerFactory<T, TContext> 
     where TContext : IonSerializationContext
 {
@@ -417,7 +417,7 @@ This will then be called to create your `IonSerializer` and give you full access
 
 In addition to the `Dictionary`, classes and properties can be marked up with `Attributes` specifying either the `IonSerializer` or `IonSerializerFactory` to be used for serialization.
 
-```
+```c#
 [IonSerializer(typeof(MyIonCarSerializer))]
 public class Car
 {
