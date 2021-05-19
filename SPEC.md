@@ -432,18 +432,6 @@ The `IonSerializerAttribute` must specify a `IonSerializer` with a no-arguments 
 
 This library relies on Amazon.Ion to convert from Ion to the C# primitive types. So long as you use the library to serialize and deserialize Ion data, there should be no lossy conversion since the maximum precision of the .NET primitives has been captured. However, if the system which wrote the data is different than the system reading the data, a lossy conversion is possible. In this case, is it recommended to supply a custom converter or preserve the Ion bytes themselves.
 
-## Appendix A: Customer request
-
-[**Qiusheng Jiang**](https://app.slack.com/team/W017W1AF9ED) [6:23 PM](https://amzn-aws.slack.com/archives/G01CFDRUG6R/p1612319039019200)
-FYI - Sage UK's ask on .Net Driver:
-
-```
-•It would be great for Sage if AWS QLDB and the associated Amazon ION libraries provided first-class support for client applications developed in .NET Core as well (as this is increasingly a preferred language within Sage, and particularly for the Sage Network).
-•Ideally, this should include a full suite of .NET/C# client libraries, developer documentation, tutorials, sample applications etc.
-```
-
-
-
 
 
 
