@@ -228,15 +228,22 @@ namespace Amazon.Ion.ObjectMapper.Test
         [IonField]
         internal string specification;
 
-        public Wheel()
+        [IonField]
+        internal int size;
+
+        public Wheel(int size)
         {
             this.specification = "default";
+            this.size = size;
         }
 
         [IonConstructor]
-        public Wheel([IonPropertyName("specification")] string specification)
+        public Wheel(
+            [IonPropertyName("specification")] string specification,
+            [IonPropertyName("size")] int size)
         {
-            this.specification = $"Specification: {specification}";
+            this.specification = $"Specification: {specification}, Size: {size} inches";
+            this.size = size;
         }
     }
 
