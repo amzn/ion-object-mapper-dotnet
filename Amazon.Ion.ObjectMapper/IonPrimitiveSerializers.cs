@@ -26,7 +26,7 @@ namespace Amazon.Ion.ObjectMapper
             reader.GetBytes(blob);
             return blob;
         }
-        
+
         public void Serialize(IIonWriter writer, byte[] item)
         {
             writer.WriteBlob(item);
@@ -66,7 +66,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             return reader.IntValue();
         }
-        
+
         public void Serialize(IIonWriter writer, long item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
@@ -163,7 +163,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             return reader.SymbolValue();
         }
-        
+
         public void Serialize(IIonWriter writer, SymbolToken item)
         {
             writer.WriteSymbolToken(item);
