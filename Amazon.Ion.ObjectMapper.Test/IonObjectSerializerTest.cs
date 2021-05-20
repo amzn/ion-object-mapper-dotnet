@@ -129,19 +129,17 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void SerializeMaxDepthException()
+        public void DeserializeMaxDepth()
         {
-            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 3});
-            Assert.ThrowsException<NotSupportedException>(() => serializer.Serialize(TestObjects.honda));
-        }
-        
-        [TestMethod]
-        public void DeserializeMaxDepthException()
-        {
-            var stream = new IonSerializer().Serialize(TestObjects.honda);
+            var stream = new IonSerializer(new IonSerializationOptions {IncludeFields = true}).Serialize(TestObjects.drKyler);
             
-            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 3});
-            Assert.ThrowsException<NotSupportedException>(() => serializer.Deserialize<Car>(stream));
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 3, IncludeFields = true});
+            var deserialized = serializer.Deserialize<Teacher>(stream);
+
+            Assert.IsNotNull(deserialized.car);
+            Assert.IsNull(deserialized.car.Make);
+            Assert.IsNull(deserialized.car.Model);
+            Assert.IsNull(deserialized.car.Engine);
         }
 
         [TestMethod]
