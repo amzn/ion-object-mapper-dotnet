@@ -168,81 +168,69 @@ namespace Amazon.Ion.ObjectMapper
 
         public void Serialize<T>(IIonWriter writer, T item)
         {
-            try
+            if (item == null)
             {
-                if (++currentDepth >= options.MaxDepth)
-                {
-                    throw new NotSupportedException($"Cannot serialize further as max object tree depth {options.MaxDepth} is reached");
-                }
-
-                if (item == null)
-                {
-                    new IonNullSerializer().Serialize(writer, (object)null);
-                }
-                else if (item is bool)
-                {
-                    new IonBooleanSerializer().Serialize(writer, Convert.ToBoolean(item));
-                }
-                else if (item is int)
-                {
-                    new IonIntSerializer().Serialize(writer, Convert.ToInt32(item));
-                }
-                else if (item is long)
-                {
-                    new IonLongSerializer().Serialize(writer, Convert.ToInt64(item));
-                }
-                else if (item is float)
-                {
-                    new IonFloatSerializer().Serialize(writer, Convert.ToSingle(item));
-                }
-                else if (item is double)
-                {
-                    new IonDoubleSerializer().Serialize(writer, Convert.ToDouble(item));
-                }
-                else if (item is decimal)
-                {
-                    new IonDecimalSerializer().Serialize(writer, Convert.ToDecimal(item));
-                }
-                else if (item is BigDecimal)
-                {
-                    new IonBigDecimalSerializer().Serialize(writer, (BigDecimal)(object)item);
-                }
-                else if (item is byte[])
-                {
-                    new IonByteArraySerializer().Serialize(writer, (byte[])(object)item);
-                }
-                else if (item is string)
-                {
-                    new IonStringSerializer().Serialize(writer, item as string);
-                }
-                else if (item is SymbolToken)
-                {
-                    new IonSymbolSerializer().Serialize(writer, (SymbolToken)(object)item);
-                }
-                else if (item is DateTime)
-                {
-                    new IonDateTimeSerializer().Serialize(writer, (DateTime)(object)item);
-                }
-                else if (item is System.Collections.IList) 
-                {
-                    NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)(object)item);
-                }
-                else if (item is Guid) 
-                {
-                    new IonGuidSerializer(options).Serialize(writer, (Guid)(object)item);
-                }
-                else if (item is object) 
-                {
-                    new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
-                }
-                else
-                {
-                    throw new NotSupportedException($"{typeof(T)} is not supported for serialization");
-                }
+                new IonNullSerializer().Serialize(writer, (object)null);
             }
-            finally
+            else if (item is bool)
             {
-                currentDepth--;
+                new IonBooleanSerializer().Serialize(writer, Convert.ToBoolean(item));
+            }
+            else if (item is int)
+            {
+                new IonIntSerializer().Serialize(writer, Convert.ToInt32(item));
+            }
+            else if (item is long)
+            {
+                new IonLongSerializer().Serialize(writer, Convert.ToInt64(item));
+            }
+            else if (item is float)
+            {
+                new IonFloatSerializer().Serialize(writer, Convert.ToSingle(item));
+            }
+            else if (item is double)
+            {
+                new IonDoubleSerializer().Serialize(writer, Convert.ToDouble(item));
+            }
+            else if (item is decimal)
+            {
+                new IonDecimalSerializer().Serialize(writer, Convert.ToDecimal(item));
+            }
+            else if (item is BigDecimal)
+            {
+                new IonBigDecimalSerializer().Serialize(writer, (BigDecimal)(object)item);
+            }
+            else if (item is byte[])
+            {
+                new IonByteArraySerializer().Serialize(writer, (byte[])(object)item);
+            }
+            else if (item is string)
+            {
+                new IonStringSerializer().Serialize(writer, item as string);
+            }
+            else if (item is SymbolToken)
+            {
+                new IonSymbolSerializer().Serialize(writer, (SymbolToken)(object)item);
+            }
+            else if (item is DateTime)
+            {
+                new IonDateTimeSerializer().Serialize(writer, (DateTime)(object)item);
+            }
+            else if (item is System.Collections.IList) 
+            {
+                NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)(object)item);
+            }
+            else if (item is Guid) 
+            {
+                new IonGuidSerializer(options).Serialize(writer, (Guid)(object)item);
+            }
+            else if (item is object) 
+            {
+                new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
+            }
+            else
+            {
+                throw new NotSupportedException($"{typeof(T)} is not supported for serialization");
             }
         }
 
@@ -282,7 +270,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 if (++currentDepth >= options.MaxDepth)
                 {
-                    throw new NotSupportedException($"Cannot deserialize further as max object tree depth {options.MaxDepth} is reached");
+                    return null;
                 }
 
                 switch (ionType)
