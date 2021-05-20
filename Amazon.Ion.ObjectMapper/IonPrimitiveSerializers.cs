@@ -31,11 +31,6 @@ namespace Amazon.Ion.ObjectMapper
         {
             writer.WriteBlob(item);
         }
-
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteBlob((byte[])item);
-        }
     }
     public class IonStringSerializer : IonSerializer<string>
     {
@@ -47,11 +42,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, string item)
         {
             writer.WriteString(item);
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteString(item as string);
         }
     }
 
@@ -65,11 +55,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, int item)
         {
             writer.WriteInt(item);
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteInt(Convert.ToInt32(item));
         }
     }
 
@@ -87,12 +72,6 @@ namespace Amazon.Ion.ObjectMapper
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             writer.WriteInt(item);
         }
-
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
-            writer.WriteInt(Convert.ToInt64(item));
-        }
     }
     public class IonBooleanSerializer : IonSerializer<bool>
     {
@@ -104,11 +83,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, bool item)
         {
             writer.WriteBool(item);
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteBool(Convert.ToBoolean(item));
         }
     }
 
@@ -122,11 +96,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, double item)
         {
             writer.WriteFloat(item);
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteFloat(Convert.ToDouble(item));
         }
     }
 
@@ -144,12 +113,6 @@ namespace Amazon.Ion.ObjectMapper
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             writer.WriteDecimal(item);
         }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
-            writer.WriteDecimal(Convert.ToDecimal(item));
-        }
     }
 
     public class IonBigDecimalSerializer : IonSerializer<BigDecimal>
@@ -162,11 +125,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, BigDecimal item)
         {
             writer.WriteDecimal(item);
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteDecimal((BigDecimal)item);
         }
     }
 
@@ -184,12 +142,6 @@ namespace Amazon.Ion.ObjectMapper
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             writer.WriteFloat(item);
         }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
-            writer.WriteFloat(Convert.ToSingle(item));
-        }
     }
 
     public class IonDateTimeSerializer : IonSerializer<DateTime>
@@ -203,11 +155,6 @@ namespace Amazon.Ion.ObjectMapper
         {
             writer.WriteTimestamp(new Timestamp(item));
         }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteTimestamp(new Timestamp((DateTime)item));
-        }
     }
 
     public class IonSymbolSerializer : IonSerializer<SymbolToken>
@@ -220,11 +167,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, SymbolToken item)
         {
             writer.WriteSymbolToken(item);
-        }
-
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteSymbolToken((SymbolToken)item);
         }
     }
 
@@ -240,11 +182,6 @@ namespace Amazon.Ion.ObjectMapper
         public void Serialize(IIonWriter writer, string item)
         {
             writer.WriteClob(Encoding.UTF8.GetBytes(item));
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            writer.WriteClob(Encoding.UTF8.GetBytes(item as string));
         }
     }
 
@@ -271,11 +208,6 @@ namespace Amazon.Ion.ObjectMapper
                 writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             }
             writer.WriteBlob(item.ToByteArray());
-        }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            this.Serialize(writer, (Guid)item);
         }
     }
 }
