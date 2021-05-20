@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -284,6 +285,32 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + ", birthDate: " + birthDate + " }";
+        }
+    }
+    
+    public class UpperCaseStringIonSerializer : IonSerializer<string>
+    {
+        public string Deserialize(IIonReader reader)
+        {
+            return reader.StringValue().ToUpper();
+        }
+
+        public void Serialize(IIonWriter writer, string item)
+        {
+            writer.WriteString(item.ToUpper());
+        }
+    }
+    
+    public class NegativeIntIonSerializer : IonSerializer<int>
+    {
+        public int Deserialize(IIonReader reader)
+        {
+            return -reader.IntValue();
+        }
+
+        public void Serialize(IIonWriter writer, int item)
+        {
+            writer.WriteInt(-item);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -82,6 +83,52 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNull(deserialized.Brand);
             Assert.IsNull(deserialized.color);
             Assert.IsNotNull(deserialized.canOffroad);
+        }
+        
+        [TestMethod]
+        public void SerializesAndDeserializesWithCustomSerializers()
+        {
+            var defaultSerializer = new IonSerializer();
+            var customSerializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(string), new UpperCaseStringIonSerializer()},
+                    {typeof(int), new NegativeIntIonSerializer()},
+                }
+            });
+
+            var testStr = "test string";
+
+            var stream = customSerializer.Serialize(testStr);
+            var serializedStr = StreamToIonValue(stream);
+            Assert.AreEqual(testStr.ToUpper(), serializedStr.StringValue);
+
+            stream = defaultSerializer.Serialize(testStr);
+            var deserializedStr = customSerializer.Deserialize<string>(stream);
+            Assert.AreEqual(testStr.ToUpper(), deserializedStr);
+
+            var testInt = 15;
+            
+            stream = customSerializer.Serialize(testInt);
+            var serializedInt = StreamToIonValue(stream);
+            Assert.AreEqual(-testInt, serializedInt.IntValue);
+            
+            stream = defaultSerializer.Serialize(testInt);
+            var deserializedInt = customSerializer.Deserialize<int>(stream);
+            Assert.AreEqual(-testInt, deserializedInt);
+            
+            stream = customSerializer.Serialize(TestObjects.honda);
+            var serializedCar = StreamToIonValue(stream);
+            Assert.IsTrue(serializedCar.ContainsField("make"));
+            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), serializedCar.GetField("make").StringValue);
+            Assert.IsTrue(serializedCar.ContainsField("yearOfManufacture"));
+            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, serializedCar.GetField("yearOfManufacture").IntValue);
+            
+            stream = defaultSerializer.Serialize(TestObjects.honda);
+            var deserializedCar = customSerializer.Deserialize<Car>(stream);
+            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserializedCar.Make);
+            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserializedCar.YearOfManufacture);
         }
 
         [TestMethod]
