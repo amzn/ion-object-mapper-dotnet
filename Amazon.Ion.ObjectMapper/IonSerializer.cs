@@ -136,7 +136,7 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        internal readonly IonSerializationOptions options;
+        private readonly IonSerializationOptions options;
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
