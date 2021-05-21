@@ -291,7 +291,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
-            if (reader.CurrentDepth >= this.options.MaxDepth)
+            if (reader.CurrentDepth > this.options.MaxDepth)
             {
                 return null;
             }
