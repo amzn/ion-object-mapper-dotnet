@@ -298,7 +298,6 @@ namespace Amazon.Ion.ObjectMapper.Test
         public readonly string lastName;
         public string department;
         public readonly DateTime? birthDate;
-        public Car car;
 
         public Teacher()
         {
@@ -306,7 +305,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.lastName = null;
             this.department = null;
             this.birthDate = null;
-            this.car = null;
         }
         
         public Teacher(string firstName, string lastName, string department, DateTime birthDate, Car car)
@@ -315,13 +313,11 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.lastName = lastName;
             this.department = department;
             this.birthDate = birthDate;
-            this.car = car;
         }
         
         public override string ToString()
         {
-            return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + 
-                   ", birthDate: " + birthDate + ", car:  " + car + " }";
+            return $"<Teacher>{{ firstName: {firstName}, lastName: {lastName}, department: {department}, birthDate: {birthDate} }}";
         }
     }
 }

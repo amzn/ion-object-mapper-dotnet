@@ -58,7 +58,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNull(deserialized.lastName);
             Assert.IsNotNull(deserialized.department);
             Assert.IsNull(deserialized.birthDate);
-            Assert.IsNotNull(deserialized.car);
         }
 
         [TestMethod]
@@ -135,11 +134,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             
             var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 2, IncludeFields = true});
             var deserialized = serializer.Deserialize<Teacher>(stream);
-
-            Assert.IsNotNull(deserialized.car);
-            Assert.IsNull(deserialized.car.Make);
-            Assert.IsNull(deserialized.car.Model);
-            Assert.IsNull(deserialized.car.Engine);
         }
 
         [TestMethod]
