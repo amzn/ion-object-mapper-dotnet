@@ -307,7 +307,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.birthDate = null;
         }
         
-        public Teacher(string firstName, string lastName, string department, DateTime birthDate, Car car)
+        public Teacher(string firstName, string lastName, string department, DateTime birthDate)
         {
             this.firstName = firstName;
             this.lastName = lastName;
