@@ -58,6 +58,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNull(deserialized.lastName);
             Assert.IsNotNull(deserialized.department);
             Assert.IsNull(deserialized.birthDate);
+            Assert.IsNotNull(deserialized.car);
         }
 
         [TestMethod]
