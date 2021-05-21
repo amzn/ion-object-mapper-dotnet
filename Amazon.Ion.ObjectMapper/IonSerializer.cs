@@ -136,8 +136,7 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        private readonly IonSerializationOptions options;
-        private int currentDepth;
+        internal readonly IonSerializationOptions options;
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
@@ -147,7 +146,6 @@ namespace Amazon.Ion.ObjectMapper
         public IonSerializer(IonSerializationOptions options)
         {
             this.options = options;
-            this.currentDepth = 0;
         }
 
         public Stream Serialize<T>(T item)
@@ -266,64 +264,57 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
-            try
+            if (reader.CurrentDepth >= this.options.MaxDepth)
             {
-                if (++currentDepth >= options.MaxDepth)
-                {
-                    return null;
-                }
-
-                switch (ionType)
-                {
-                    case IonType.None:
-                    case IonType.Null:
-                        return new IonNullSerializer().Deserialize(reader);
-                    case IonType.Bool:
-                        return new IonBooleanSerializer().Deserialize(reader);
-                    case IonType.Int:
-                        if (reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
-                        {
-                            return new IonLongSerializer().Deserialize(reader);
-                        }
-                        return new IonIntSerializer().Deserialize(reader);
-                    case IonType.Float:
-                        if (reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
-                        {
-                            return new IonFloatSerializer().Deserialize(reader);
-                        }
-                        return new IonDoubleSerializer().Deserialize(reader);
-                    case IonType.Decimal:
-                        if (reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
-                        {
-                            return new IonDecimalSerializer().Deserialize(reader);
-                        }
-                        return new IonBigDecimalSerializer().Deserialize(reader);
-                    case IonType.String:
-                        return new IonStringSerializer().Deserialize(reader);
-                    case IonType.Symbol:
-                        return new IonSymbolSerializer().Deserialize(reader);
-                    case IonType.Timestamp:
-                        return new IonDateTimeSerializer().Deserialize(reader);
-                    case IonType.Blob:
-                        if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
-                            || type.IsAssignableTo(typeof(Guid)))
-                        {
-                            return new IonGuidSerializer(options).Deserialize(reader);
-                        }
-                        return new IonByteArraySerializer().Deserialize(reader);
-                    case IonType.Clob:
-                        return new IonClobSerializer().Deserialize(reader);
-                    case IonType.List:
-                        return NewIonListSerializer(type).Deserialize(reader);
-                    case IonType.Struct:
-                        return new IonObjectSerializer(this, options, type).Deserialize(reader);
-                    default:
-                        throw new NotSupportedException($"{ionType} is not supported for deserialization");
-                }
+                return null;
             }
-            finally
+
+            switch (ionType)
             {
-                currentDepth--;
+                case IonType.None:
+                case IonType.Null:
+                    return new IonNullSerializer().Deserialize(reader);
+                case IonType.Bool:
+                    return new IonBooleanSerializer().Deserialize(reader);
+                case IonType.Int:
+                    if (reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
+                    {
+                        return new IonLongSerializer().Deserialize(reader);
+                    }
+                    return new IonIntSerializer().Deserialize(reader);
+                case IonType.Float:
+                    if (reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
+                    {
+                        return new IonFloatSerializer().Deserialize(reader);
+                    }
+                    return new IonDoubleSerializer().Deserialize(reader);
+                case IonType.Decimal:
+                    if (reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
+                    {
+                        return new IonDecimalSerializer().Deserialize(reader);
+                    }
+                    return new IonBigDecimalSerializer().Deserialize(reader);
+                case IonType.String:
+                    return new IonStringSerializer().Deserialize(reader);
+                case IonType.Symbol:
+                    return new IonSymbolSerializer().Deserialize(reader);
+                case IonType.Timestamp:
+                    return new IonDateTimeSerializer().Deserialize(reader);
+                case IonType.Blob:
+                    if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
+                        || type.IsAssignableTo(typeof(Guid)))
+                    {
+                        return new IonGuidSerializer(options).Deserialize(reader);
+                    }
+                    return new IonByteArraySerializer().Deserialize(reader);
+                case IonType.Clob:
+                    return new IonClobSerializer().Deserialize(reader);
+                case IonType.List:
+                    return NewIonListSerializer(type).Deserialize(reader);
+                case IonType.Struct:
+                    return new IonObjectSerializer(this, options, type).Deserialize(reader);
+                default:
+                    throw new NotSupportedException($"{ionType} is not supported for deserialization");
             }
         }
 

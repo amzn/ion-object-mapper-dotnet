@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -133,7 +132,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             var stream = new IonSerializer(new IonSerializationOptions {IncludeFields = true}).Serialize(TestObjects.drKyler);
             
-            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 3, IncludeFields = true});
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 2, IncludeFields = true});
             var deserialized = serializer.Deserialize<Teacher>(stream);
 
             Assert.IsNotNull(deserialized.car);
