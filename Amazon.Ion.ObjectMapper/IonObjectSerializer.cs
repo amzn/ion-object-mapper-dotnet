@@ -137,7 +137,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (options.PropertyNameCaseInsensitive)
             {
-                return targetType.GetProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.CurrentCultureIgnoreCase));
+                return targetType.GetProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
             }
 
             var name = options.NamingConvention.ToProperty(readName);
