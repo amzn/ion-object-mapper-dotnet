@@ -151,6 +151,28 @@ namespace Amazon.Ion.ObjectMapper.Test
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
 
+        public static PoliticalParty democrats = new PoliticalParty { Name = "Democratic Party" };
+        public static PoliticalParty republicans = new PoliticalParty { Name = "Republican Party" };
+        public static Politician JoeBiden = new Politician {FirstName = "Joe", LastName = "Biden", Party = democrats };
+        public static Politician MurielBowser = new Politician {FirstName = "Muriel", LastName = "Bowser", Party = democrats };
+        public static Politician CherylSelby = new Politician {FirstName = "Cheryl", LastName = "Selby", Party = democrats };
+        public static Politician JayInslee = new Politician {FirstName = "Jay", LastName = "Inslee", Party = democrats };
+        public static Politician SteveAdler = new Politician {FirstName = "Steve", LastName = "Adler", Party = democrats };
+        public static Politician GregAbbott = new Politician {FirstName = "Greg", LastName = "Abbott", Party = republicans };
+        public static City WashingtonDC = new City {Name = "Washington D.C.", Mayor = MurielBowser};
+        public static City Olympia = new City {Name = "Olympia", Mayor = CherylSelby};
+        public static City Austin = new City {Name = "Austin", Mayor = SteveAdler};
+        public static State Washington = new State {Name = "Washington", Capital = Olympia, Governor = JayInslee};
+        public static State Texas = new State {Name = "Texas", Capital = Austin, Governor = GregAbbott};
+        private static State[] states = { Washington, Texas };
+        public static Country UnitedStates = new Country
+        {
+            Name = "United States of America",
+            Capital = WashingtonDC,
+            President = JoeBiden,
+            States = new List<State>(states)
+        };
+
         public static Ship Titanic = new Ship
         {
             Name = "Titanic",
@@ -319,5 +341,38 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             return $"<Teacher>{{ firstName: {firstName}, lastName: {lastName}, department: {department}, birthDate: {birthDate} }}";
         }
+    }
+
+    public class Country
+    {
+        public string Name { get; init; }
+        public City Capital { get; init; }
+        public Politician President { get; init; }
+        public List<State> States { get; init; }
+    }
+
+    public class State
+    {
+        public string Name { get; init; }
+        public City Capital { get; init; }
+        public Politician Governor { get; init; }
+    }
+
+    public class City
+    {
+        public string Name { get; init; }
+        public Politician Mayor { get; init; }
+    }
+
+    public class Politician
+    {
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
+        public PoliticalParty Party { get; init; }
+    }
+
+    public class PoliticalParty
+    {
+        public string Name { get; init; }
     }
 }

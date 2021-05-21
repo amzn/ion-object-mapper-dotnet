@@ -128,12 +128,18 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void DeserializeMaxDepth()
+        public void DeserializesObjectsThatExceedMaxDepth()
         {
-            var stream = new IonSerializer(new IonSerializationOptions {IncludeFields = true}).Serialize(TestObjects.drKyler);
+            var stream = new IonSerializer().Serialize(TestObjects.UnitedStates);
             
-            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 2, IncludeFields = true});
-            var deserialized = serializer.Deserialize<Teacher>(stream);
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 5});
+            var deserialized = serializer.Deserialize<Country>(stream);
+            
+            Assert.IsNotNull(deserialized.States);
+            Assert.IsNotNull(deserialized.States[0].Capital);
+            Assert.IsNotNull(deserialized.States[0].Capital.Mayor);
+            Assert.IsNotNull(deserialized.States[0].Capital.Mayor.Party);
+            Assert.IsNull(deserialized.States[0].Capital.Mayor.Party.Name);
         }
 
         [TestMethod]
