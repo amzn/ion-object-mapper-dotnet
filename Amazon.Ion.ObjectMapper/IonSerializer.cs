@@ -169,67 +169,94 @@ namespace Amazon.Ion.ObjectMapper
             if (item == null)
             {
                 new IonNullSerializer().Serialize(writer, (object)null);
+                return;
             }
-            else if (item is bool)
+            
+            if (item is bool)
             {
                 new IonBooleanSerializer().Serialize(writer, Convert.ToBoolean(item));
+                return;
             }
-            else if (item is int)
+            
+            if (item is int)
             {
                 new IonIntSerializer().Serialize(writer, Convert.ToInt32(item));
+                return;
             }
-            else if (item is long)
+            
+            if (item is long)
             {
                 new IonLongSerializer().Serialize(writer, Convert.ToInt64(item));
+                return;
             }
-            else if (item is float)
+            
+            if (item is float)
             {
                 new IonFloatSerializer().Serialize(writer, Convert.ToSingle(item));
+                return;
             }
-            else if (item is double)
+            
+            if (item is double)
             {
                 new IonDoubleSerializer().Serialize(writer, Convert.ToDouble(item));
+                return;
             }
-            else if (item is decimal)
+            
+            if (item is decimal)
             {
                 new IonDecimalSerializer().Serialize(writer, Convert.ToDecimal(item));
+                return;
             }
-            else if (item is BigDecimal)
+            
+            if (item is BigDecimal)
             {
                 new IonBigDecimalSerializer().Serialize(writer, (BigDecimal)(object)item);
+                return;
             }
-            else if (item is byte[])
+            
+            if (item is byte[])
             {
                 new IonByteArraySerializer().Serialize(writer, (byte[])(object)item);
+                return;
             }
-            else if (item is string)
+            
+            if (item is string)
             {
                 new IonStringSerializer().Serialize(writer, item as string);
+                return;
             }
-            else if (item is SymbolToken)
+            
+            if (item is SymbolToken)
             {
                 new IonSymbolSerializer().Serialize(writer, (SymbolToken)(object)item);
+                return;
             }
-            else if (item is DateTime)
+            
+            if (item is DateTime)
             {
                 new IonDateTimeSerializer().Serialize(writer, (DateTime)(object)item);
+                return;
             }
-            else if (item is System.Collections.IList) 
+            
+            if (item is System.Collections.IList) 
             {
                 NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)(object)item);
+                return;
             }
-            else if (item is Guid) 
+            
+            if (item is Guid) 
             {
                 new IonGuidSerializer(options).Serialize(writer, (Guid)(object)item);
+                return;
             }
-            else if (item is object) 
+            
+            if (item is object) 
             {
                 new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
+                return;
             }
-            else
-            {
-                throw new NotSupportedException($"{typeof(T)} is not supported for serialization");
-            }
+
+            throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
         }
 
         private IonListSerializer NewIonListSerializer(Type listType) 
