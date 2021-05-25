@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -119,8 +120,8 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static Radio fmRadio = new Radio { Band = "FM" };
 
-        public static Teacher drKyler = new Teacher("Edward", "Kyler", "Math", DateTime.Parse("08/18/1962"));
-        public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.Parse("04/29/1985"));
+        public static Teacher drKyler = new Teacher("Edward", "Kyler", "Math", DateTime.ParseExact("18/08/1962", "dd/MM/yyyy", CultureInfo.InvariantCulture));
+        public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.ParseExact("29/04/1985", "dd/MM/yyyy", CultureInfo.InvariantCulture));
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
     }
