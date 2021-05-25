@@ -321,7 +321,7 @@ namespace Amazon.Ion.ObjectMapper
                 this.objectSerializer.targetType = type;
                 return this.objectSerializer.Deserialize(reader);
             }
-            
+
             throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
         }
 
@@ -337,58 +337,82 @@ namespace Amazon.Ion.ObjectMapper
                 throw new NotSupportedException($"Custom serializer for {type} is not supported");
             }
             
-            if (type == typeof(bool)) return serializer is IonSerializer<bool>;
+            if (type == typeof(bool))
+                return serializer is IonSerializer<bool>;
 
-            if (type == typeof(string)) return serializer is IonSerializer<string>;
+            if (type == typeof(string))
+                return serializer is IonSerializer<string>;
 
-            if (type == typeof(byte[])) return serializer is IonSerializer<byte[]>;
+            if (type == typeof(byte[]))
+                return serializer is IonSerializer<byte[]>;
 
-            if (type == typeof(int)) return serializer is IonSerializer<int>;
+            if (type == typeof(int))
+                return serializer is IonSerializer<int>;
 
-            if (type == typeof(long)) return serializer is IonSerializer<long>;
+            if (type == typeof(long))
+                return serializer is IonSerializer<long>;
 
-            if (type == typeof(float)) return serializer is IonSerializer<float>;
+            if (type == typeof(float))
+                return serializer is IonSerializer<float>;
 
-            if (type == typeof(double)) return serializer is IonSerializer<double>;
+            if (type == typeof(double))
+                return serializer is IonSerializer<double>;
             
-            if (type == typeof(decimal)) return serializer is IonSerializer<decimal>;
+            if (type == typeof(decimal))
+                return serializer is IonSerializer<decimal>;
             
-            if (type == typeof(BigDecimal)) return serializer is IonSerializer<BigDecimal>;
+            if (type == typeof(BigDecimal))
+                return serializer is IonSerializer<BigDecimal>;
 
-            if (type == typeof(SymbolToken)) return serializer is IonSerializer<SymbolToken>;
+            if (type == typeof(SymbolToken))
+                return serializer is IonSerializer<SymbolToken>;
             
-            if (type == typeof(DateTime)) return serializer is IonSerializer<DateTime>;
+            if (type == typeof(DateTime))
+                return serializer is IonSerializer<DateTime>;
 
-            if (type == typeof(Guid)) return serializer is IonSerializer<Guid>;
+            if (type == typeof(Guid))
+                return serializer is IonSerializer<Guid>;
 
             return false;
         }
 
         private void SerializePrimitive(Type type, IIonWriter writer, object item)
         {
-            if (type == typeof(bool)) this.primitiveSerializers[type].Serialize(writer, Convert.ToBoolean(item));
+            if (type == typeof(bool))
+                this.primitiveSerializers[type].Serialize(writer, Convert.ToBoolean(item));
 
-            else if (type == typeof(string)) this.primitiveSerializers[type].Serialize(writer, item as string);
+            else if (type == typeof(string))
+                this.primitiveSerializers[type].Serialize(writer, item as string);
 
-            else if (type == typeof(byte[])) this.primitiveSerializers[type].Serialize(writer, (byte[])item);
+            else if (type == typeof(byte[]))
+                this.primitiveSerializers[type].Serialize(writer, (byte[])item);
 
-            else if (type == typeof(int)) this.primitiveSerializers[type].Serialize(writer, Convert.ToInt32(item));
+            else if (type == typeof(int))
+                this.primitiveSerializers[type].Serialize(writer, Convert.ToInt32(item));
 
-            else if (type == typeof(long)) this.primitiveSerializers[type].Serialize(writer, Convert.ToInt64(item));
+            else if (type == typeof(long))
+                this.primitiveSerializers[type].Serialize(writer, Convert.ToInt64(item));
 
-            else if (type == typeof(float)) this.primitiveSerializers[type].Serialize(writer, Convert.ToSingle(item));
+            else if (type == typeof(float))
+                this.primitiveSerializers[type].Serialize(writer, Convert.ToSingle(item));
 
-            else if (type == typeof(double)) this.primitiveSerializers[type].Serialize(writer, Convert.ToDouble(item));
+            else if (type == typeof(double))
+                this.primitiveSerializers[type].Serialize(writer, Convert.ToDouble(item));
             
-            else if (type == typeof(decimal)) this.primitiveSerializers[type].Serialize(writer, Convert.ToDecimal(item));
+            else if (type == typeof(decimal))
+                this.primitiveSerializers[type].Serialize(writer, Convert.ToDecimal(item));
             
-            else if (type == typeof(BigDecimal)) this.primitiveSerializers[type].Serialize(writer, (BigDecimal)item);
+            else if (type == typeof(BigDecimal))
+                this.primitiveSerializers[type].Serialize(writer, (BigDecimal)item);
 
-            else if (type == typeof(SymbolToken)) this.primitiveSerializers[type].Serialize(writer, (SymbolToken)item);
+            else if (type == typeof(SymbolToken))
+                this.primitiveSerializers[type].Serialize(writer, (SymbolToken)item);
             
-            else if (type == typeof(DateTime)) this.primitiveSerializers[type].Serialize(writer, (DateTime)item);
+            else if (type == typeof(DateTime))
+                this.primitiveSerializers[type].Serialize(writer, (DateTime)item);
 
-            else if (type == typeof(Guid)) this.primitiveSerializers[type].Serialize(writer, (Guid)item);
+            else if (type == typeof(Guid))
+                this.primitiveSerializers[type].Serialize(writer, (Guid)item);
         }
     }
 }
