@@ -27,63 +27,56 @@ namespace Amazon.Ion.ObjectMapper
                 throw new ArgumentException("Cannot deserialize with a null Ion reader");
             }
             
-            try
+            var ionConstructors = targetType.GetConstructors().Where(IsIonConstructor);
+            if (ionConstructors.Any())
             {
-                reader.StepIn();
-                
-                var ionConstructors = targetType.GetConstructors().Where(IsIonConstructor);
-                if (ionConstructors.Any())
+                if (ionConstructors.Count() > 1)
                 {
-                    if (ionConstructors.Count() > 1)
+                    throw new NotSupportedException(
+                        $"More than one constructor in class {targetType.Name} " +
+                        "is annotated with the [IonConstructor] attribute");
+                }
+                
+                return InvokeIonConstructor(ionConstructors.First(), reader);
+            }
+
+            var targetObject = options.ObjectFactory.Create(options, reader, targetType);
+            reader.StepIn();
+
+            IonType ionType;
+            while ((ionType = reader.MoveNext()) != IonType.None)
+            {
+                var property = FindProperty(reader.CurrentFieldName);
+                FieldInfo field;
+                if (property != null)
+                {
+                    var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
+                    
+                    if (options.IgnoreDefaults && deserialized == default)
                     {
-                        throw new NotSupportedException(
-                            $"More than one constructor in class {targetType.Name} " +
-                            "is annotated with the [IonConstructor] attribute");
+                        continue;
                     }
                     
-                    return InvokeIonConstructor(ionConstructors.First(), reader);
+                    property.SetValue(targetObject, deserialized);
                 }
-
-                var targetObject = options.ObjectFactory.Create(options, reader, targetType);
-
-                IonType ionType;
-                while ((ionType = reader.MoveNext()) != IonType.None)
+                else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
-                    var property = FindProperty(reader.CurrentFieldName);
-                    FieldInfo field;
-                    if (property != null)
+                    var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
+                    
+                    if (options.IgnoreReadOnlyFields && field.IsInitOnly)
                     {
-                        var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-                        
-                        if (options.IgnoreDefaults && deserialized == default)
-                        {
-                            continue;
-                        }
-                        
-                        property.SetValue(targetObject, deserialized);
+                        continue;
                     }
-                    else if ((field = FindField(reader.CurrentFieldName)) != null)
+                    if (options.IgnoreDefaults && deserialized == default)
                     {
-                        var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
-                        
-                        if (options.IgnoreReadOnlyFields && field.IsInitOnly)
-                        {
-                            continue;
-                        }
-                        if (options.IgnoreDefaults && deserialized == default)
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        field.SetValue(targetObject, deserialized);
-                    }
+                    field.SetValue(targetObject, deserialized);
                 }
-                return targetObject;
             }
-            finally
-            {
-                reader.StepOut();
-            }
+            reader.StepOut();
+            return targetObject;
         }
 
         public void Serialize(IIonWriter writer, object item)
@@ -159,6 +152,8 @@ namespace Amazon.Ion.ObjectMapper
                     
                     paramIndexMap.Add(param.Name, i);
                 }
+                
+                reader.StepIn();
 
                 // Iterate through reader to determine argument values to pass into constructor.
                 IonType ionType;
@@ -171,6 +166,8 @@ namespace Amazon.Ion.ObjectMapper
                         arguments[index] = deserialized;
                     }
                 }
+                
+                reader.StepOut();
             }
 
             return ionConstructor.Invoke(arguments);
