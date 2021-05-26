@@ -124,6 +124,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.ParseExact("29/04/1985", "dd/MM/yyyy", CultureInfo.InvariantCulture));
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
+        
+        public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
     }
 
     public class Car
@@ -285,6 +287,32 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + ", birthDate: " + birthDate + " }";
+        }
+    }
+
+    public class Student
+    {
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
+        public string Major { get; }
+
+        public Student()
+        {
+            this.FirstName = default;
+            this.LastName = default;
+            this.Major = default;
+        }
+        
+        public Student(string firstName, string lastName, string major)
+        {
+            this.FirstName = firstName;
+            this.LastName = lastName;
+            this.Major = major;
+        }
+        
+        public override string ToString()
+        {
+            return $"<Student>{{ FirstName: {FirstName}, LastName: {LastName}, Major: {Major} }}";
         }
     }
 }
