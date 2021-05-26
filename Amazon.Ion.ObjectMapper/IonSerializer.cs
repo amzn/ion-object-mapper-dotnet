@@ -216,19 +216,21 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
-            switch (item)
+            if (item is IList)
             {
-                case IList:
-                    this.listSerializer.SetListType(type);
-                    this.listSerializer.Serialize(writer, item);
-                    break;
-                case object:
-                    this.objectSerializer.targetType = type;
-                    this.objectSerializer.Serialize(writer, item);
-                    break;
-                default:
-                    throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
+                this.listSerializer.SetListType(type);
+                this.listSerializer.Serialize(writer, item);
+                return;
             }
+            
+            if (item is object)
+            {
+                this.objectSerializer.targetType = type;
+                this.objectSerializer.Serialize(writer, item);
+                return;
+            }
+            
+            throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
         }
 
         public T Deserialize<T>(Stream stream)
