@@ -50,35 +50,17 @@ namespace Amazon.Ion.ObjectMapper.Test
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Motorcycle : Vehicle
     {
-        public string Make { get; init; }
-        
-        public long PurchaseDate { get; }
+        public string Brand { get; init; }
 
         [IonField]
         public string color;
 
         [IonField]
-        public bool canOffroad;
-
-        public Motorcycle()
-        {
-            this.Make = default;
-            this.color = default;
-            this.canOffroad = default;
-            this.PurchaseDate = DateTime.Now.Ticks;
-        }
-
-        public Motorcycle(string make, string color, bool offroad, DateTime date)
-        {
-            this.Make = make;
-            this.color = color;
-            this.canOffroad = offroad;
-            this.PurchaseDate = date.Ticks;
-        }
-
+        public bool canOffroad; 
+        
         public override string ToString()
         {
-            return $"<Motorcycle>{{ Make: {this.Make}, color: {this.color}, canOffroad: {this.canOffroad} }}";
+            return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
     
@@ -132,13 +114,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             YearOfManufacture = 2010, 
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
-        };
-        
-        public static readonly Motorcycle Harley = new Motorcycle
-        {
-            Make = "Harley",
-            color = "Black",
-            canOffroad = true,
         };
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
