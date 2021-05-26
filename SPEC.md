@@ -185,6 +185,48 @@ public class Engine
 
 the `init` keyword is a C# modifier which indicates that the property is only settable at construction time. In reality the Intermediate Language (IL) code just contains a regular setter and so long as properties in general have a getter and setter, the library will be able to use them. By default, all gettable properties will be serialized and all settable properties will be deserialized, but this can be configured as specified later in this document.
 
+### Default behavior when deserializing annotated Ion
+
+Annotated Ion types will by default map to the C# class name in currently loaded assemblies if and only if the **first** type annotation matches the name of the class. The C# class type must also be a subtype of the type passed into the deserialize method.
+
+```c#
+public class DefaultDeserialization
+{
+    public class Car
+    {
+        public override string ToString()
+        {
+            return "<Car>";
+        }
+    }
+    
+    public class Truck : Car
+    {
+        public override string ToString()
+        {
+            return "<Truck>";
+        }
+    }
+    
+    public void DeserializeExample() {
+        // Create Ion strcut with annotation that matches Truck Class Type name.
+        IIonValue ionTruck = valueFactory.NewEmptyStruct();
+        ionTruck.AddTypeAnnotation("Truck");
+
+        IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+        IonSerializer ionSerializer = new IonSerializer();
+        // This will only attempt to deserialize into a Truck if and only if Truck is a subtype of the input Type, in this case Typeof(car).
+        var car = ionSerializer.Deserialize(reader, Typeof(Car));
+
+        // This will print "<Truck>".
+        string output = car.ToString();
+    }
+}
+```
+
+
+
 ### Supported types
 
 In addition to all `object` types these types are supported by default:

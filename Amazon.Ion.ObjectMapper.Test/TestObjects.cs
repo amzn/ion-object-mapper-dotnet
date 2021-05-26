@@ -142,6 +142,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
+        public static Truck nativeTruck = new Truck();
+
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
         public static Radio fmRadio = new Radio { Band = "FM" };

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
@@ -103,8 +104,24 @@ namespace Amazon.Ion.ObjectMapper
             if (annotations.Length > 0)
             {
                 var typeName = annotations[0];
-                var assemblyName = options.AnnotatedTypeAssemblies.First(a => Type.GetType(FullName(typeName, a)) != null);
-                return Activator.CreateInstance(Type.GetType(FullName(typeName, assemblyName)));
+                Type typeToCreate = null;
+                try
+                {
+                    var assemblyName = options.AnnotatedTypeAssemblies.First(a => Type.GetType(FullName(typeName, a)) != null);
+                    typeToCreate = Type.GetType(FullName(typeName, assemblyName));
+                }
+                catch
+                {
+                    typeToCreate = AppDomain.CurrentDomain
+                        .GetAssemblies()
+                        .SelectMany(x => x.GetTypes())
+                        .FirstOrDefault(t => string.Equals(t.Name, typeName, StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (typeToCreate != null && targetType.IsAssignableFrom(typeToCreate))
+                {
+                    return Activator.CreateInstance(typeToCreate);
+                }
             }
             return Activator.CreateInstance(targetType);
         }
