@@ -486,5 +486,85 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
             Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
         }
+
+        [TestMethod]
+        public void DeserializeAnnotatedIonToParentClassNameMatchingAnnotation()
+        {
+            IIonValue ionTruck = valueFactory.NewEmptyStruct();
+            ionTruck.AddTypeAnnotation("Truck");
+
+            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+            IonSerializer ionSerializer = new IonSerializer();
+            Vehicle truck = ionSerializer.Deserialize<Vehicle>(reader);
+
+            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+        }
+
+        [TestMethod]
+        public void DeserializeAnnotatedIonToClassNameMatchingAnnotation()
+        {
+            IIonValue ionTruck = valueFactory.NewEmptyStruct();
+            ionTruck.AddTypeAnnotation("Truck");
+
+            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+            IonSerializer ionSerializer = new IonSerializer();
+            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+
+            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+        }
+
+        [TestMethod]
+        public void DeserializeAnnotatedIonToClassNameNotMatchingAnnotation()
+        {
+            IIonValue ionTruck = valueFactory.NewEmptyStruct();
+            ionTruck.AddTypeAnnotation("NonMatching");
+
+            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+            IonSerializer ionSerializer = new IonSerializer();
+            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+
+            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+        }
+
+        [TestMethod]
+        public void DeserializeAnnotatedIonToClassNameWithAnnotatedTypeAssemblies()
+        {
+            IonSerializationOptions options = new IonSerializationOptions
+            {
+                AnnotatedTypeAssemblies = new string[]
+                {
+                        typeof(Truck).Assembly.GetName().Name
+                }
+            };
+
+            IIonValue ionTruck = valueFactory.NewEmptyStruct();
+            ionTruck.AddTypeAnnotation("Truck");
+
+            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+            IonSerializer ionSerializer = new IonSerializer(options);
+            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+
+            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+        }
+
+        [TestMethod]
+        public void DeserializeMultipleAnnotatedIonToClassNameWithAnnotated()
+        {
+            // Multiple annotations are ignored, it will only pick the first one.
+            IIonValue ionTruck = valueFactory.NewEmptyStruct();
+            ionTruck.AddTypeAnnotation("Truck");
+            ionTruck.AddTypeAnnotation("SecondAnnotation");
+
+            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+            IonSerializer ionSerializer = new IonSerializer();
+            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+
+            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+        }
     }
 }
