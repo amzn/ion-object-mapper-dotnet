@@ -59,6 +59,30 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.IsNotNull(deserialized.department);
             Assert.IsNull(deserialized.birthDate);
         }
+        
+        [TestMethod]
+        public void SerializesObjectsWithIgnoreReadOnlyProperties()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
+            IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.JohnGreenwood));
+            
+            Assert.IsTrue(serialized.ContainsField("firstName"));
+            Assert.IsTrue(serialized.ContainsField("lastName"));
+            Assert.IsFalse(serialized.ContainsField("<Major>k__BackingField"));
+        }
+        
+        [TestMethod]
+        public void DeserializesObjectsWithIgnoreReadOnlyProperties()
+        {
+            var stream = new IonSerializer().Serialize(TestObjects.JohnGreenwood);
+
+            var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
+            var deserialized = serializer.Deserialize<Student>(stream);
+            
+            Assert.AreEqual(TestObjects.JohnGreenwood.FirstName, deserialized.FirstName);
+            Assert.AreEqual(TestObjects.JohnGreenwood.LastName, deserialized.LastName);
+            Assert.AreNotEqual(TestObjects.JohnGreenwood.Major, deserialized.Major);
+        }
 
         [TestMethod]
         public void SerializesObjectsWithIgnoreDefaults()
