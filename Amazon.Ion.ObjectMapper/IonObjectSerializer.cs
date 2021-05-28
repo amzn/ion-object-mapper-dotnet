@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Amazon.IonDotnet;
@@ -27,7 +28,7 @@ namespace Amazon.Ion.ObjectMapper
                 // this.readOnlyProperties is used for detecting the appropriate backing fields.
                 // However if we are already including all fields,
                 // then there is no need for this backing field detection logic.
-                this.readOnlyProperties = ReadOnlyProperties(this.targetType);
+                this.readOnlyProperties = this.targetType.GetProperties().Where(IsReadOnlyProperty);
             }
         }
 
@@ -89,7 +90,7 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                if (this.options.IgnoreReadOnlyProperties && !property.CanWrite)
+                if (this.options.IgnoreReadOnlyProperties && IsReadOnlyProperty(property))
                 {
                     continue;
                 }
@@ -167,9 +168,10 @@ namespace Amazon.Ion.ObjectMapper
             return targetType.GetProperty(name);
         }
 
-        private IEnumerable<PropertyInfo> ReadOnlyProperties(Type targetType)
+        private bool IsReadOnlyProperty(PropertyInfo prop)
         {
-            return targetType.GetProperties().Where(p => !p.CanWrite);
+            return !prop.CanWrite || 
+                   Attribute.GetCustomAttribute(prop, typeof(ReadOnlyAttribute)) is ReadOnlyAttribute {IsReadOnly: true};
         }
         
         private FieldInfo FindField(string name)
