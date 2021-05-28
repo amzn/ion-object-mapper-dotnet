@@ -337,7 +337,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public override string ToString()
         {
-            return $"<Teacher>{{ firstName: {firstName}, lastName: {lastName}, department: {department}, birthDate: {birthDate} }}";
+            return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + ", birthDate: " + birthDate + " }";
         }
     }
 
