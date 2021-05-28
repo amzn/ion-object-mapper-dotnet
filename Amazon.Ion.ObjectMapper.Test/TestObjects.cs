@@ -56,8 +56,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string color;
 
         [IonField]
-        public bool canOffroad; 
-
+        public bool canOffroad;
+        
         public override string ToString()
         {
             return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
