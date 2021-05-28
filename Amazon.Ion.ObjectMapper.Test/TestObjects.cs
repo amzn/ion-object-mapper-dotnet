@@ -151,25 +151,23 @@ namespace Amazon.Ion.ObjectMapper.Test
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
 
-        public static PoliticalParty democrats = new PoliticalParty { Name = "Democratic Party" };
-        public static PoliticalParty republicans = new PoliticalParty { Name = "Republican Party" };
-        public static Politician JoeBiden = new Politician {FirstName = "Joe", LastName = "Biden", Party = democrats };
-        public static Politician MurielBowser = new Politician {FirstName = "Muriel", LastName = "Bowser", Party = democrats };
-        public static Politician CherylSelby = new Politician {FirstName = "Cheryl", LastName = "Selby", Party = democrats };
-        public static Politician JayInslee = new Politician {FirstName = "Jay", LastName = "Inslee", Party = democrats };
-        public static Politician SteveAdler = new Politician {FirstName = "Steve", LastName = "Adler", Party = democrats };
-        public static Politician GregAbbott = new Politician {FirstName = "Greg", LastName = "Abbott", Party = republicans };
-        public static City WashingtonDC = new City {Name = "Washington D.C.", Mayor = MurielBowser};
-        public static City Olympia = new City {Name = "Olympia", Mayor = CherylSelby};
-        public static City Austin = new City {Name = "Austin", Mayor = SteveAdler};
-        public static State Washington = new State {Name = "Washington", Capital = Olympia, Governor = JayInslee};
-        public static State Texas = new State {Name = "Texas", Capital = Austin, Governor = GregAbbott};
+        private static Politician GeorgeAdams = new Politician {FirstName = "George", LastName = "Adams" };
+        private static Politician SuzanneBenson = new Politician {FirstName = "Suzanne", LastName = "Benson" };
+        private static Politician SarahCasey = new Politician {FirstName = "Sarah", LastName = "Casey" };
+        private static Politician CharlesRogers = new Politician {FirstName = "Charles", LastName = "Rogers" };
+        private static Politician RolandCohen = new Politician {FirstName = "Roland", LastName = "Cohen" };
+        private static Politician GeneHouston = new Politician {FirstName = "Gene", LastName = "Houston" };
+        private static City WashingtonDC = new City {Name = "Washington D.C.", Mayor = SuzanneBenson};
+        private static City Olympia = new City {Name = "Olympia", Mayor = SarahCasey};
+        private static City Austin = new City {Name = "Austin", Mayor = RolandCohen};
+        private static State Washington = new State {Name = "Washington", Capital = Olympia, Governor = CharlesRogers};
+        private static State Texas = new State {Name = "Texas", Capital = Austin, Governor = GeneHouston};
         private static State[] states = { Washington, Texas };
         public static Country UnitedStates = new Country
         {
             Name = "United States of America",
             Capital = WashingtonDC,
-            President = JoeBiden,
+            President = GeorgeAdams,
             States = new List<State>(states)
         };
 
@@ -368,11 +366,5 @@ namespace Amazon.Ion.ObjectMapper.Test
     {
         public string FirstName { get; init; }
         public string LastName { get; init; }
-        public PoliticalParty Party { get; init; }
-    }
-
-    public class PoliticalParty
-    {
-        public string Name { get; init; }
     }
 }
