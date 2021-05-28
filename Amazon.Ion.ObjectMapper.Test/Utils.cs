@@ -92,9 +92,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public static IIonValue StreamToIonValue(Stream stream)
         {
-            var ion = IonLoader.Default.Load(stream);
-            stream.Position = 0;
-            return ion.GetElementAt(0);
+            return IonLoader.Default.Load(Copy(stream)).GetElementAt(0);
         }
     }
 }
