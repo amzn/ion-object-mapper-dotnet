@@ -132,14 +132,11 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             var stream = new IonSerializer().Serialize(TestObjects.UnitedStates);
             
-            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 5});
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 4});
             var deserialized = serializer.Deserialize<Country>(stream);
-            
-            Assert.IsNotNull(deserialized.States);
-            Assert.IsNotNull(deserialized.States[0].Capital);
+
             Assert.IsNotNull(deserialized.States[0].Capital.Mayor);
-            Assert.IsNotNull(deserialized.States[0].Capital.Mayor.Party);
-            Assert.IsNull(deserialized.States[0].Capital.Mayor.Party.Name);
+            Assert.IsNull(deserialized.States[0].Capital.Mayor.FirstName);
         }
 
         [TestMethod]
