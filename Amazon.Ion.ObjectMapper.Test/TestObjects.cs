@@ -341,6 +341,28 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    public class Ruler
+    {
+        internal int size;
+
+        [IonPropertyGetter("size")]
+        public int GetSize() 
+        {
+            return this.size + 10;
+        }
+    
+        [IonPropertySetter("size")]
+        public void SetSize(int input) 
+        {
+            this.size = input - 10;
+        }
+        
+        public override string ToString()
+        {
+            return $"<Ruler>{{ size: {this.size} }}";
+        }
+    }
+
     public class Country
     {
         public string Name { get; init; }

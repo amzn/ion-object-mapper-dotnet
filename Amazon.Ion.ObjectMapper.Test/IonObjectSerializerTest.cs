@@ -113,13 +113,18 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesAndDeserializesGetterAndSetterMethods()
         {
             var serializer = new IonSerializer();
+            var ruler = new Ruler {size = 20};
 
-            var stream = serializer.Serialize(TestObjects.honda);
+            var stream = serializer.Serialize(ruler);
             IIonStruct serialized = StreamToIonValue(stream);
-            Assert.IsTrue(serialized.ContainsField("color"));
+            Assert.IsTrue(serialized.ContainsField("size"));
+            
+            // Note that GetSize() returns size + 10.
+            Assert.AreEqual(ruler.GetSize(), serialized.GetField("size").IntValue);
 
-            var deserialized = serializer.Deserialize<Car>(stream);
-            Assert.AreEqual(TestObjects.honda.GetColor(), deserialized.color);
+            // The setter subtracts 10 when setting the size which will cancel out the 10 added by the getter.
+            var deserialized = serializer.Deserialize<Ruler>(stream);
+            Assert.AreEqual(ruler.size, deserialized.size);
         }
 
         [TestMethod]
