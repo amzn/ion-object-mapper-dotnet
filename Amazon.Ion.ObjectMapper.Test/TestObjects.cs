@@ -50,20 +50,20 @@ namespace Amazon.Ion.ObjectMapper.Test
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Motorcycle : Vehicle
     {
-        public string Make { get; init; }
+        public string Brand { get; init; }
 
         [IonField]
         public string color;
 
         [IonField]
-        public bool canOffroad;
-        
+        public bool canOffroad; 
+
         public override string ToString()
         {
-            return $"<Motorcycle>{{ Make: {this.Make}, color: {this.color}, canOffroad: {this.canOffroad} }}";
+            return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
-
+    
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
     {
