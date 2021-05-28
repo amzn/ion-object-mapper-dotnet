@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper.Test
@@ -72,6 +73,32 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Yacht>";
         }
     }
+
+    [IonDoNotAnnotateType(ExcludeDescendants = true)]
+    public class Ship : Boat
+    {
+        public string Name { get; init; }
+        public int Weight { get; init; }
+        public int Capacity { get; init; }
+        
+        public override string ToString()
+        {
+            return $"<Ship>{{ Name: {this.Name}, Weight: {this.Weight}, Capacity: {this.Capacity} }}";
+        }
+    }
+    
+    // For testing case insensitive deserialization.
+    public class ShipWithVariedCasing : Boat
+    {
+        public string name { get; init; }
+        public double WEIGHT { get; init; }
+        public int CaPaCiTy { get; init; }
+        
+        public override string ToString()
+        {
+            return $"<Ship>{{ name: {this.name}, WEIGHT: {this.WEIGHT}, CaPaCiTy: {this.CaPaCiTy} }}";
+        }
+    }
     
     public class Catamaran : Yacht
     {
@@ -120,10 +147,17 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static Radio fmRadio = new Radio { Band = "FM" };
 
-        public static Teacher drKyler = new Teacher("Edward", "Kyler", "Math", DateTime.Parse("08/18/1962"));
-        public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.Parse("04/29/1985"));
+        public static Teacher drKyler = new Teacher("Edward", "Kyler", "Math", DateTime.ParseExact("18/08/1962", "dd/MM/yyyy", CultureInfo.InvariantCulture));
+        public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.ParseExact("29/04/1985", "dd/MM/yyyy", CultureInfo.InvariantCulture));
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
+
+        public static Ship Titanic = new Ship
+        {
+            Name = "Titanic",
+            Weight = 52310,
+            Capacity = 2230,
+        };
     }
 
     public class Car
