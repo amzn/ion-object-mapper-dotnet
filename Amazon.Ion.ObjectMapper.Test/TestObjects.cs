@@ -72,6 +72,32 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Yacht>";
         }
     }
+
+    [IonDoNotAnnotateType(ExcludeDescendants = true)]
+    public class Ship : Boat
+    {
+        public string Name { get; init; }
+        public int Weight { get; init; }
+        public int Capacity { get; init; }
+        
+        public override string ToString()
+        {
+            return $"<Ship>{{ Name: {this.Name}, Weight: {this.Weight}, Capacity: {this.Capacity} }}";
+        }
+    }
+    
+    // For testing case insensitive deserialization.
+    public class ShipWithVariedCasing : Boat
+    {
+        public string name { get; init; }
+        public double WEIGHT { get; init; }
+        public int CaPaCiTy { get; init; }
+        
+        public override string ToString()
+        {
+            return $"<Ship>{{ name: {this.name}, WEIGHT: {this.WEIGHT}, CaPaCiTy: {this.CaPaCiTy} }}";
+        }
+    }
     
     public class Catamaran : Yacht
     {
@@ -126,6 +152,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
         
         public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
+
+        public static Ship Titanic = new Ship
+        {
+            Name = "Titanic",
+            Weight = 52310,
+            Capacity = 2230,
+        };
     }
 
     public class Car
