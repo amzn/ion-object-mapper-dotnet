@@ -139,6 +139,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 return ((IonPropertyName)ionPropertyName).Name;
             }
+
             return options.NamingConvention.FromProperty(property.Name);
         }
 
@@ -156,6 +157,11 @@ namespace Amazon.Ion.ObjectMapper
             if (exact != null)
             {
                 return exact;
+            }
+
+            if (options.PropertyNameCaseInsensitive)
+            {
+                return targetType.GetProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
             }
 
             var name = options.NamingConvention.ToProperty(readName);
