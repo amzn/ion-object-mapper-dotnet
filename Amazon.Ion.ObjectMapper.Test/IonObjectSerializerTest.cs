@@ -88,27 +88,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesAndDeserializesObjectsWithCaseInsensitiveProperties()
         {
             var serializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });
-            var stream = serializer.Serialize(TestObjects.Harley);
-
-            var deserialized1 = serializer.Deserialize<MOTORCYCLE>(stream);
             
-            Assert.AreEqual(TestObjects.Harley.Make, deserialized1.MAKE);
-            Assert.IsNull(deserialized1.COLOR);
-            Assert.IsFalse(deserialized1.CANOFFROAD);
-
-            stream.Position = 0;
-            var deserialized2 = serializer.Deserialize<motorcycle>(stream);
+            var stream = serializer.Serialize(TestObjects.Titanic);
+            var deserialized = serializer.Deserialize<ShipWithVariedCasing>(stream);
             
-            Assert.AreEqual(TestObjects.Harley.Make, deserialized2.make);
-            Assert.IsNotNull(deserialized2.color);
-            Assert.IsFalse(deserialized2.canoffroad);
-            
-            stream.Position = 0;
-            var deserialized3 = serializer.Deserialize<MoToRcYcLe>(stream);
-            
-            Assert.AreEqual(TestObjects.Harley.Make, deserialized3.MaKe);
-            Assert.IsNull(deserialized3.CoLoR);
-            Assert.IsFalse(deserialized3.CaNoFfRoAd);
+            Assert.AreEqual(TestObjects.Titanic.Name, deserialized.name);
+            Assert.AreEqual(TestObjects.Titanic.Weight, deserialized.WEIGHT);
+            Assert.AreEqual(TestObjects.Titanic.Capacity, deserialized.CaPaCiTy);
         }
 
         [TestMethod]
