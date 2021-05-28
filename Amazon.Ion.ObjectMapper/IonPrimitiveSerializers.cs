@@ -27,7 +27,7 @@ namespace Amazon.Ion.ObjectMapper
             return blob;
         }
 
-        public void Serialize(IIonWriter writer, byte[] item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteBlob(item);
         }
@@ -39,7 +39,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.StringValue();
         }
 
-        public void Serialize(IIonWriter writer, string item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteString(item);
         }
@@ -52,7 +52,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.IntValue();
         }
 
-        public void Serialize(IIonWriter writer, int item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteInt(item);
         }
@@ -67,7 +67,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.IntValue();
         }
 
-        public void Serialize(IIonWriter writer, long item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             writer.WriteInt(item);
@@ -80,7 +80,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.BoolValue();
         }
 
-        public void Serialize(IIonWriter writer, bool item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteBool(item);
         }
@@ -93,7 +93,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.DoubleValue();
         }
 
-        public void Serialize(IIonWriter writer, double item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteFloat(item);
         }
@@ -108,7 +108,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.DecimalValue().ToDecimal();
         }
 
-        public void Serialize(IIonWriter writer, decimal item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             writer.WriteDecimal(item);
@@ -122,7 +122,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.DecimalValue();
         }
 
-        public void Serialize(IIonWriter writer, BigDecimal item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteDecimal(item);
         }
@@ -137,7 +137,7 @@ namespace Amazon.Ion.ObjectMapper
             return Convert.ToSingle(reader.DoubleValue());
         }
 
-        public void Serialize(IIonWriter writer, float item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             writer.WriteFloat(item);
@@ -151,7 +151,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.TimestampValue().DateTimeValue;
         }
 
-        public void Serialize(IIonWriter writer, DateTime item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteTimestamp(new Timestamp(item));
         }
@@ -164,7 +164,7 @@ namespace Amazon.Ion.ObjectMapper
             return reader.SymbolValue();
         }
 
-        public void Serialize(IIonWriter writer, SymbolToken item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteSymbolToken(item);
         }
@@ -179,7 +179,7 @@ namespace Amazon.Ion.ObjectMapper
             return Encoding.UTF8.GetString(clob);
         }
 
-        public void Serialize(IIonWriter writer, string item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteClob(Encoding.UTF8.GetBytes(item));
         }
@@ -202,7 +202,7 @@ namespace Amazon.Ion.ObjectMapper
             return new Guid(blob);
         }
 
-        public void Serialize(IIonWriter writer, Guid item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             if (annotateGuids) {
                 writer.SetTypeAnnotations(new List<string>() { ANNOTATION });

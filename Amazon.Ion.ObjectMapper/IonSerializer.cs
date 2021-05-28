@@ -11,7 +11,7 @@ namespace Amazon.Ion.ObjectMapper
 {
     public interface IonSerializer<T>
     {
-        void Serialize(IIonWriter writer, T item);
+        void Serialize(IIonWriter writer, dynamic item);
         T Deserialize(IIonReader reader);
     }
 
@@ -126,6 +126,8 @@ namespace Amazon.Ion.ObjectMapper
         public readonly bool PermissiveMode;
 
         public Dictionary<Type, dynamic> IonSerializers { get; init; }
+
+        public Dictionary<string, dynamic> AnnotatedIonSerializers { get; init; }
     }
 
     public interface IonSerializerFactory<T, TContext> where TContext : IonSerializationContext
@@ -210,6 +212,23 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             Type type = item.GetType();
+
+            if (options.AnnotatedIonSerializers != null)
+            {
+                var annotationAttributes = type.GetCustomAttributes(typeof(IonAnnotateType), false);
+                foreach (IonAnnotateType annotationAttribute in annotationAttributes)
+                {
+                    // Todo: Use AnnotationConvention instead of Name
+                    if (options.AnnotatedIonSerializers.ContainsKey(annotationAttribute.Name))
+                    {
+                        var serializer = options.AnnotatedIonSerializers[annotationAttribute.Name];
+                        writer.AddTypeAnnotation(annotationAttribute.Name);
+                        serializer.Serialize(writer, item);
+                        return;
+                    }
+                }
+            }
+
             if (this.primitiveSerializers.ContainsKey(type))
             {
                 this.SerializePrimitive(type, writer, item);
@@ -243,6 +262,17 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
+            if (options.AnnotatedIonSerializers != null)
+            {
+                foreach (var valuePair in options.AnnotatedIonSerializers)
+                {
+                    if (reader.HasAnnotation(valuePair.Key))
+                    {
+                        return valuePair.Value.Deserialize(reader);
+                    }
+                }
+            }
+
             if (ionType == IonType.None || ionType == IonType.Null)
             {
                 return this.nullSerializer.Deserialize(reader);

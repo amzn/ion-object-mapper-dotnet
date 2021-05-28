@@ -63,6 +63,15 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
+
+    [IonAnnotateType(Name = "Supra")]
+    public class Supra : Vehicle
+    {
+        public override string ToString()
+        {
+            return "Is that a Supra!?";
+        }
+    }
     
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
@@ -115,6 +124,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
+
+        public static Supra a90 = new Supra();
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
@@ -295,7 +306,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             return reader.StringValue().ToUpper();
         }
 
-        public void Serialize(IIonWriter writer, string item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteString(item.ToUpper());
         }
@@ -308,9 +319,24 @@ namespace Amazon.Ion.ObjectMapper.Test
             return -reader.IntValue();
         }
 
-        public void Serialize(IIonWriter writer, int item)
+        public void Serialize(IIonWriter writer, dynamic item)
         {
             writer.WriteInt(-item);
+        }
+    }
+
+    public class SupraSerializer : IonSerializer<string>
+    {
+        public string Deserialize(IIonReader reader)
+        {
+            // Custom serializer always deserializes into this string
+            return "Is that a Supra!?";
+        }
+
+        public void Serialize(IIonWriter writer, dynamic item)
+        {
+            // Custom serializer serializes into a null value
+            writer.WriteNull();
         }
     }
 }

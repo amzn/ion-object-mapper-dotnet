@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Amazon.IonDotnet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -34,6 +35,17 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesAndDeserializesLists()
         {
             Check(new int[] { 1, 1, 2, 3, 5, 8, 11 });
+        }
+
+        [TestMethod]
+        public void AnnotatedIonSerializer()
+        {
+            var annotatedIonSerializer = new Dictionary<string, dynamic>();
+            annotatedIonSerializer.Add("Supra", new SupraSerializer());
+            var serializer = new IonSerializer(new IonSerializationOptions { AnnotatedIonSerializers = annotatedIonSerializer });
+            var stream = serializer.Serialize(TestObjects.a90);
+            var output = serializer.Deserialize<string>(stream);
+            Assert.AreEqual(TestObjects.a90.ToString(), output);
         }
     }
 }
