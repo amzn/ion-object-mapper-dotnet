@@ -28,7 +28,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(motorcycle));
 
-            Assert.IsFalse(serialized.ContainsField("brand"));
+            Assert.IsFalse(serialized.ContainsField("Brand"));
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
@@ -66,7 +66,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(new Motorcycle {canOffroad = true}));
 
-            Assert.IsFalse(serialized.ContainsField("brand"));
+            Assert.IsFalse(serialized.ContainsField("Brand"));
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
