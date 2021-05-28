@@ -44,7 +44,7 @@ namespace Amazon.Ion.ObjectMapper
                 FieldInfo field;
                 if (property != null)
                 {
-                    if (!property.CanWrite)
+                    if (IsReadOnlyProperty(property))
                     {
                         // property.SetValue() does not work with a readonly property.
                         // logic for handling deserializing readonly properties happens during field processing
@@ -168,10 +168,9 @@ namespace Amazon.Ion.ObjectMapper
             return targetType.GetProperty(name);
         }
 
-        private bool IsReadOnlyProperty(PropertyInfo prop)
+        private bool IsReadOnlyProperty(PropertyInfo property)
         {
-            return !prop.CanWrite || 
-                   Attribute.GetCustomAttribute(prop, typeof(ReadOnlyAttribute)) is ReadOnlyAttribute {IsReadOnly: true};
+            return property.SetMethod == null;
         }
         
         private FieldInfo FindField(string name)
