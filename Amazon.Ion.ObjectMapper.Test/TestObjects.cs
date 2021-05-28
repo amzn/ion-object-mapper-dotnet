@@ -53,10 +53,10 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string Brand { get; init; }
 
         [IonField]
-        public string color; 
+        public string color;
 
         [IonField]
-        public bool canOffroad;
+        public bool canOffroad; 
         
         public override string ToString()
         {
