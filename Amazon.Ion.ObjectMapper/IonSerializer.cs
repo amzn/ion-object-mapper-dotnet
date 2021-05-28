@@ -113,6 +113,11 @@ namespace Amazon.Ion.ObjectMapper
         public bool IgnoreDefaults { get; init; } = false;
         public bool IncludeTypeInformation { get; init; } = false;
         public TypeAnnotationPrefix TypeAnnotationPrefix { get; init; } = new NamespaceTypeAnnotationPrefix();
+
+        public TypeAnnotationName TypeAnnotationName { get; init; } = new ClassNameTypeAnnotationName();
+
+        public AnnotationConvention AnnotationConvention { get; init; } = new DefaultAnnotationConvention();
+
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
 
         public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
