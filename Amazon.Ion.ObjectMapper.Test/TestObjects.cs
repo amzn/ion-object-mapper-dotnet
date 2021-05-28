@@ -64,63 +64,38 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
-    // For testing case insensitive deserialization.
-    public class MOTORCYCLE : Vehicle
-    {
-        public string MAKE { get; init; }
-
-        [IonField]
-        public string COLOR;
-
-        [IonField]
-        public bool CANOFFROAD;
-        
-        public override string ToString()
-        {
-            return $"<MOTORCYCLE>{{ MAKE: {this.MAKE}, COLOR: {this.COLOR}, CANOFFROAD: {this.CANOFFROAD} }}";
-        }
-    }
-    
-    // For testing case insensitive deserialization.
-    public class motorcycle : Vehicle
-    {
-        public string make { get; init; }
-
-        [IonField]
-        public string color;
-
-        [IonField]
-        public bool canoffroad;
-        
-        public override string ToString()
-        {
-            return $"<motorcycle>{{ make: {this.make}, color: {this.color}, canoffroad: {this.canoffroad} }}";
-        }
-    }
-    
-    // For testing case insensitive deserialization.
-    public class MoToRcYcLe : Vehicle
-    {
-        public string MaKe { get; init; }
-
-        [IonField]
-        public string CoLoR;
-
-        [IonField]
-        public bool CaNoFfRoAd;
-        
-        public override string ToString()
-        {
-            return $"<MoToRcYcLe>{{ MaKe: {this.MaKe}, CoLoR: {this.CoLoR}, CaNoFfRoAd: {this.CaNoFfRoAd} }}";
-        }
-    }
-    
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
     {
         public override string ToString()
         {
             return "<Yacht>";
+        }
+    }
+
+    [IonDoNotAnnotateType(ExcludeDescendants = true)]
+    public class Ship : Boat
+    {
+        public string Name { get; init; }
+        public int Weight { get; init; }
+        public int Capacity { get; init; }
+        
+        public override string ToString()
+        {
+            return $"<Ship>{{ Name: {this.Name}, Weight: {this.Weight}, Capacity: {this.Capacity} }}";
+        }
+    }
+    
+    // For testing case insensitive deserialization.
+    public class ShipWithVariedCasing : Boat
+    {
+        public string name { get; init; }
+        public double WEIGHT { get; init; }
+        public int CaPaCiTy { get; init; }
+        
+        public override string ToString()
+        {
+            return $"<Ship>{{ name: {this.name}, WEIGHT: {this.WEIGHT}, CaPaCiTy: {this.CaPaCiTy} }}";
         }
     }
     
@@ -167,13 +142,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
-        public static readonly Motorcycle Harley = new Motorcycle
-        {
-            Make = "Harley",
-            color = "Black",
-            canOffroad = true,
-        };
-
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
         public static Radio fmRadio = new Radio { Band = "FM" };
@@ -182,6 +150,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.ParseExact("29/04/1985", "dd/MM/yyyy", CultureInfo.InvariantCulture));
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
+
+        public static Ship Titanic = new Ship
+        {
+            Name = "Titanic",
+            Weight = 52310,
+            Capacity = 2230,
+        };
     }
 
     public class Car
