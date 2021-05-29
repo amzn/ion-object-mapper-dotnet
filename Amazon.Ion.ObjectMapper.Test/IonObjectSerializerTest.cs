@@ -490,10 +490,9 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializeAnnotatedIonToParentClassNameMatchingAnnotation()
         {
-            IIonValue ionTruck = valueFactory.NewEmptyStruct();
-            ionTruck.AddTypeAnnotation("Truck");
+            string truckIonText = "Truck:: { }";
 
-            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+            IIonReader reader = IonReaderBuilder.Build(truckIonText);
 
             IonSerializer ionSerializer = new IonSerializer();
             Vehicle truck = ionSerializer.Deserialize<Vehicle>(reader);
@@ -504,10 +503,9 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializeAnnotatedIonToClassNameMatchingAnnotation()
         {
-            IIonValue ionTruck = valueFactory.NewEmptyStruct();
-            ionTruck.AddTypeAnnotation("Truck");
+            string truckIonText = "Truck:: { }";
 
-            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+            IIonReader reader = IonReaderBuilder.Build(truckIonText);
 
             IonSerializer ionSerializer = new IonSerializer();
             Truck truck = ionSerializer.Deserialize<Truck>(reader);
@@ -518,10 +516,9 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializeAnnotatedIonToClassNameNotMatchingAnnotation()
         {
-            IIonValue ionTruck = valueFactory.NewEmptyStruct();
-            ionTruck.AddTypeAnnotation("NonMatching");
+            string annotatedIonText = "NonMatching:: { }";
 
-            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+            IIonReader reader = IonReaderBuilder.Build(annotatedIonText);
 
             IonSerializer ionSerializer = new IonSerializer();
             Truck truck = ionSerializer.Deserialize<Truck>(reader);
@@ -540,10 +537,9 @@ namespace Amazon.Ion.ObjectMapper.Test
                 }
             };
 
-            IIonValue ionTruck = valueFactory.NewEmptyStruct();
-            ionTruck.AddTypeAnnotation("Truck");
+            string truckIonText = "Truck:: { }";
 
-            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+            IIonReader reader = IonReaderBuilder.Build(truckIonText);
 
             IonSerializer ionSerializer = new IonSerializer(options);
             Truck truck = ionSerializer.Deserialize<Truck>(reader);
