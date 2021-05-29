@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Amazon.IonDotnet;
@@ -13,23 +12,15 @@ namespace Amazon.Ion.ObjectMapper
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
-        private readonly IEnumerable<PropertyInfo> readOnlyProperties;
+        private readonly Lazy<IEnumerable<PropertyInfo>> readOnlyProperties;
 
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
             this.options = options;
             this.targetType = targetType;
-            
-            if (!this.options.IgnoreReadOnlyProperties && !this.options.IncludeFields)
-            {
-                // If we are serialzing/deserializing readonly properties then we need to serialize/deserialize those
-                // properties' backing fields.
-                // this.readOnlyProperties is used for detecting the appropriate backing fields.
-                // However if we are already including all fields,
-                // then there is no need for this backing field detection logic.
-                this.readOnlyProperties = this.targetType.GetProperties().Where(IsReadOnlyProperty);
-            }
+            this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
+                () => this.targetType.GetProperties().Where(IsReadOnlyProperty));
         }
 
         public object Deserialize(IIonReader reader)
@@ -209,8 +200,8 @@ namespace Amazon.Ion.ObjectMapper
                 return true;
             }
 
-            if (!this.options.IgnoreReadOnlyProperties && 
-                this.readOnlyProperties.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
+            if (!this.options.IgnoreReadOnlyProperties &&
+                this.readOnlyProperties.Value.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
             {
                 return true;
             }
