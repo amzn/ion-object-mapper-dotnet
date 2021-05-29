@@ -209,11 +209,11 @@ public class DefaultDeserialization
     }
     
     public void DeserializeExample() {
-        // Create Ion strcut with annotation that matches Truck Class Type name.
-        IIonValue ionTruck = valueFactory.NewEmptyStruct();
-        ionTruck.AddTypeAnnotation("Truck");
+        // Create Ion struct with annotation that matches Truck Class Type name.
+        
+        string truckIonText = "Truck:: { }";
 
-        IIonReader reader = IonReaderBuilder.Build(ionTruck);
+        IIonReader reader = IonReaderBuilder.Build(truckIonText);
 
         IonSerializer ionSerializer = new IonSerializer();
         // This will only attempt to deserialize into a Truck if and only if Truck is a subtype of the input Type, in this case Typeof(car).

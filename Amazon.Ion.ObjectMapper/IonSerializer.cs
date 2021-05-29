@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
@@ -107,15 +106,16 @@ namespace Amazon.Ion.ObjectMapper
                 Type typeToCreate = null;
                 try
                 {
+                    // First throws InvalidOperationException if no elements match the condition
                     var assemblyName = options.AnnotatedTypeAssemblies.First(a => Type.GetType(FullName(typeName, a)) != null);
                     typeToCreate = Type.GetType(FullName(typeName, assemblyName));
                 }
-                catch
+                catch (InvalidOperationException)
                 {
                     typeToCreate = AppDomain.CurrentDomain
                         .GetAssemblies()
                         .SelectMany(x => x.GetTypes())
-                        .FirstOrDefault(t => string.Equals(t.Name, typeName, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(type => string.Equals(type.Name, typeName, StringComparison.OrdinalIgnoreCase));
                 }
 
                 if (typeToCreate != null && targetType.IsAssignableFrom(typeToCreate))
