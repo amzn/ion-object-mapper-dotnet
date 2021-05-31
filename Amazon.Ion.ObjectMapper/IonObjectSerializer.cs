@@ -27,7 +27,7 @@ namespace Amazon.Ion.ObjectMapper
                 throw new ArgumentException("Cannot deserialize with a null Ion reader");
             }
             
-            var ionConstructors = targetType.GetConstructors().Where(IsIonConstructor);
+            var ionConstructors = targetType.GetConstructors(fieldBindings).Where(IsIonConstructor);
             if (ionConstructors.Any())
             {
                 if (ionConstructors.Count() > 1)
