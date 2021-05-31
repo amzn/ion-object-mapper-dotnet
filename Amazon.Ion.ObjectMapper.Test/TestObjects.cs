@@ -225,11 +225,8 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Wheel
     {
-        [IonField]
-        internal string specification;
-
-        [IonField]
-        internal int size;
+        public string specification { get; init; }
+        public int size { get; init; }
 
         public Wheel(int size)
         {
@@ -238,7 +235,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [IonConstructor]
-        public Wheel(
+        private Wheel(
             [IonPropertyName("specification")] string specification,
             [IonPropertyName("size")] int size)
         {
