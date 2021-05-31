@@ -343,42 +343,66 @@ namespace Amazon.Ion.ObjectMapper
             {
                 throw new NotSupportedException($"Custom serializer for {type} is not supported");
             }
-            
+
             if (type == typeof(bool))
+            {
                 return serializer is IonSerializer<bool>;
+            }
 
             if (type == typeof(string))
+            {
                 return serializer is IonSerializer<string>;
+            }
 
             if (type == typeof(byte[]))
+            {
                 return serializer is IonSerializer<byte[]>;
+            }
 
             if (type == typeof(int))
+            {
                 return serializer is IonSerializer<int>;
+            }
 
             if (type == typeof(long))
+            {
                 return serializer is IonSerializer<long>;
+            }
 
             if (type == typeof(float))
+            {
                 return serializer is IonSerializer<float>;
+            }
 
             if (type == typeof(double))
+            {
                 return serializer is IonSerializer<double>;
-            
+            }
+
             if (type == typeof(decimal))
+            {
                 return serializer is IonSerializer<decimal>;
-            
+            }
+
             if (type == typeof(BigDecimal))
+            {
                 return serializer is IonSerializer<BigDecimal>;
+            }
 
             if (type == typeof(SymbolToken))
+            {
                 return serializer is IonSerializer<SymbolToken>;
-            
+            }
+
             if (type == typeof(DateTime))
+            {
                 return serializer is IonSerializer<DateTime>;
+            }
 
             if (type == typeof(Guid))
+            {
                 return serializer is IonSerializer<Guid>;
+            }
 
             return false;
         }
@@ -386,42 +410,66 @@ namespace Amazon.Ion.ObjectMapper
         private void SerializePrimitive(Type type, IIonWriter writer, object item)
         {
             var serializer = this.primitiveSerializers[type];
-            
+
             if (type == typeof(bool))
+            {
                 serializer.Serialize(writer, Convert.ToBoolean(item));
+            }
 
             else if (type == typeof(string))
+            {
                 serializer.Serialize(writer, item as string);
+            }
 
             else if (type == typeof(byte[]))
+            {
                 serializer.Serialize(writer, (byte[])item);
+            }
 
             else if (type == typeof(int))
+            {
                 serializer.Serialize(writer, Convert.ToInt32(item));
+            }
 
             else if (type == typeof(long))
+            {
                 serializer.Serialize(writer, Convert.ToInt64(item));
+            }
 
             else if (type == typeof(float))
+            {
                 serializer.Serialize(writer, Convert.ToSingle(item));
+            }
 
             else if (type == typeof(double))
+            {
                 serializer.Serialize(writer, Convert.ToDouble(item));
-            
+            }
+
             else if (type == typeof(decimal))
+            {
                 serializer.Serialize(writer, Convert.ToDecimal(item));
-            
+            }
+
             else if (type == typeof(BigDecimal))
+            {
                 serializer.Serialize(writer, (BigDecimal)item);
+            }
 
             else if (type == typeof(SymbolToken))
+            {
                 serializer.Serialize(writer, (SymbolToken)item);
-            
+            }
+
             else if (type == typeof(DateTime))
+            {
                 serializer.Serialize(writer, (DateTime)item);
+            }
 
             else if (type == typeof(Guid))
+            {
                 serializer.Serialize(writer, (Guid)item);
+            }
         }
     }
 }
