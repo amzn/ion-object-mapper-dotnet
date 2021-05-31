@@ -142,15 +142,16 @@ namespace Amazon.Ion.ObjectMapper
                 var paramIndexMap = new Dictionary<string, int>();
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    var param = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
-                    if (param == null)
+                    var ionPropertyName = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
+                    if (ionPropertyName == null)
                     {
                         throw new NotSupportedException(
                             $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
-                            $"for {targetType.Name}'s IonConstructor");
+                            $"for {targetType.Name}'s IonConstructor. All constructor arguments must be annotated " +
+                            "so we know which parameters to set at construction time.");
                     }
                     
-                    paramIndexMap.Add(param.Name, i);
+                    paramIndexMap.Add(ionPropertyName.Name, i);
                 }
                 
                 reader.StepIn();
