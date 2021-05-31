@@ -11,14 +11,7 @@ namespace Amazon.Ion.ObjectMapper
         private const BindingFlags fieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
-        internal Type targetType;
-
-        public IonObjectSerializer(IonSerializer ionSerializer)
-        {
-            this.ionSerializer = ionSerializer;
-            this.options = ionSerializer.options;
-            this.targetType = default;
-        }
+        private readonly Type targetType;
 
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
