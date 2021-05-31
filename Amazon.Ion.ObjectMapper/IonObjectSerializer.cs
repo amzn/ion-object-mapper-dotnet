@@ -24,7 +24,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (reader == null)
             {
-                throw new ArgumentException("Cannot deserialize with a null Ion reader");
+                throw new NullReferenceException("Cannot deserialize with a null Ion reader");
             }
             
             var ionConstructors = targetType.GetConstructors(fieldBindings).Where(IsIonConstructor);
@@ -83,7 +83,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (writer == null)
             {
-                throw new ArgumentException("Cannot serialize with a null Ion writer");
+                throw new NullReferenceException("Cannot serialize with a null Ion writer");
             }
             
             options.TypeAnnotator.Apply(options, writer, targetType);
