@@ -170,11 +170,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 foreach (var serializer in this.options.IonSerializers)
                 {
-                    if (ValidateCustomSerializer(serializer.Key, serializer.Value))
-                    {
-                        this.primitiveSerializers[serializer.Key] = serializer.Value;
-                    }
-                    else
+                    if (!ValidateCustomSerializer(serializer.Key, serializer.Value))
                     {
                         throw new NotSupportedException($"Custom serializer does not satisfy IonSerializer<{serializer.Key}> interface");
                     }
@@ -247,34 +243,34 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.Bool)
             {
-                return this.primitiveSerializers[typeof(bool)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(bool)).Deserialize(reader);
             }
 
             if (ionType == IonType.Int)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
                 {
-                    return this.primitiveSerializers[typeof(long)].Deserialize(reader);
+                    return this.GetPrimitiveSerializer(typeof(long)).Deserialize(reader);
                 }
-                return this.primitiveSerializers[typeof(int)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(int)).Deserialize(reader);
             }
 
             if (ionType == IonType.Float)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
                 {
-                    return this.primitiveSerializers[typeof(float)].Deserialize(reader);
+                    return this.GetPrimitiveSerializer(typeof(float)).Deserialize(reader);
                 }
-                return this.primitiveSerializers[typeof(double)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(double)).Deserialize(reader);
             }
 
             if (ionType == IonType.Decimal)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
                 {
-                    return this.primitiveSerializers[typeof(decimal)].Deserialize(reader);
+                    return this.GetPrimitiveSerializer(typeof(decimal)).Deserialize(reader);
                 }
-                return this.primitiveSerializers[typeof(BigDecimal)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(BigDecimal)).Deserialize(reader);
             }
 
             if (ionType == IonType.Blob) 
@@ -282,24 +278,24 @@ namespace Amazon.Ion.ObjectMapper
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                     || type.IsAssignableTo(typeof(Guid)))
                 {
-                    return this.primitiveSerializers[typeof(Guid)].Deserialize(reader);
+                    return this.GetPrimitiveSerializer(typeof(Guid)).Deserialize(reader);
                 }
-                return this.primitiveSerializers[typeof(byte[])].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(byte[])).Deserialize(reader);
             }
 
             if (ionType == IonType.String) 
             {
-                return this.primitiveSerializers[typeof(string)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(string)).Deserialize(reader);
             }
 
             if (ionType == IonType.Symbol) 
             {
-                return this.primitiveSerializers[typeof(SymbolToken)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(SymbolToken)).Deserialize(reader);
             }
 
             if (ionType == IonType.Timestamp) 
             {
-                return this.primitiveSerializers[typeof(DateTime)].Deserialize(reader);
+                return this.GetPrimitiveSerializer(typeof(DateTime)).Deserialize(reader);
             }
 
             if (ionType == IonType.Clob) 
@@ -397,7 +393,7 @@ namespace Amazon.Ion.ObjectMapper
 
         private void SerializePrimitive(Type type, IIonWriter writer, object item)
         {
-            var serializer = this.primitiveSerializers[type];
+            var serializer = this.GetPrimitiveSerializer(type);
 
             if (type == typeof(bool))
             {
@@ -458,6 +454,16 @@ namespace Amazon.Ion.ObjectMapper
             {
                 serializer.Serialize(writer, (Guid)item);
             }
+        }
+
+        private dynamic GetPrimitiveSerializer(Type type)
+        {
+            if (this.options.IonSerializers != null && this.options.IonSerializers.ContainsKey(type))
+            {
+                return this.options.IonSerializers[type];
+            }
+
+            return this.primitiveSerializers[type];
         }
     }
 }
