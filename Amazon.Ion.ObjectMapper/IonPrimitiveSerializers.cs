@@ -1,5 +1,6 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
+using System.Numerics;
 using System.Text;
 using Amazon.IonDotnet;
 
@@ -134,6 +135,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public float Deserialize(IIonReader reader)
         {
+            
             return Convert.ToSingle(reader.DoubleValue());
         }
 
@@ -188,11 +190,11 @@ namespace Amazon.Ion.ObjectMapper
     public class IonGuidSerializer : IonSerializer<Guid>
     {
         internal static readonly string ANNOTATION = "guid128";
-        private readonly bool annotateGuids;
+        private IonSerializationOptions options;
 
-        public IonGuidSerializer(bool annotateGuids)
+        public IonGuidSerializer(IonSerializationOptions options)
         {
-            this.annotateGuids = annotateGuids;
+            this.options = options;
         }
 
         public Guid Deserialize(IIonReader reader)
@@ -204,7 +206,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public void Serialize(IIonWriter writer, Guid item)
         {
-            if (annotateGuids) {
+            if (options.AnnotateGuids) {
                 writer.SetTypeAnnotations(new List<string>() { ANNOTATION });
             }
             writer.WriteBlob(item.ToByteArray());

@@ -163,7 +163,7 @@ namespace Amazon.Ion.ObjectMapper
                 {typeof(BigDecimal), new IonBigDecimalSerializer()},
                 {typeof(SymbolToken), new IonSymbolSerializer()},
                 {typeof(DateTime), new IonDateTimeSerializer()},
-                {typeof(Guid), new IonGuidSerializer(this.options.AnnotateGuids)},
+                {typeof(Guid), new IonGuidSerializer(this.options)},
             };
 
             if (this.options.IonSerializers != null)
