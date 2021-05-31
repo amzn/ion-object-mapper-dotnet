@@ -140,12 +140,8 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        internal readonly IonSerializationOptions options;
+        private readonly IonSerializationOptions options;
         private Dictionary<Type, dynamic> primitiveSerializers { get; init; }
-        private IonNullSerializer nullSerializer { get; init; }
-        private IonClobSerializer clobSerializer { get; init; }
-        private IonListSerializer listSerializer { get; init; }
-        private IonObjectSerializer objectSerializer { get; init; }
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
@@ -169,10 +165,6 @@ namespace Amazon.Ion.ObjectMapper
                 {typeof(DateTime), new IonDateTimeSerializer()},
                 {typeof(Guid), new IonGuidSerializer(this.options.AnnotateGuids)},
             };
-            this.nullSerializer = new IonNullSerializer();
-            this.clobSerializer = new IonClobSerializer();
-            this.listSerializer = new IonListSerializer(this);
-            this.objectSerializer = new IonObjectSerializer(this);
 
             if (this.options.IonSerializers != null)
             {
@@ -210,7 +202,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (item == null)
             {
-                this.nullSerializer.Serialize(writer, null);
+                new IonNullSerializer().Serialize(writer, null);
                 return;
             }
 
@@ -223,15 +215,13 @@ namespace Amazon.Ion.ObjectMapper
 
             if (item is IList)
             {
-                this.listSerializer.SetListType(type);
-                this.listSerializer.Serialize(writer, item);
+                new IonListSerializer(this, type).Serialize(writer, item);
                 return;
             }
             
             if (item is object)
             {
-                this.objectSerializer.targetType = type;
-                this.objectSerializer.Serialize(writer, item);
+                new IonObjectSerializer(this, options, type).Serialize(writer, item);
                 return;
             }
             
@@ -252,7 +242,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (ionType == IonType.None || ionType == IonType.Null)
             {
-                return this.nullSerializer.Deserialize(reader);
+                return new IonNullSerializer().Deserialize(reader);
             }
 
             if (ionType == IonType.Bool)
@@ -314,19 +304,17 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.Clob) 
             {
-                return this.clobSerializer.Deserialize(reader);
+                return new IonClobSerializer().Deserialize(reader);
             }
 
             if (ionType == IonType.List) 
             {
-                this.listSerializer.SetListType(type);
-                return this.listSerializer.Deserialize(reader);
+                return new IonListSerializer(this, type).Deserialize(reader);
             }
 
             if (ionType == IonType.Struct) 
             {
-                this.objectSerializer.targetType = type;
-                return this.objectSerializer.Deserialize(reader);
+                return new IonObjectSerializer(this, options, type).Deserialize(reader);
             }
 
             throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
