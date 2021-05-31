@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -120,7 +121,16 @@ namespace Amazon.Ion.ObjectMapper.Test
             
             Assert.AreEqual(
                 $"Specification: {wheel.specification}, Size: {wheel.size} inches", deserialized.specification);
-            Assert.AreEqual(wheel.size, deserialized.size);
+        }
+        
+        [TestMethod]
+        public void ExceptionOnDeserializingObjectWithMultipleIonConstructors()
+        {
+            var serializer = new IonSerializer();
+            var tire = new Tire(17);
+
+            var stream = serializer.Serialize(tire);
+            Assert.ThrowsException<NotSupportedException>(() => serializer.Deserialize<Tire>(stream));
         }
 
         [TestMethod]

@@ -297,6 +297,28 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.size = size;
         }
     }
+    
+    public class Tire
+    {
+        public string specification { get; init; }
+        public int size { get; init; }
+
+        [IonConstructor]
+        public Tire(int size)
+        {
+            this.specification = "default";
+            this.size = size;
+        }
+
+        [IonConstructor]
+        private Tire(
+            [IonPropertyName("specification")] string specification,
+            [IonPropertyName("size")] int size)
+        {
+            this.specification = $"Specification: {specification}, Size: {size} inches";
+            this.size = size;
+        }
+    }
 
     public class School
     {
