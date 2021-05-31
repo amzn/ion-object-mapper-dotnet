@@ -12,24 +12,9 @@ namespace Amazon.Ion.ObjectMapper
         private Type elementType;
         private bool isGenericList;
 
-        public IonListSerializer(IonSerializer serializer)
-        {
-            this.serializer = serializer;
-        }
-
         public IonListSerializer(IonSerializer serializer, Type listType)
         {
             this.serializer = serializer;
-            this.SetListType(listType);
-        }
-        
-        internal void SetListType(Type listType)
-        {
-            if (listType == this.listType)
-            {
-                return;
-            }
-
             this.listType = listType;
 
             if (this.listType.IsArray)
@@ -54,7 +39,7 @@ namespace Amazon.Ion.ObjectMapper
         public IList Deserialize(IIonReader reader)
         {
             reader.StepIn();
-            var list = new System.Collections.ArrayList();
+            var list = new ArrayList();
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
@@ -72,14 +57,14 @@ namespace Amazon.Ion.ObjectMapper
                 return typedArray;
             }
             
-            if (listType is System.Collections.IEnumerable || listType is object)
+            if (listType is IEnumerable || listType is object)
             {
-                System.Collections.IList typedList;
+                IList typedList;
                 if (listType.IsGenericType) 
                 {
-                    typedList = (System.Collections.IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+                    typedList = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
                 } else {
-                    typedList = new System.Collections.ArrayList();
+                    typedList = new ArrayList();
                 }
 
                 foreach (var element in list)
