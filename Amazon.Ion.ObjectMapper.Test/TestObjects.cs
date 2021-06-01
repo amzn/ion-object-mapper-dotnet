@@ -150,6 +150,28 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.ParseExact("29/04/1985", "dd/MM/yyyy", CultureInfo.InvariantCulture));
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
+        
+        public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
+
+        private static Politician GeorgeAdams = new Politician {FirstName = "George", LastName = "Adams" };
+        private static Politician SuzanneBenson = new Politician {FirstName = "Suzanne", LastName = "Benson" };
+        private static Politician SarahCasey = new Politician {FirstName = "Sarah", LastName = "Casey" };
+        private static Politician CharlesRogers = new Politician {FirstName = "Charles", LastName = "Rogers" };
+        private static Politician RolandCohen = new Politician {FirstName = "Roland", LastName = "Cohen" };
+        private static Politician GeneHouston = new Politician {FirstName = "Gene", LastName = "Houston" };
+        private static City WashingtonDC = new City {Name = "Washington D.C.", Mayor = SuzanneBenson};
+        private static City Olympia = new City {Name = "Olympia", Mayor = SarahCasey};
+        private static City Austin = new City {Name = "Austin", Mayor = RolandCohen};
+        private static State Washington = new State {Name = "Washington", Capital = Olympia, Governor = CharlesRogers};
+        private static State Texas = new State {Name = "Texas", Capital = Austin, Governor = GeneHouston};
+        private static State[] states = { Washington, Texas };
+        public static Country UnitedStates = new Country
+        {
+            Name = "United States of America",
+            Capital = WashingtonDC,
+            President = GeorgeAdams,
+            States = new List<State>(states)
+        };
 
         public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
         
@@ -347,5 +369,32 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             return $"<Student>{{ FirstName: {FirstName}, LastName: {LastName}, Major: {Major} }}";
         }
+    }
+
+    public class Country
+    {
+        public string Name { get; init; }
+        public City Capital { get; init; }
+        public Politician President { get; init; }
+        public List<State> States { get; init; }
+    }
+
+    public class State
+    {
+        public string Name { get; init; }
+        public City Capital { get; init; }
+        public Politician Governor { get; init; }
+    }
+
+    public class City
+    {
+        public string Name { get; init; }
+        public Politician Mayor { get; init; }
+    }
+
+    public class Politician
+    {
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
     }
 }
