@@ -64,13 +64,10 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
-    [IonAnnotateType(Name = "Supra")]
     public class Supra : Vehicle
     {
-        public override string ToString()
-        {
-            return "Is that a Supra!?";
-        }
+        [IonAnnotateType(Name = "Manufacturer")]
+        public string Brand { get; set; } = "Toyota";
     }
     
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
@@ -301,12 +298,12 @@ namespace Amazon.Ion.ObjectMapper.Test
     
     public class UpperCaseStringIonSerializer : IonSerializer<string>
     {
-        public string Deserialize(IIonReader reader)
+        public override string Deserialize(IIonReader reader)
         {
             return reader.StringValue().ToUpper();
         }
 
-        public void Serialize(IIonWriter writer, dynamic item)
+        public override void Serialize(IIonWriter writer, string item)
         {
             writer.WriteString(item.ToUpper());
         }
@@ -314,29 +311,40 @@ namespace Amazon.Ion.ObjectMapper.Test
     
     public class NegativeIntIonSerializer : IonSerializer<int>
     {
-        public int Deserialize(IIonReader reader)
+        public override int Deserialize(IIonReader reader)
         {
             return -reader.IntValue();
         }
 
-        public void Serialize(IIonWriter writer, dynamic item)
+        public override void Serialize(IIonWriter writer, int item)
         {
             writer.WriteInt(-item);
         }
     }
 
-    public class SupraSerializer : IonSerializer<string>
+    public class SupraManufacturerDeserializer : IonSerializer<string>
     {
-        public string Deserialize(IIonReader reader)
+        public override string Deserialize(IIonReader reader)
         {
-            // Custom serializer always deserializes into this string
-            return "Is that a Supra!?";
+            return "BMW";
         }
 
-        public void Serialize(IIonWriter writer, dynamic item)
+        public override void Serialize(IIonWriter writer, string item)
         {
-            // Custom serializer serializes into a null value
-            writer.WriteNull();
+            writer.WriteString(item);
+        }
+    }
+
+    public class SupraManufacturerSerializer : IonSerializer<string>
+    {
+        public override string Deserialize(IIonReader reader)
+        {
+            return reader.StringValue();
+        }
+
+        public override void Serialize(IIonWriter writer, string item)
+        {
+            writer.WriteString("BMW");
         }
     }
 }

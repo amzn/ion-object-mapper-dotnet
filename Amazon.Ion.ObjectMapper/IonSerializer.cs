@@ -9,10 +9,20 @@ using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
 
 namespace Amazon.Ion.ObjectMapper
 {
-    public interface IonSerializer<T>
+    public abstract class IonSerializer<T>
     {
-        void Serialize(IIonWriter writer, dynamic item);
-        T Deserialize(IIonReader reader);
+        public abstract void Serialize(IIonWriter writer, T item);
+        public abstract T Deserialize(IIonReader reader);
+
+        internal Type GetParameterType()
+        {
+            return typeof(T);
+        }
+
+        internal T CastToParameterType(object item)
+        {
+            return (T)item;
+        }
     }
 
     public interface IonSerializationContext
@@ -212,21 +222,11 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             Type type = item.GetType();
+            var ionAnnotateTypes = (IEnumerable<IonAnnotateType>)type.GetCustomAttributes(typeof(IonAnnotateType), false);
 
-            if (options.AnnotatedIonSerializers != null)
+            if (TryAnnotatedIonSerializer(writer, item, ionAnnotateTypes))
             {
-                var annotationAttributes = type.GetCustomAttributes(typeof(IonAnnotateType), false);
-                foreach (IonAnnotateType annotationAttribute in annotationAttributes)
-                {
-                    // Todo: Use AnnotationConvention instead of Name
-                    if (options.AnnotatedIonSerializers.ContainsKey(annotationAttribute.Name))
-                    {
-                        var serializer = options.AnnotatedIonSerializers[annotationAttribute.Name];
-                        writer.AddTypeAnnotation(annotationAttribute.Name);
-                        serializer.Serialize(writer, item);
-                        return;
-                    }
-                }
+                return;
             }
 
             if (this.primitiveSerializers.ContainsKey(type))
@@ -358,6 +358,32 @@ namespace Amazon.Ion.ObjectMapper
         public T Deserialize<T>(IIonReader reader)
         {
             return (T) Deserialize(reader, typeof(T));
+        }
+
+        internal bool TryAnnotatedIonSerializer<T>(IIonWriter writer, T item, IEnumerable<IonAnnotateType> annotationAttributes)
+        {
+            Type itemType = item.GetType();
+
+            if (options.AnnotatedIonSerializers != null)
+            {
+                foreach (IonAnnotateType annotationAttribute in annotationAttributes)
+                {
+                    // Todo: Use AnnotationConvention instead of Name
+                    if (options.AnnotatedIonSerializers.ContainsKey(annotationAttribute.Name))
+                    {
+                        var serializer = options.AnnotatedIonSerializers[annotationAttribute.Name];
+                        Type serializerType = serializer.GetParameterType();
+                        if (!itemType.IsAssignableTo(serializerType))
+                        {
+                            throw new NotSupportedException($"Serializer with annotation key {annotationAttribute.Name} expects type {serializerType} and got {itemType}.");
+                        }
+                        writer.AddTypeAnnotation(annotationAttribute.Name);
+                        serializer.Serialize(writer, serializer.CastToParameterType(item));
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         
         private bool ValidateCustomSerializer(Type type, dynamic serializer)

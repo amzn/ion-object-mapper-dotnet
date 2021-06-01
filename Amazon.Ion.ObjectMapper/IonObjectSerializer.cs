@@ -27,7 +27,7 @@ namespace Amazon.Ion.ObjectMapper
             this.targetType = targetType;
         }
 
-        public object Deserialize(IIonReader reader)
+        public override object Deserialize(IIonReader reader)
         {
             var targetObject = options.ObjectFactory.Create(options, reader, targetType);
             reader.StepIn();
@@ -68,7 +68,7 @@ namespace Amazon.Ion.ObjectMapper
             return targetObject;
         }
 
-        public void Serialize(IIonWriter writer, object item)
+        public override void Serialize(IIonWriter writer, object item)
         {
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
@@ -90,6 +90,13 @@ namespace Amazon.Ion.ObjectMapper
                 }
 
                 writer.SetFieldName(IonFieldNameFromProperty(property));
+
+                var ionAnnotateTypes = (IEnumerable<IonAnnotateType>)property.GetCustomAttributes(typeof(IonAnnotateType));
+                if (ionSerializer.TryAnnotatedIonSerializer(writer, propertyValue, ionAnnotateTypes))
+                {
+                    continue;
+                }
+
                 ionSerializer.Serialize(writer, propertyValue);
             }
 
@@ -110,6 +117,13 @@ namespace Amazon.Ion.ObjectMapper
                 }
 
                 writer.SetFieldName(GetFieldName(field));
+
+                var ionAnnotateTypes = (IEnumerable<IonAnnotateType>)field.GetCustomAttributes(typeof(IonAnnotateType));
+                if (ionSerializer.TryAnnotatedIonSerializer(writer, fieldValue, ionAnnotateTypes))
+                {
+                    continue;
+                }
+
                 ionSerializer.Serialize(writer, fieldValue);
             }
             writer.StepOut();
