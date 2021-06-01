@@ -173,8 +173,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             States = new List<State>(states)
         };
 
-        public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
-        
         public static Ship Titanic = new Ship
         {
             Name = "Titanic",
