@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -72,7 +71,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Yacht>";
         }
     }
-
+    
     public class Catamaran : Yacht
     {
         public override string ToString()

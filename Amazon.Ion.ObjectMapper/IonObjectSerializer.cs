@@ -201,11 +201,6 @@ namespace Amazon.Ion.ObjectMapper
                 return exact;
             }
 
-            if (options.PropertyNameCaseInsensitive)
-            {
-                return targetType.GetProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
-            }
-
             var name = options.NamingConvention.ToProperty(readName);
             return targetType.GetProperty(name);
         }
