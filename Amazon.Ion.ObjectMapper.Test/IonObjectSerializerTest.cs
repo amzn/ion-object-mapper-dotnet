@@ -85,6 +85,19 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesAndDeserializesObjectsWithCaseInsensitiveProperties()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });
+            
+            var stream = serializer.Serialize(TestObjects.Titanic);
+            var deserialized = serializer.Deserialize<ShipWithVariedCasing>(stream);
+            
+            Assert.AreEqual(TestObjects.Titanic.Name, deserialized.name);
+            Assert.AreEqual(TestObjects.Titanic.Weight, deserialized.WEIGHT);
+            Assert.AreEqual(TestObjects.Titanic.Capacity, deserialized.CaPaCiTy);
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesFields()
         {
             Check(TestObjects.registration);
@@ -130,6 +143,18 @@ namespace Amazon.Ion.ObjectMapper.Test
                     }
                 }
             );
+        }
+
+        [TestMethod]
+        public void DeserializesObjectsThatExceedMaxDepth()
+        {
+            var stream = new IonSerializer().Serialize(TestObjects.UnitedStates);
+            
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 4});
+            var deserialized = serializer.Deserialize<Country>(stream);
+
+            Assert.IsNotNull(deserialized.States[0].Capital.Mayor);
+            Assert.IsNull(deserialized.States[0].Capital.Mayor.FirstName);
         }
 
         [TestMethod]
