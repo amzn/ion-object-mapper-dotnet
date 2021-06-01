@@ -140,7 +140,7 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        internal readonly IonSerializationOptions options;
+        private readonly IonSerializationOptions options;
         private Dictionary<Type, dynamic> primitiveSerializers { get; init; }
 
         public IonSerializer() : this(new IonSerializationOptions())
@@ -170,11 +170,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 foreach (var serializer in this.options.IonSerializers)
                 {
-                    if (ValidateCustomSerializer(serializer.Key, serializer.Value))
-                    {
-                        this.primitiveSerializers[serializer.Key] = serializer.Value;
-                    }
-                    else
+                    if (!ValidateCustomSerializer(serializer.Key, serializer.Value))
                     {
                         throw new NotSupportedException($"Custom serializer does not satisfy IonSerializer<{serializer.Key}> interface");
                     }
