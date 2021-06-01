@@ -629,5 +629,63 @@ namespace Amazon.Ion.ObjectMapper.Test
             var deserialized = customSerializer.Deserialize<Guid>(stream);
             Assert.IsTrue(expectedGuid.SequenceEqual(deserialized.ToByteArray()));
         }
+        
+        [TestMethod]
+        public void SerializesObjectsWithCustomSerializers()
+        {
+            var customSerializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(string), new UpperCaseStringIonSerializer()},
+                    {typeof(int), new NegativeIntIonSerializer()},
+                    {typeof(double), new NegativeDoubleIonSerializer()},
+                    {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+                }
+            });
+
+            var stream = customSerializer.Serialize(TestObjects.honda);
+            var serialized = StreamToIonValue(stream);
+
+            Assert.IsTrue(serialized.ContainsField("make"));
+            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), serialized.GetField("make").StringValue);
+
+            Assert.IsTrue(serialized.ContainsField("yearOfManufacture"));
+            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, serialized.GetField("yearOfManufacture").IntValue);
+
+            Assert.IsTrue(serialized.ContainsField("weightInKg"));
+            Assert.AreEqual(-TestObjects.honda.Weight, serialized.GetField("weightInKg").DoubleValue);
+            
+            Assert.IsTrue(serialized.ContainsField("engine"));
+            var engine = serialized.GetField("engine");
+            Assert.IsTrue(engine.ContainsField("manufactureDate"));
+            Assert.AreEqual(
+                TestObjects.honda.Engine.ManufactureDate.AddDays(1), 
+                engine.GetField("manufactureDate").TimestampValue.DateTimeValue);
+        }
+        
+        [TestMethod]
+        public void DeserializesObjectsWithCustomSerializers()
+        {
+            var defaultSerializer = new IonSerializer();
+            var customSerializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(string), new UpperCaseStringIonSerializer()},
+                    {typeof(int), new NegativeIntIonSerializer()},
+                    {typeof(double), new NegativeDoubleIonSerializer()},
+                    {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+                }
+            });
+
+            var stream = defaultSerializer.Serialize(TestObjects.honda);
+            var deserialized = customSerializer.Deserialize<Car>(stream);
+
+            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserialized.Make);
+            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserialized.YearOfManufacture);
+            Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
+            Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
+        }
     }
 }
