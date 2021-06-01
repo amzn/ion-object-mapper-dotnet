@@ -340,6 +340,28 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + ", birthDate: " + birthDate + " }";
         }
     }
+    
+    public class Ruler
+    {
+        internal int size;
+
+        [IonPropertyGetter("size")]
+        public int GetSize() 
+        {
+            return this.size + 10;
+        }
+    
+        [IonPropertySetter("size")]
+        public void SetSize(int input) 
+        {
+            this.size = input - 10;
+        }
+        
+        public override string ToString()
+        {
+            return $"<Ruler>{{ size: {this.size} }}";
+        }
+    }
 
     public class Ruler
     {
