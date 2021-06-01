@@ -102,22 +102,17 @@ namespace Amazon.Ion.ObjectMapper
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
         public IonSerializationFormat Format { get; init; } = TEXT;
-        public int MaxDepth { get; init; } = 64;
+        public readonly int MaxDepth;
         public bool AnnotateGuids { get; init; } = false;
 
         public bool IncludeFields { get; init; } = false;
         public bool IgnoreNulls { get; init; } = false;
         public bool IgnoreReadOnlyFields { get; init; } = false;
         public readonly bool IgnoreReadOnlyProperties;
-        public bool PropertyNameCaseInsensitive { get; init; } = false;
+        public readonly bool PropertyNameCaseInsensitive;
         public bool IgnoreDefaults { get; init; } = false;
         public bool IncludeTypeInformation { get; init; } = false;
         public TypeAnnotationPrefix TypeAnnotationPrefix { get; init; } = new NamespaceTypeAnnotationPrefix();
-
-        public TypeAnnotationName TypeAnnotationName { get; init; } = new ClassNameTypeAnnotationName();
-
-        public AnnotationConvention AnnotationConvention { get; init; } = new DefaultAnnotationConvention();
-
         public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
 
         public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
@@ -256,7 +251,7 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
-            throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
+            throw new NotSupportedException("Do not know how to serialize type " + typeof(T));
         }
 
         private IonListSerializer NewIonListSerializer(Type listType) 
@@ -291,11 +286,6 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
-            if (reader.CurrentDepth > this.options.MaxDepth)
-            {
-                return null;
-            }
-
             if (ionType == IonType.None || ionType == IonType.Null)
             {
                 return new IonNullSerializer().Deserialize(reader);
@@ -373,7 +363,7 @@ namespace Amazon.Ion.ObjectMapper
                 return new IonObjectSerializer(this, options, type).Deserialize(reader);
             }
 
-            throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
+            throw new NotSupportedException("Don't know how to Deserialize this Ion data. Last IonType was: " + ionType);
         }
 
         public T Deserialize<T>(IIonReader reader)

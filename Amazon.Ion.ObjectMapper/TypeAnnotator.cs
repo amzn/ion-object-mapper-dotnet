@@ -35,32 +35,6 @@ namespace Amazon.Ion.ObjectMapper
         }
     }
 
-    public interface TypeAnnotationName
-    {
-        public string Apply(Type type);
-    }
-
-    public class ClassNameTypeAnnotationName : TypeAnnotationName
-    {
-        public string Apply(Type type)
-        {
-            return type.Name;
-        }
-    }
-
-    public interface AnnotationConvention
-    {
-        public string Apply(IonAnnotateType annotateType, Type type);
-    }
-
-    public class DefaultAnnotationConvention : AnnotationConvention
-    {
-        public string Apply(IonAnnotateType annotateType, Type type)
-        {
-            return (annotateType.Prefix + "." + annotateType.Name);
-        }
-    }
-
     public interface TypeAnnotator
     {
         public void Apply(IonSerializationOptions options, IIonWriter writer, Type type);
@@ -79,9 +53,9 @@ namespace Amazon.Ion.ObjectMapper
 
             if (annotateType != null)
             {
-                annotateType.Prefix ??= options.TypeAnnotationPrefix.Apply(type);
-                annotateType.Name ??= options.TypeAnnotationName.Apply(type);
-                writer.AddTypeAnnotation(options.AnnotationConvention.Apply(annotateType, type));
+                var prefix = annotateType.Prefix != null ? annotateType.Prefix : options.TypeAnnotationPrefix.Apply(type);
+                var name = annotateType.Name != null ? annotateType.Name : type.Name;
+                writer.AddTypeAnnotation(prefix + "." + name);
             }
         }
 
