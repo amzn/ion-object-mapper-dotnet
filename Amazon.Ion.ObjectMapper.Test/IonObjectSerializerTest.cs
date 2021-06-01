@@ -687,5 +687,20 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
             Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
         }
+        
+        [TestMethod]
+        public void ExceptionOnInvalidCustomSerializer()
+        {
+            var options = new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    // An int serializer should not be valid for type string
+                    {typeof(string), new NegativeIntIonSerializer()},
+                }
+            };
+
+            Assert.ThrowsException<NotSupportedException>(() => new IonSerializer(options));
+        }
     }
 }
