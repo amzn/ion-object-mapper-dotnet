@@ -8,9 +8,9 @@ namespace Amazon.Ion.ObjectMapper
     public class IonListSerializer : IonSerializer<IList>
     {
         private readonly IonSerializer serializer;
-        private Type listType;
-        private Type elementType;
-        private bool isGenericList;
+        private readonly Type listType;
+        private readonly Type elementType;
+        private readonly bool isGenericList;
 
         public IonListSerializer(IonSerializer serializer, Type listType)
         {
