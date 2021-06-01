@@ -175,6 +175,18 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void DeserializesObjectsThatExceedMaxDepth()
+        {
+            var stream = new IonSerializer().Serialize(TestObjects.UnitedStates);
+            
+            var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 4});
+            var deserialized = serializer.Deserialize<Country>(stream);
+
+            Assert.IsNotNull(deserialized.States[0].Capital.Mayor);
+            Assert.IsNull(deserialized.States[0].Capital.Mayor.FirstName);
+        }
+
+        [TestMethod]
         public void RespectAnnotationInheritance()
         {
             var serializer = new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("testing") });

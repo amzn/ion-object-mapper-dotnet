@@ -104,7 +104,7 @@ namespace Amazon.Ion.ObjectMapper
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
         public IonSerializationFormat Format { get; init; } = TEXT;
-        public readonly int MaxDepth;
+        public int MaxDepth { get; init; } = 64;
         public bool AnnotateGuids { get; init; } = false;
 
         public bool IncludeFields { get; init; } = false;
@@ -140,8 +140,12 @@ namespace Amazon.Ion.ObjectMapper
 
     public class IonSerializer
     {
-        private readonly IonSerializationOptions options;
+        internal readonly IonSerializationOptions options;
         private Dictionary<Type, dynamic> primitiveSerializers { get; init; }
+        private IonNullSerializer nullSerializer { get; init; }
+        private IonClobSerializer clobSerializer { get; init; }
+        private IonListSerializer listSerializer { get; init; }
+        private IonObjectSerializer objectSerializer { get; init; }
 
         public IonSerializer() : this(new IonSerializationOptions())
         {
@@ -163,14 +167,22 @@ namespace Amazon.Ion.ObjectMapper
                 {typeof(BigDecimal), new IonBigDecimalSerializer()},
                 {typeof(SymbolToken), new IonSymbolSerializer()},
                 {typeof(DateTime), new IonDateTimeSerializer()},
-                {typeof(Guid), new IonGuidSerializer(this.options)},
+                {typeof(Guid), new IonGuidSerializer(this.options.AnnotateGuids)},
             };
+            this.nullSerializer = new IonNullSerializer();
+            this.clobSerializer = new IonClobSerializer();
+            this.listSerializer = new IonListSerializer(this);
+            this.objectSerializer = new IonObjectSerializer(this);
 
             if (this.options.IonSerializers != null)
             {
                 foreach (var serializer in this.options.IonSerializers)
                 {
-                    if (!ValidateCustomSerializer(serializer.Key, serializer.Value))
+                    if (ValidateCustomSerializer(serializer.Key, serializer.Value))
+                    {
+                        this.primitiveSerializers[serializer.Key] = serializer.Value;
+                    }
+                    else
                     {
                         throw new NotSupportedException($"Custom serializer does not satisfy IonSerializer<{serializer.Key}> interface");
                     }
@@ -198,7 +210,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (item == null)
             {
-                new IonNullSerializer().Serialize(writer, null);
+                this.nullSerializer.Serialize(writer, null);
                 return;
             }
 
@@ -211,13 +223,15 @@ namespace Amazon.Ion.ObjectMapper
 
             if (item is IList)
             {
-                new IonListSerializer(this, type).Serialize(writer, item);
+                this.listSerializer.SetListType(type);
+                this.listSerializer.Serialize(writer, item);
                 return;
             }
             
             if (item is object)
             {
-                new IonObjectSerializer(this, options, type).Serialize(writer, item);
+                this.objectSerializer.targetType = type;
+                this.objectSerializer.Serialize(writer, item);
                 return;
             }
             
@@ -236,41 +250,46 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
+            if (reader.CurrentDepth > this.options.MaxDepth)
+            {
+                return null;
+            }
+
             if (ionType == IonType.None || ionType == IonType.Null)
             {
-                return new IonNullSerializer().Deserialize(reader);
+                return this.nullSerializer.Deserialize(reader);
             }
 
             if (ionType == IonType.Bool)
             {
-                return this.GetPrimitiveSerializer(typeof(bool)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(bool)].Deserialize(reader);
             }
 
             if (ionType == IonType.Int)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
                 {
-                    return this.GetPrimitiveSerializer(typeof(long)).Deserialize(reader);
+                    return this.primitiveSerializers[typeof(long)].Deserialize(reader);
                 }
-                return this.GetPrimitiveSerializer(typeof(int)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(int)].Deserialize(reader);
             }
 
             if (ionType == IonType.Float)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
                 {
-                    return this.GetPrimitiveSerializer(typeof(float)).Deserialize(reader);
+                    return this.primitiveSerializers[typeof(float)].Deserialize(reader);
                 }
-                return this.GetPrimitiveSerializer(typeof(double)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(double)].Deserialize(reader);
             }
 
             if (ionType == IonType.Decimal)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
                 {
-                    return this.GetPrimitiveSerializer(typeof(decimal)).Deserialize(reader);
+                    return this.primitiveSerializers[typeof(decimal)].Deserialize(reader);
                 }
-                return this.GetPrimitiveSerializer(typeof(BigDecimal)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(BigDecimal)].Deserialize(reader);
             }
 
             if (ionType == IonType.Blob) 
@@ -278,39 +297,41 @@ namespace Amazon.Ion.ObjectMapper
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                     || type.IsAssignableTo(typeof(Guid)))
                 {
-                    return this.GetPrimitiveSerializer(typeof(Guid)).Deserialize(reader);
+                    return this.primitiveSerializers[typeof(Guid)].Deserialize(reader);
                 }
-                return this.GetPrimitiveSerializer(typeof(byte[])).Deserialize(reader);
+                return this.primitiveSerializers[typeof(byte[])].Deserialize(reader);
             }
 
             if (ionType == IonType.String) 
             {
-                return this.GetPrimitiveSerializer(typeof(string)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(string)].Deserialize(reader);
             }
 
             if (ionType == IonType.Symbol) 
             {
-                return this.GetPrimitiveSerializer(typeof(SymbolToken)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(SymbolToken)].Deserialize(reader);
             }
 
             if (ionType == IonType.Timestamp) 
             {
-                return this.GetPrimitiveSerializer(typeof(DateTime)).Deserialize(reader);
+                return this.primitiveSerializers[typeof(DateTime)].Deserialize(reader);
             }
 
             if (ionType == IonType.Clob) 
             {
-                return new IonClobSerializer().Deserialize(reader);
+                return this.clobSerializer.Deserialize(reader);
             }
 
             if (ionType == IonType.List) 
             {
-                return new IonListSerializer(this, type).Deserialize(reader);
+                this.listSerializer.SetListType(type);
+                return this.listSerializer.Deserialize(reader);
             }
 
             if (ionType == IonType.Struct) 
             {
-                return new IonObjectSerializer(this, options, type).Deserialize(reader);
+                this.objectSerializer.targetType = type;
+                return this.objectSerializer.Deserialize(reader);
             }
 
             throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
@@ -327,143 +348,85 @@ namespace Amazon.Ion.ObjectMapper
             {
                 throw new NotSupportedException($"Custom serializer for {type} is not supported");
             }
-
+            
             if (type == typeof(bool))
-            {
                 return serializer is IonSerializer<bool>;
-            }
 
             if (type == typeof(string))
-            {
                 return serializer is IonSerializer<string>;
-            }
 
             if (type == typeof(byte[]))
-            {
                 return serializer is IonSerializer<byte[]>;
-            }
 
             if (type == typeof(int))
-            {
                 return serializer is IonSerializer<int>;
-            }
 
             if (type == typeof(long))
-            {
                 return serializer is IonSerializer<long>;
-            }
 
             if (type == typeof(float))
-            {
                 return serializer is IonSerializer<float>;
-            }
 
             if (type == typeof(double))
-            {
                 return serializer is IonSerializer<double>;
-            }
-
+            
             if (type == typeof(decimal))
-            {
                 return serializer is IonSerializer<decimal>;
-            }
-
+            
             if (type == typeof(BigDecimal))
-            {
                 return serializer is IonSerializer<BigDecimal>;
-            }
 
             if (type == typeof(SymbolToken))
-            {
                 return serializer is IonSerializer<SymbolToken>;
-            }
-
+            
             if (type == typeof(DateTime))
-            {
                 return serializer is IonSerializer<DateTime>;
-            }
 
             if (type == typeof(Guid))
-            {
                 return serializer is IonSerializer<Guid>;
-            }
 
             return false;
         }
 
         private void SerializePrimitive(Type type, IIonWriter writer, object item)
         {
-            var serializer = this.GetPrimitiveSerializer(type);
-
+            var serializer = this.primitiveSerializers[type];
+            
             if (type == typeof(bool))
-            {
                 serializer.Serialize(writer, Convert.ToBoolean(item));
-            }
 
             else if (type == typeof(string))
-            {
                 serializer.Serialize(writer, item as string);
-            }
 
             else if (type == typeof(byte[]))
-            {
                 serializer.Serialize(writer, (byte[])item);
-            }
 
             else if (type == typeof(int))
-            {
                 serializer.Serialize(writer, Convert.ToInt32(item));
-            }
 
             else if (type == typeof(long))
-            {
                 serializer.Serialize(writer, Convert.ToInt64(item));
-            }
 
             else if (type == typeof(float))
-            {
                 serializer.Serialize(writer, Convert.ToSingle(item));
-            }
 
             else if (type == typeof(double))
-            {
                 serializer.Serialize(writer, Convert.ToDouble(item));
-            }
-
+            
             else if (type == typeof(decimal))
-            {
                 serializer.Serialize(writer, Convert.ToDecimal(item));
-            }
-
+            
             else if (type == typeof(BigDecimal))
-            {
                 serializer.Serialize(writer, (BigDecimal)item);
-            }
 
             else if (type == typeof(SymbolToken))
-            {
                 serializer.Serialize(writer, (SymbolToken)item);
-            }
-
+            
             else if (type == typeof(DateTime))
-            {
                 serializer.Serialize(writer, (DateTime)item);
-            }
 
             else if (type == typeof(Guid))
-            {
                 serializer.Serialize(writer, (Guid)item);
-            }
-        }
-
-        private dynamic GetPrimitiveSerializer(Type type)
-        {
-            if (this.options.IonSerializers != null && this.options.IonSerializers.ContainsKey(type))
-            {
-                return this.options.IonSerializers[type];
-            }
-
-            return this.primitiveSerializers[type];
         }
     }
 }
