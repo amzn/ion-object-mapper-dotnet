@@ -104,7 +104,7 @@ namespace Amazon.Ion.ObjectMapper
     {
         public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
         public IonSerializationFormat Format { get; init; } = TEXT;
-        public readonly int MaxDepth;
+        public int MaxDepth { get; init; } = 64;
         public bool AnnotateGuids { get; init; } = false;
 
         public bool IncludeFields { get; init; } = false;
@@ -250,6 +250,11 @@ namespace Amazon.Ion.ObjectMapper
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
+            if (reader.CurrentDepth > this.options.MaxDepth)
+            {
+                return null;
+            }
+
             if (ionType == IonType.None || ionType == IonType.Null)
             {
                 return this.nullSerializer.Deserialize(reader);
