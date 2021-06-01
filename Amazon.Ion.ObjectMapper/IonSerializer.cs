@@ -215,7 +215,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (item is IList)
             {
-                new IonListSerializer(this, type).Serialize(writer, item);
+                new IonListSerializer(this, type).Serialize(writer, (IList)item);
                 return;
             }
             

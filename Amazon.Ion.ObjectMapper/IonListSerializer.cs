@@ -87,10 +87,5 @@ namespace Amazon.Ion.ObjectMapper
             }
             writer.StepOut();
         }
-        
-        public void Serialize(IIonWriter writer, object item)
-        {
-            this.Serialize(writer, (IList)item);
-        }
     }
 }
