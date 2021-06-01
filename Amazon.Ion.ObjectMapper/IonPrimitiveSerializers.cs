@@ -65,7 +65,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public long Deserialize(IIonReader reader)
         {
-            return reader.IntValue();
+            return reader.LongValue();
         }
 
         public void Serialize(IIonWriter writer, long item)
