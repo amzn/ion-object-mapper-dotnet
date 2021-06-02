@@ -352,7 +352,7 @@ Ion Serialization can be customized in several ways. In order to do this, an `Io
 |`Format`	|`IonSerializationFormat`	|`BINARY`	|The other options are `TEXT` and `PRETTY_TEXT`.	|
 |`IonWriterFactory`	|`IonWriterFactory`	|`DefaultIonWriterFactory`	|Allows complete control over the creation of the `IonWriter`.	|
 |`IonReaderFactory`	|`IonReaderFactory`	|`DefaultIonReaderFactory`	|Allows complete control over the creation of the `IonReader`.	|
-|`MaxDepth`	|`int`	|64	|How far down an object tree to recurse. This is to avoid stack overflow.	|
+|`MaxDepth`	|`int`	|64	|How far down a nested Ion struct to traverse on deserialization before stopping.	|
 |`IncludeFields`	|`bool`	|FALSE	|Whether of not to include fields	|
 |`IgnoreNulls`	|`bool`	|FALSE	|Whether or not to serialize null fields and properties	|
 |`IgnoreReadOnlyFields`	|`bool`	|FALSE	|Whether or not to serialize readonly fields	|
