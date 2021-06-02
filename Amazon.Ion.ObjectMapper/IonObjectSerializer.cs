@@ -8,7 +8,7 @@ namespace Amazon.Ion.ObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {
-        private const BindingFlags bindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+        private const BindingFlags BINDINGS = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
@@ -27,7 +27,7 @@ namespace Amazon.Ion.ObjectMapper
                 throw new NullReferenceException("Cannot deserialize with a null Ion reader");
             }
             
-            var ionConstructors = targetType.GetConstructors(bindings).Where(IsIonConstructor);
+            var ionConstructors = targetType.GetConstructors(BINDINGS).Where(IsIonConstructor);
             if (ionConstructors.Any())
             {
                 if (ionConstructors.Count() > 1)
@@ -206,7 +206,7 @@ namespace Amazon.Ion.ObjectMapper
         }
         private FieldInfo FindField(string name)
         {
-            var exact = targetType.GetField(name, bindings);
+            var exact = targetType.GetField(name, BINDINGS);
             if (exact != null && IsField(exact))
             {
                 return exact;
@@ -250,7 +250,7 @@ namespace Amazon.Ion.ObjectMapper
 
         private IEnumerable<FieldInfo> Fields()
         {
-            return targetType.GetFields(bindings).Where(IsField);
+            return targetType.GetFields(BINDINGS).Where(IsField);
         }
 
         private IEnumerable<PropertyInfo> IonNamedProperties()
