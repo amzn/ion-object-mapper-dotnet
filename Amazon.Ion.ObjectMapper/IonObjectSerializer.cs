@@ -8,7 +8,7 @@ namespace Amazon.Ion.ObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {
-        private const BindingFlags fieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+        private const BindingFlags BINDINGS = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
@@ -33,12 +33,11 @@ namespace Amazon.Ion.ObjectMapper
                 if (property != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-                    
                     if (options.IgnoreDefaults && deserialized == default)
                     {
                         continue;
                     }
-                    
+
                     property.SetValue(targetObject, deserialized);
                 }
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
@@ -141,11 +140,13 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             var name = options.NamingConvention.ToProperty(readName);
-            return targetType.GetProperty(name);
+            var property = targetType.GetProperty(name, BINDINGS);
+
+            return property;
         }
         private FieldInfo FindField(string name)
         {
-            var exact = targetType.GetField(name, fieldBindings);
+            var exact = targetType.GetField(name, BINDINGS);
             if (exact != null && IsField(exact))
             {
                 return exact;
@@ -184,7 +185,7 @@ namespace Amazon.Ion.ObjectMapper
 
         private IEnumerable<FieldInfo> Fields()
         {
-            return targetType.GetFields(fieldBindings).Where(IsField);
+            return targetType.GetFields(BINDINGS).Where(IsField);
         }
 
         private IEnumerable<PropertyInfo> IonNamedProperties()
