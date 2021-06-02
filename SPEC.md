@@ -50,9 +50,9 @@ SQL interactions for sending parameters should look like this:
 ```c#
 driver.Execute(tx =>
 {
-    tx.Execute(
+    tx.Execute(tx.Query(
         "insert into Car ?", 
-        new Car { Make = "Opel", Model = "Monza", Year = 1997 });
+        new Car { Make = "Opel", Model = "Monza", Year = 1997 }));
 });
 ```
 
@@ -61,7 +61,7 @@ And interactions for reading results could look like this:
 ```c#
 var hondaYears = driver.Execute(tx =>
 {
-    return from car in tx.Execute("select * from Car").Select<Car>()
+    return from car in tx.Execute(tx.Query<Car>("select * from Car"))
         where car.Make == "Honda"
         select car.Year;
 });
