@@ -25,6 +25,12 @@ namespace Amazon.Ion.ObjectMapper
 
         public override object Deserialize(IIonReader reader)
         {
+            var customObjectSerializer = this.GetCustomObjectSerializer();
+            if (customObjectSerializer != null)
+            {
+                return customObjectSerializer.Deserialize(reader);
+            }
+
             var targetObject = options.ObjectFactory.Create(options, reader, targetType);
             reader.StepIn();
 
@@ -93,6 +99,13 @@ namespace Amazon.Ion.ObjectMapper
 
         public override void Serialize(IIonWriter writer, object item)
         {
+            var customObjectSerializer = this.GetCustomObjectSerializer();
+            if (customObjectSerializer != null)
+            {
+                this.Serialize(customObjectSerializer, writer, item);
+                return;
+            }
+            
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
 
@@ -309,6 +322,56 @@ namespace Amazon.Ion.ObjectMapper
                 return ((IonPropertyName)propertyName).Name;
             }
             return field.Name;
+        }
+
+        private dynamic GetCustomObjectSerializer()
+        {
+            var serializerAttribute = 
+                (IonSerializerAttribute)targetType.GetCustomAttribute(typeof(IonSerializerAttribute));
+            if (serializerAttribute == null)
+            {
+                return null;
+            }
+
+            var customObjectSerializer = Activator.CreateInstance(serializerAttribute.SerializerType);
+            if (!this.IsSerializerValid(targetType, customObjectSerializer))
+            {
+                throw new NotSupportedException(
+                    $"The class {targetType}'s [IonSerializer] annotated serializer is invalid");
+            }
+            return customObjectSerializer;
+        }
+
+        private bool IsSerializerValid(Type type, dynamic serializer)
+        {
+            return (bool)this.InvokeGenericMethod(nameof(this.GenericIsSerializerValid), type, new [] { serializer });
+        }
+        
+        private bool GenericIsSerializerValid<T>(dynamic serializer)
+        {
+            return serializer is IonSerializer<T>;
+        }
+        
+        private void Serialize(dynamic serializer, IIonWriter writer, object item)
+        {
+            this.InvokeGenericMethod(nameof(this.GenericSerialize), targetType, new [] { serializer, writer, item });
+        }
+
+        private void GenericSerialize<T>(dynamic serializer, IIonWriter writer, T item)
+        {
+            serializer.Serialize(writer, item);
+        }
+
+        private object InvokeGenericMethod(string methodName, Type type, object[] arguments)
+        {
+            MethodInfo method = typeof(IonObjectSerializer).GetMethod(methodName, BINDINGS);
+            if (method == null)
+            {
+                throw new NotSupportedException($"Method {methodName} not found in class IonObjectSerializer");
+            }
+
+            MethodInfo genericMethod = method.MakeGenericMethod(type);
+            return genericMethod.Invoke(this, arguments);
         }
     }
 }
