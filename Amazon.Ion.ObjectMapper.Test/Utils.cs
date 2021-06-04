@@ -94,7 +94,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public static IIonValue StreamToIonValue(Stream stream)
         {
-            return IonLoader.Default.Load(stream).GetElementAt(0);
+            return IonLoader.Default.Load(Copy(stream)).GetElementAt(0);
         }
         
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -474,6 +475,108 @@ namespace Amazon.Ion.ObjectMapper.Test
     {
         public string FirstName { get; init; }
         public string LastName { get; init; }
+    }
+    
+    [IonSerializer(typeof(MyIonDogSerializer))]
+    public class Dog
+    {
+        public string Name { get; init; }
+        public string Gender { get; init; }
+        public string Breed { get; init; }
+
+        public Dog()
+        {
+            this.Name = default;
+            this.Gender = default;
+            this.Breed = default;
+        }
+
+        public Dog(string name, string gender, string breed)
+        {
+            this.Name = name;
+            this.Gender = gender;
+            this.Breed = breed;
+        }
+    }
+    
+    // For testing invalid custom object serializer
+    [IonSerializer(typeof(MyIonDogSerializer))]
+    public class Cat
+    {
+        public string Name { get; init; }
+        public string Gender { get; init; }
+        public string Breed { get; init; }
+
+        public Cat()
+        {
+            this.Name = default;
+            this.Gender = default;
+            this.Breed = default;
+        }
+
+        public Cat(string name, string gender, string breed)
+        {
+            this.Name = name;
+            this.Gender = gender;
+            this.Breed = breed;
+        }
+    }
+
+    public class MyIonDogSerializer : IonSerializer<Dog>
+    {
+        public Dog Deserialize(IIonReader reader)
+        {
+            string name = default;
+            string gender = default;
+            string breed = default;
+
+            reader.StepIn();
+
+            while (reader.MoveNext() != IonType.None)
+            {
+                switch (reader.CurrentFieldName)
+                {
+                    case "Given Name":
+                        name = reader.StringValue();
+                        break;
+                    case "Male or Female":
+                        gender = reader.StringValue();
+                        break;
+                    case "Classification":
+                        breed = reader.StringValue();
+                        break;
+                }
+            }
+
+            reader.StepOut();
+
+            return new Dog(name, gender, breed);
+        }
+
+        public void Serialize(IIonWriter writer, Dog item)
+        {
+            writer.StepIn(IonType.Struct);
+
+            if (item.Name != null)
+            {
+                writer.SetFieldName("Given Name");
+                writer.WriteString(item.Name);
+            }
+
+            if (item.Gender != null)
+            {
+                writer.SetFieldName("Male or Female");
+                writer.WriteString(item.Gender);
+            }
+
+            if (item.Breed != null)
+            {
+                writer.SetFieldName("Classification");
+                writer.WriteString(item.Breed);
+            }
+
+            writer.StepOut();
+        }
     }
 
     public class TestDictionary : Dictionary<string, int>

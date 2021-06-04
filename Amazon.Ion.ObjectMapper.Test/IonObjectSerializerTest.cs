@@ -615,6 +615,33 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreNotEqual(TestObjects.nativeTruck.ToString(), truck.ToString());
         }
 
+        [TestMethod]
+        public void SerializesAndDeserializesWithCustomObjectSerializer()
+        {
+            var serializer = new IonSerializer();
+            var dog = new Dog("Rover", "Male", "Labrador");
+
+            var stream = serializer.Serialize(dog);
+            IIonStruct serialized = StreamToIonValue(stream);
+            Assert.IsTrue(serialized.ContainsField("Given Name"));
+            Assert.IsTrue(serialized.ContainsField("Male or Female"));
+            Assert.IsTrue(serialized.ContainsField("Classification"));
+
+            var deserialized = serializer.Deserialize<Dog>(stream);
+            Assert.AreEqual(dog.Name, deserialized.Name);
+            Assert.AreEqual(dog.Gender, deserialized.Gender);
+            Assert.AreEqual(dog.Breed, deserialized.Breed);
+        }
+
+        [TestMethod]
+        public void ExceptionOnInvalidCustomObjectSerializer()
+        {
+            var serializer = new IonSerializer();
+            var cat = new Cat("Kitty", "Female", "Bengal");
+
+            Assert.ThrowsException<NotSupportedException>(() => serializer.Serialize(cat));
+        }
+
         private void AssertIsTruck(object actual)
         {
             Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
