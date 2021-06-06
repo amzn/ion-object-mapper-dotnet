@@ -293,21 +293,21 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (listType.IsArray)
             {
-                return new IonListSerializer(this, listType, listType.GetElementType());
+                return new IonListSerializer(this, listType, listType.GetElementType(), permissiveMode);
             }
             
             if (listType.IsAssignableTo(typeof(System.Collections.IList)))
             {
                 if (listType.IsGenericType)
                 {
-                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0]);
+                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0], permissiveMode);
                 }
-                return new IonListSerializer(this, listType);
+                return new IonListSerializer(this, listType, permissiveMode);
             }
 
             if (permissiveMode)
             {
-                return new IonListSerializer(this, listType);
+                return new IonListSerializer(this, listType, true);
             }
             else
             {

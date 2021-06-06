@@ -10,20 +10,23 @@ namespace Amazon.Ion.ObjectMapper
         private readonly Type listType;
         private readonly Type elementType;
         private readonly bool isGenericList;
+        private readonly bool permissiveMode;
 
-        public IonListSerializer(IonSerializer serializer, Type listType, Type elementType)
+        public IonListSerializer(IonSerializer serializer, Type listType, Type elementType, bool permissiveMode)
         {
             this.serializer = serializer;
             this.listType = listType;
             this.elementType = elementType;
             this.isGenericList = true;
+            this.permissiveMode = permissiveMode;
         }
 
-        public IonListSerializer(IonSerializer serializer, Type listType)
+        public IonListSerializer(IonSerializer serializer, Type listType, bool permissiveMode)
         {
             this.serializer = serializer;
             this.listType = listType;
             this.isGenericList = false;
+            this.permissiveMode = permissiveMode;
         }
 
         public override System.Collections.IList Deserialize(IIonReader reader)
@@ -42,7 +45,22 @@ namespace Amazon.Ion.ObjectMapper
                 var typedArray = Array.CreateInstance(elementType, list.Count);
                 for (int i=0; i<list.Count; i++)
                 {
-                    typedArray.SetValue(list[i], i);
+                    try
+                    {
+                        typedArray.SetValue(list[i], i);
+                    }
+                    catch (Exception)
+                    {
+                        if (permissiveMode)
+                        {
+                            typedArray.SetValue(Activator.CreateInstance(elementType), i);
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
                 }
                 return typedArray;
             }
@@ -59,7 +77,21 @@ namespace Amazon.Ion.ObjectMapper
 
                 foreach (var element in list)
                 {
-                    typedList.Add(element);
+                    try
+                    {
+                        typedList.Add(element);
+                    }
+                    catch (Exception)
+                    {
+                        if (permissiveMode)
+                        {
+                            typedList.Add(Activator.CreateInstance(elementType));
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                 }
 
                 return typedList;
