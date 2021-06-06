@@ -143,9 +143,8 @@ namespace Amazon.Ion.ObjectMapper
         public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
         public string[] AnnotatedTypeAssemblies { get; init; } = new string[] {};
 
-        public readonly bool PermissiveMode;
-        
         public Dictionary<Type, IIonSerializer> IonSerializers { get; init; }
+        public bool PermissiveMode { get; init; } = false;
     }
 
     public interface IonSerializerFactory<T, TContext> where TContext : IonSerializationContext
@@ -277,7 +276,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (item is System.Collections.IList)
             {
-                NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)item);
+                NewIonListSerializer(item.GetType(), options.PermissiveMode).Serialize(writer, (System.Collections.IList)item);
                 return;
             }
 
@@ -290,7 +289,7 @@ namespace Amazon.Ion.ObjectMapper
             throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
         }
 
-        private IonListSerializer NewIonListSerializer(Type listType) 
+        private IonListSerializer NewIonListSerializer(Type listType, bool permissiveMode) 
         {
             if (listType.IsArray)
             {
@@ -305,8 +304,15 @@ namespace Amazon.Ion.ObjectMapper
                 }
                 return new IonListSerializer(this, listType);
             }
-            
-            throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
+
+            if (permissiveMode)
+            {
+                return new IonListSerializer(this, listType);
+            }
+            else
+            {
+                throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
+            }
         }
 
 
@@ -420,7 +426,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.List) 
             {
-                return NewIonListSerializer(type).Deserialize(reader);
+                return NewIonListSerializer(type, options.PermissiveMode).Deserialize(reader);
             }
 
             if (ionType == IonType.Struct) 
@@ -433,7 +439,20 @@ namespace Amazon.Ion.ObjectMapper
 
         public T Deserialize<T>(IIonReader reader)
         {
-            return (T) Deserialize(reader, typeof(T));
+            try
+            {
+                return (T)Deserialize(reader, typeof(T));
+            }
+            catch (InvalidCastException)
+            {
+                if (options.PermissiveMode)
+                {
+                    return default(T);
+                } else
+                {
+                    throw;
+                }
+            }
         }
 
         private IIonSerializer GetPrimitiveSerializer<T>(IIonSerializer defaultSerializer)
