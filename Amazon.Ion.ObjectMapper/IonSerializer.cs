@@ -305,14 +305,15 @@ namespace Amazon.Ion.ObjectMapper
                 return new IonListSerializer(this, listType, permissiveMode);
             }
 
-            if (permissiveMode)
-            {
-                return new IonListSerializer(this, listType, true);
-            }
-            else
-            {
-                throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
-            }
+            throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
+            //if (permissiveMode)
+            //{
+            //    return new IonListSerializer(this, listType, true);
+            //}
+            //else
+            //{
+            //    throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
+            //}
         }
 
 
@@ -443,7 +444,7 @@ namespace Amazon.Ion.ObjectMapper
             {
                 return (T)Deserialize(reader, typeof(T));
             }
-            catch (InvalidCastException)
+            catch (NotSupportedException)
             {
                 if (options.PermissiveMode)
                 {
