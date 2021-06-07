@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using Amazon.IonDotnet;
-using Amazon.IonDotnet.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.Ion.ObjectMapper.Test.Utils;
 
