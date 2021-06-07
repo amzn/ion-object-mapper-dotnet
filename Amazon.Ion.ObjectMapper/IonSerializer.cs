@@ -306,14 +306,6 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
-            //if (permissiveMode)
-            //{
-            //    return new IonListSerializer(this, listType, true);
-            //}
-            //else
-            //{
-            //    throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
-            //}
         }
 
 
