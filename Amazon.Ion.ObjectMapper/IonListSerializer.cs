@@ -10,23 +10,23 @@ namespace Amazon.Ion.ObjectMapper
         private readonly Type listType;
         private readonly Type elementType;
         private readonly bool isGenericList;
-        private readonly bool permissiveMode;
+        private readonly bool isPermissiveMode;
 
-        public IonListSerializer(IonSerializer serializer, Type listType, Type elementType, bool permissiveMode)
+        public IonListSerializer(IonSerializer serializer, Type listType, Type elementType, bool isPermissiveMode)
         {
             this.serializer = serializer;
             this.listType = listType;
             this.elementType = elementType;
             this.isGenericList = true;
-            this.permissiveMode = permissiveMode;
+            this.isPermissiveMode = isPermissiveMode;
         }
 
-        public IonListSerializer(IonSerializer serializer, Type listType, bool permissiveMode)
+        public IonListSerializer(IonSerializer serializer, Type listType, bool isPermissiveMode)
         {
             this.serializer = serializer;
             this.listType = listType;
             this.isGenericList = false;
-            this.permissiveMode = permissiveMode;
+            this.isPermissiveMode = isPermissiveMode;
         }
 
         public override System.Collections.IList Deserialize(IIonReader reader)
@@ -51,7 +51,7 @@ namespace Amazon.Ion.ObjectMapper
                     }
                     catch (Exception)
                     {
-                        if (permissiveMode)
+                        if (isPermissiveMode)
                         {
                             typedArray.SetValue(Activator.CreateInstance(elementType), i);
                         }
@@ -83,7 +83,7 @@ namespace Amazon.Ion.ObjectMapper
                     }
                     catch (Exception)
                     {
-                        if (permissiveMode)
+                        if (isPermissiveMode)
                         {
                             typedList.Add(Activator.CreateInstance(elementType));
                         }

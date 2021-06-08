@@ -289,20 +289,20 @@ namespace Amazon.Ion.ObjectMapper
             throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
         }
 
-        private IonListSerializer NewIonListSerializer(Type listType, bool permissiveMode) 
+        private IonListSerializer NewIonListSerializer(Type listType, bool isPermissiveMode) 
         {
             if (listType.IsArray)
             {
-                return new IonListSerializer(this, listType, listType.GetElementType(), permissiveMode);
+                return new IonListSerializer(this, listType, listType.GetElementType(), isPermissiveMode);
             }
             
             if (listType.IsAssignableTo(typeof(System.Collections.IList)))
             {
                 if (listType.IsGenericType)
                 {
-                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0], permissiveMode);
+                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0], isPermissiveMode);
                 }
-                return new IonListSerializer(this, listType, permissiveMode);
+                return new IonListSerializer(this, listType, isPermissiveMode);
             }
 
             throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
