@@ -8,16 +8,19 @@ namespace Amazon.Ion.ObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {
-        private const BindingFlags BINDINGS = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+        private const BindingFlags fieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
+        private readonly Lazy<IEnumerable<PropertyInfo>> readOnlyProperties;
 
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
             this.options = options;
             this.targetType = targetType;
+            this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
+                () => this.targetType.GetProperties().Where(IsReadOnlyProperty));
         }
 
         public object Deserialize(IIonReader reader)
@@ -32,6 +35,14 @@ namespace Amazon.Ion.ObjectMapper
                 FieldInfo field;
                 if (property != null)
                 {
+                    if (IsReadOnlyProperty(property))
+                    {
+                        // property.SetValue() does not work with a readonly property.
+                        // logic for handling deserializing readonly properties happens during field processing
+                        // when we detect backing fields for the property.
+                        continue;
+                    }
+
                     var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
                     if (options.IgnoreDefaults && deserialized == default)
                     {
@@ -71,6 +82,12 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
                 
+
+                if (this.options.IgnoreReadOnlyProperties && IsReadOnlyProperty(property))
+                {
+                    continue;
+                }
+
                 var propertyValue = property.GetValue(item);
                 if (options.IgnoreNulls && propertyValue == null)
                 {
@@ -87,12 +104,13 @@ namespace Amazon.Ion.ObjectMapper
 
             foreach (var field in Fields())
             {
-                var fieldValue = field.GetValue(item);
-                if (options.IgnoreNulls && fieldValue == null)
+                if (options.IgnoreReadOnlyFields && field.IsInitOnly)
                 {
                     continue;
                 }
-                if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+
+                var fieldValue = field.GetValue(item);
+                if (options.IgnoreNulls && fieldValue == null)
                 {
                     continue;
                 }
@@ -140,13 +158,17 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             var name = options.NamingConvention.ToProperty(readName);
-            var property = targetType.GetProperty(name, BINDINGS);
-
-            return property;
+            return targetType.GetProperty(name);
         }
+
+        private bool IsReadOnlyProperty(PropertyInfo property)
+        {
+            return property.SetMethod == null;
+        }
+        
         private FieldInfo FindField(string name)
         {
-            var exact = targetType.GetField(name, BINDINGS);
+            var exact = targetType.GetField(name, fieldBindings);
             if (exact != null && IsField(exact))
             {
                 return exact;
@@ -180,12 +202,18 @@ namespace Amazon.Ion.ObjectMapper
                 return true;
             }
 
+            if (!this.options.IgnoreReadOnlyProperties &&
+                this.readOnlyProperties.Value.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
+            {
+                return true;
+            }
+
             return IsIonField(field);
         }
 
         private IEnumerable<FieldInfo> Fields()
         {
-            return targetType.GetFields(BINDINGS).Where(IsField);
+            return targetType.GetFields(fieldBindings).Where(IsField);
         }
 
         private IEnumerable<PropertyInfo> IonNamedProperties()
