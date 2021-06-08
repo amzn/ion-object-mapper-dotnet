@@ -436,12 +436,13 @@ namespace Amazon.Ion.ObjectMapper
             {
                 return (T)Deserialize(reader, typeof(T));
             }
-            catch (NotSupportedException)
+            catch (Exception e)
             {
-                if (options.PermissiveMode)
+                if (options.PermissiveMode && (e is NotSupportedException || e is InvalidCastException))
                 {
                     return default(T);
-                } else
+                }
+                else
                 {
                     throw;
                 }

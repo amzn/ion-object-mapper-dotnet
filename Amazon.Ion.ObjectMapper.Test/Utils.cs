@@ -70,6 +70,25 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(item.ToString(), Serde(ionSerializer, item).ToString());
         }
 
+        public static void CheckPermissiveMode<T>(object item, bool permissiveMode, T expectedType, bool expectedNull = false)
+        {
+            var stream = new IonSerializer().Serialize(item);
+
+            var serializer = new IonSerializer(new IonSerializationOptions { PermissiveMode = permissiveMode });
+
+            var deserialized =  serializer.Deserialize<T>(stream);
+
+            if (expectedNull)
+            {
+                Assert.IsNull(deserialized);
+            }
+            else
+            {
+                Assert.AreEqual(deserialized.GetType(), expectedType.GetType());
+                Assert.AreEqual(expectedType.ToString(), deserialized.ToString());
+            }
+        }
+
         public static void AssertHasAnnotation(string annotation, Stream stream)
         {
             AssertHasAnnotation(annotation, StreamToIonValue(Copy(stream)));
