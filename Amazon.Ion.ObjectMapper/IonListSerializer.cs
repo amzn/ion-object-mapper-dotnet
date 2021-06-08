@@ -49,9 +49,9 @@ namespace Amazon.Ion.ObjectMapper
                     {
                         typedArray.SetValue(list[i], i);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        if (isPermissiveMode)
+                        if (isPermissiveMode && (e is ArgumentException || e is InvalidCastException))
                         {
                             typedArray.SetValue(Activator.CreateInstance(elementType), i);
                         }
@@ -81,9 +81,9 @@ namespace Amazon.Ion.ObjectMapper
                     {
                         typedList.Add(element);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        if (isPermissiveMode)
+                        if (isPermissiveMode && e is ArgumentException)
                         {
                             typedList.Add(Activator.CreateInstance(elementType));
                         }
