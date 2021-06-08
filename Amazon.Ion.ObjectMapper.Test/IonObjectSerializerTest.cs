@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Amazon.IonDotnet;
 using Amazon.IonDotnet.Tree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.Ion.ObjectMapper.Test.Utils;
@@ -183,6 +186,274 @@ namespace Amazon.Ion.ObjectMapper.Test
             AssertHasAnnotation(
                 "my.universal.namespace.BussyMcBusface", 
                 new IonSerializer().Serialize(new Bus()));
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomBoolSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new NegationBoolIonSerializer(), true);
+            Assert.AreEqual(false, serialized.BoolValue);
+        }
+        
+        [TestMethod]
+        public void DeserializesWithCustomBoolSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new NegationBoolIonSerializer(), true);
+            Assert.AreEqual(false, deserialized);
+        }
+        
+        [TestMethod]
+        public void SerializesWithCustomStringSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new UpperCaseStringIonSerializer(), "test string");
+            Assert.AreEqual("TEST STRING", serialized.StringValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomStringSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new UpperCaseStringIonSerializer(), "test string");
+            Assert.AreEqual("TEST STRING", deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomByteArraySerializer()
+        {
+            var testArr = new byte[] { 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26 };
+            var expectedArr = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+            var serialized = SerializeToIonWithCustomSerializer(new ZeroByteArrayIonSerializer(), testArr);
+            Assert.IsTrue(expectedArr.SequenceEqual(serialized.Bytes().ToArray()));
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomByteArraySerializer()
+        {
+            var testArr = new byte[] { 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26 };
+            var expectedArr = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+            var deserialized = DeserializeWithCustomSerializer(new ZeroByteArrayIonSerializer(), testArr);
+            Assert.IsTrue(expectedArr.SequenceEqual(deserialized));
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomIntSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeIntIonSerializer(), 15);
+            Assert.AreEqual(-15, serialized.IntValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomIntSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new NegativeIntIonSerializer(), 15);
+            Assert.AreEqual(-15, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomLongSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeLongIonSerializer(), 9223372036854775807);
+            Assert.AreEqual(-9223372036854775807, serialized.LongValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomLongSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new NegativeLongIonSerializer(), 9223372036854775807);
+            Assert.AreEqual(-9223372036854775807, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomFloatSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeFloatIonSerializer(), (float)3.14);
+            Assert.AreEqual(-(float)3.14, serialized.DoubleValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomFloatSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new NegativeFloatIonSerializer(), (float)3.14);
+            Assert.AreEqual(-(float)3.14, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomDoubleSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeDoubleIonSerializer(), 3.14);
+            Assert.AreEqual(-3.14, serialized.DoubleValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomDoubleSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new NegativeDoubleIonSerializer(), 3.14);
+            Assert.AreEqual(-3.14, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomDecimalSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeDecimalIonSerializer(), (decimal)3.14);
+            Assert.AreEqual(-(decimal)3.14, serialized.DecimalValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomDecimalSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(new NegativeDecimalIonSerializer(), (decimal)3.14);
+            Assert.AreEqual(-(decimal)3.14, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomBigDecimalSerializer()
+        {
+            var testBigDecimal = BigDecimal.Parse("3.14159265359");
+            
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeBigDecimalIonSerializer(), testBigDecimal);
+            Assert.AreEqual(-testBigDecimal, serialized.BigDecimalValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomBigDecimalSerializer()
+        {
+            var testBigDecimal = BigDecimal.Parse("3.14159265359");
+            
+            var deserialized = DeserializeWithCustomSerializer(new NegativeBigDecimalIonSerializer(), testBigDecimal);
+            Assert.AreEqual(-testBigDecimal, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomSymbolSerializer()
+        {
+            var serialized = SerializeToIonWithCustomSerializer(
+                new UpperCaseSymbolIonSerializer(), 
+                new SymbolToken("test symbol", 10));
+            Assert.AreEqual("TEST SYMBOL", serialized.SymbolValue.Text);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomSymbolSerializer()
+        {
+            var deserialized = DeserializeWithCustomSerializer(
+                new UpperCaseSymbolIonSerializer(), 
+                new SymbolToken("test symbol", 10));
+            Assert.AreEqual("TEST SYMBOL", deserialized.Text);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomDateSerializer()
+        {
+            var testDate = new DateTime(2005, 05, 23);
+            var expectedDate = testDate.AddDays(1);
+
+            var serialized = SerializeToIonWithCustomSerializer(new NextDayDateTimeIonSerializer(), testDate);
+            Assert.AreEqual(expectedDate, serialized.TimestampValue.DateTimeValue);
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomDateSerializer()
+        {
+            var testDate = new DateTime(2005, 05, 23);
+            var expectedDate = testDate.AddDays(1);
+
+            var deserialized = DeserializeWithCustomSerializer(new NextDayDateTimeIonSerializer(), testDate);
+            Assert.AreEqual(expectedDate, deserialized);
+        }
+
+        [TestMethod]
+        public void SerializesWithCustomGuidSerializer()
+        {
+            var testGuid = new Guid(new byte[] 
+            { 
+                0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+                0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F
+            });
+            var expectedGuid = new byte[]
+            {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+
+            var serialized = SerializeToIonWithCustomSerializer(new ZeroGuidIonSerializer(), testGuid);
+            Assert.IsTrue(expectedGuid.SequenceEqual(serialized.Bytes().ToArray()));
+        }
+
+        [TestMethod]
+        public void DeserializesWithCustomGuidSerializer()
+        {
+            var testGuid = new Guid(new byte[] 
+            { 
+                0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+                0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F
+            });
+            var expectedGuid = new byte[]
+            {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+
+            var deserialized = DeserializeWithCustomSerializer(new ZeroGuidIonSerializer(), testGuid);
+            Assert.IsTrue(expectedGuid.SequenceEqual(deserialized.ToByteArray()));
+        }
+
+        [TestMethod]
+        public void SerializesObjectsWithCustomSerializers()
+        {
+            var customSerializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(string), new UpperCaseStringIonSerializer()},
+                    {typeof(int), new NegativeIntIonSerializer()},
+                    {typeof(double), new NegativeDoubleIonSerializer()},
+                    {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+                }
+            });
+
+            var stream = customSerializer.Serialize(TestObjects.honda);
+            var serialized = StreamToIonValue(stream);
+
+            Assert.IsTrue(serialized.ContainsField("make"));
+            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), serialized.GetField("make").StringValue);
+
+            Assert.IsTrue(serialized.ContainsField("yearOfManufacture"));
+            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, serialized.GetField("yearOfManufacture").IntValue);
+
+            Assert.IsTrue(serialized.ContainsField("weightInKg"));
+            Assert.AreEqual(-TestObjects.honda.Weight, serialized.GetField("weightInKg").DoubleValue);
+
+            Assert.IsTrue(serialized.ContainsField("engine"));
+            var engine = serialized.GetField("engine");
+            Assert.IsTrue(engine.ContainsField("manufactureDate"));
+            Assert.AreEqual(
+                TestObjects.honda.Engine.ManufactureDate.AddDays(1), 
+                engine.GetField("manufactureDate").TimestampValue.DateTimeValue);
+        }
+
+        [TestMethod]
+        public void DeserializesObjectsWithCustomSerializers()
+        {
+            var defaultSerializer = new IonSerializer();
+            var customSerializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(string), new UpperCaseStringIonSerializer()},
+                    {typeof(int), new NegativeIntIonSerializer()},
+                    {typeof(double), new NegativeDoubleIonSerializer()},
+                    {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+                }
+            });
+
+            var stream = defaultSerializer.Serialize(TestObjects.honda);
+            var deserialized = customSerializer.Deserialize<Car>(stream);
+
+            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserialized.Make);
+            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserialized.YearOfManufacture);
+            Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
+            Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
         }
     }
 }
