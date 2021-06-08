@@ -8,7 +8,7 @@ namespace Amazon.Ion.ObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {
-        private const BindingFlags fieldBindings = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+        private const BindingFlags BINDINGS = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
@@ -81,7 +81,6 @@ namespace Amazon.Ion.ObjectMapper
                 {
                     continue;
                 }
-                
 
                 if (this.options.IgnoreReadOnlyProperties && IsReadOnlyProperty(property))
                 {
@@ -168,7 +167,7 @@ namespace Amazon.Ion.ObjectMapper
         
         private FieldInfo FindField(string name)
         {
-            var exact = targetType.GetField(name, fieldBindings);
+            var exact = targetType.GetField(name, BINDINGS);
             if (exact != null && IsField(exact))
             {
                 return exact;
@@ -213,7 +212,7 @@ namespace Amazon.Ion.ObjectMapper
 
         private IEnumerable<FieldInfo> Fields()
         {
-            return targetType.GetFields(fieldBindings).Where(IsField);
+            return targetType.GetFields(BINDINGS).Where(IsField);
         }
 
         private IEnumerable<PropertyInfo> IonNamedProperties()
