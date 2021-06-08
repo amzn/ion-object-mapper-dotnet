@@ -102,7 +102,7 @@ namespace Amazon.Ion.ObjectMapper
             var customObjectSerializer = this.GetCustomObjectSerializer();
             if (customObjectSerializer != null)
             {
-                this.Serialize(customObjectSerializer, writer, item);
+                Utils.Serialize(targetType, customObjectSerializer, writer, item);
                 return;
             }
             
@@ -334,44 +334,12 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             var customObjectSerializer = Activator.CreateInstance(serializerAttribute.SerializerType);
-            if (!this.IsSerializerValid(targetType, customObjectSerializer))
+            if (!Utils.IsSerializerValid(targetType, customObjectSerializer))
             {
                 throw new NotSupportedException(
                     $"The class {targetType}'s [IonSerializer] annotated serializer is invalid");
             }
             return customObjectSerializer;
-        }
-
-        private bool IsSerializerValid(Type type, dynamic serializer)
-        {
-            return (bool)this.InvokeGenericMethod(nameof(this.GenericIsSerializerValid), type, new [] { serializer });
-        }
-        
-        private bool GenericIsSerializerValid<T>(dynamic serializer)
-        {
-            return serializer is IonSerializer<T>;
-        }
-        
-        private void Serialize(dynamic serializer, IIonWriter writer, object item)
-        {
-            this.InvokeGenericMethod(nameof(this.GenericSerialize), targetType, new [] { serializer, writer, item });
-        }
-
-        private void GenericSerialize<T>(dynamic serializer, IIonWriter writer, T item)
-        {
-            serializer.Serialize(writer, item);
-        }
-
-        private object InvokeGenericMethod(string methodName, Type type, object[] arguments)
-        {
-            MethodInfo method = typeof(IonObjectSerializer).GetMethod(methodName, BINDINGS);
-            if (method == null)
-            {
-                throw new NotSupportedException($"Method {methodName} not found in class IonObjectSerializer");
-            }
-
-            MethodInfo genericMethod = method.MakeGenericMethod(type);
-            return genericMethod.Invoke(this, arguments);
         }
     }
 }
