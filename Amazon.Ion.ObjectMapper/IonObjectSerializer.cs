@@ -28,7 +28,10 @@ namespace Amazon.Ion.ObjectMapper
             var customObjectSerializer = this.GetCustomObjectSerializer();
             if (customObjectSerializer != null)
             {
-                return customObjectSerializer.Deserialize(reader);
+                reader.StepIn();
+                var deserialized = customObjectSerializer.Deserialize(reader);
+                reader.StepOut();
+                return deserialized;
             }
 
             var targetObject = options.ObjectFactory.Create(options, reader, targetType);
@@ -102,7 +105,9 @@ namespace Amazon.Ion.ObjectMapper
             var customObjectSerializer = this.GetCustomObjectSerializer();
             if (customObjectSerializer != null)
             {
+                writer.StepIn(IonType.Struct);
                 Utils.Serialize(targetType, customObjectSerializer, writer, item);
+                writer.StepOut();
                 return;
             }
             

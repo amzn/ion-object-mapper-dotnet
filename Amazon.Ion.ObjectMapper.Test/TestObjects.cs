@@ -530,8 +530,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             string gender = default;
             string breed = default;
 
-            reader.StepIn();
-
             while (reader.MoveNext() != IonType.None)
             {
                 switch (reader.CurrentFieldName)
@@ -548,15 +546,11 @@ namespace Amazon.Ion.ObjectMapper.Test
                 }
             }
 
-            reader.StepOut();
-
             return new Dog(name, gender, breed);
         }
 
         public void Serialize(IIonWriter writer, Dog item)
         {
-            writer.StepIn(IonType.Struct);
-
             if (item.Name != null)
             {
                 writer.SetFieldName("Given Name");
@@ -574,8 +568,6 @@ namespace Amazon.Ion.ObjectMapper.Test
                 writer.SetFieldName("Classification");
                 writer.WriteString(item.Breed);
             }
-
-            writer.StepOut();
         }
     }
 
