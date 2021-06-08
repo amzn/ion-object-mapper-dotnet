@@ -70,13 +70,18 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(item.ToString(), Serde(ionSerializer, item).ToString());
         }
 
-        public static void CheckPermissiveMode<T>(object item, bool permissiveMode, T expectedType, bool expectedNull = false)
+        public static void CheckPermissiveMode<T>(object item, bool isPermissiveMode, T expectedType, bool expectedNull = false)
         {
             var stream = new IonSerializer().Serialize(item);
 
-            var serializer = new IonSerializer(new IonSerializationOptions { PermissiveMode = permissiveMode });
+            CheckPermissiveMode(stream, isPermissiveMode, expectedType, expectedNull);
+        }
 
-            var deserialized =  serializer.Deserialize<T>(stream);
+        public static void CheckPermissiveMode<T>(Stream stream, bool isPermissiveMode, T expectedType, bool expectedNull = false)
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions { PermissiveMode = isPermissiveMode });
+
+            var deserialized = serializer.Deserialize<T>(stream);
 
             if (expectedNull)
             {
