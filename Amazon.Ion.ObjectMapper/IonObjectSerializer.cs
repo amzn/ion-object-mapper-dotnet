@@ -157,7 +157,9 @@ namespace Amazon.Ion.ObjectMapper
             }
 
             var name = options.NamingConvention.ToProperty(readName);
-            return targetType.GetProperty(name);
+            var property = targetType.GetProperty(name, BINDINGS);
+
+            return property;
         }
 
         private bool IsReadOnlyProperty(PropertyInfo property)
