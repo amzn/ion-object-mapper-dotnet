@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -93,6 +95,35 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static IIonValue StreamToIonValue(Stream stream)
         {
             return IonLoader.Default.Load(stream).GetElementAt(0);
+        }
+        
+        public static IIonValue SerializeToIonWithCustomSerializer<T>(dynamic customSerializer, T item)
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(T), customSerializer},
+                }
+            });
+
+            var stream = serializer.Serialize(item);
+            return StreamToIonValue(stream);
+        }
+
+        public static T DeserializeWithCustomSerializer<T>(dynamic customSerializer, T item)
+        {
+            var defaultSerializer = new IonSerializer();
+            var serializer = new IonSerializer(new IonSerializationOptions
+            {
+                IonSerializers = new Dictionary<Type, dynamic>()
+                {
+                    {typeof(T), customSerializer},
+                }
+            });
+
+            var stream = defaultSerializer.Serialize(item);
+            return serializer.Deserialize<T>(stream);
         }
     }
 }
