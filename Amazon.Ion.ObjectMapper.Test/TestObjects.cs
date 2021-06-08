@@ -524,6 +524,8 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class MyIonDogSerializer : IonSerializer<Dog>
     {
+        public MyIonDogSerializer() {}
+        
         public Dog Deserialize(IIonReader reader)
         {
             string name = default;
