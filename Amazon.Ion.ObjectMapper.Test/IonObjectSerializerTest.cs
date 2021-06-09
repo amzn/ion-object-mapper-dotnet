@@ -397,6 +397,46 @@ namespace Amazon.Ion.ObjectMapper.Test
             var deserialized = DeserializeWithCustomSerializer(new ZeroGuidIonSerializer(), testGuid);
             Assert.IsTrue(expectedGuid.SequenceEqual(deserialized.ToByteArray()));
         }
+        
+        [TestMethod]
+        public void SerializesListsWithCustomSerializers()
+        {
+            var customSerializers = new Dictionary<Type, dynamic>()
+            {
+                {typeof(string), new UpperCaseStringIonSerializer()},
+                {typeof(int), new NegativeIntIonSerializer()},
+                {typeof(float), new NegativeFloatIonSerializer()},
+            };
+
+            List<object> testList = new List<object>(new object[] { "test", 5, 3.14f });
+            
+            var serialized = (IIonList)SerializeToIonWithCustomSerializers(customSerializers, testList);
+
+            Assert.AreEqual(3, serialized.Count);
+            Assert.AreEqual("TEST", serialized.GetElementAt(0).StringValue);
+            Assert.AreEqual(-5, serialized.GetElementAt(1).IntValue);
+            Assert.AreEqual(-3.14f, serialized.GetElementAt(2).DoubleValue);
+        }
+        
+        [TestMethod]
+        public void DeserializesListsWithCustomSerializers()
+        {
+            var customSerializers = new Dictionary<Type, dynamic>()
+            {
+                {typeof(string), new UpperCaseStringIonSerializer()},
+                {typeof(int), new NegativeIntIonSerializer()},
+                {typeof(float), new NegativeFloatIonSerializer()},
+            };
+
+            List<object> testList = new List<object>(new object[] { "test", 5, 3.14f });
+            
+            var deserialized = DeserializeWithCustomSerializers(customSerializers, testList);
+
+            Assert.AreEqual(3, deserialized.Count);
+            Assert.AreEqual("TEST", deserialized[0]);
+            Assert.AreEqual(-5, deserialized[1]);
+            Assert.AreEqual(-3.14f, deserialized[2]);
+        }
 
         [TestMethod]
         public void SerializesObjectsWithCustomSerializers()
