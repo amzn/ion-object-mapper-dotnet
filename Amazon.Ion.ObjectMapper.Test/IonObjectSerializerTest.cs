@@ -343,7 +343,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void SerializesWithCustomDateSerializer()
+        public void SerializesWithCustomDateTimeSerializer()
         {
             var testDate = new DateTime(2005, 05, 23);
             var expectedDate = testDate.AddDays(1);
@@ -353,7 +353,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void DeserializesWithCustomDateSerializer()
+        public void DeserializesWithCustomDateTimeSerializer()
         {
             var testDate = new DateTime(2005, 05, 23);
             var expectedDate = testDate.AddDays(1);
