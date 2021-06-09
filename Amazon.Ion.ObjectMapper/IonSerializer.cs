@@ -417,8 +417,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.Clob) 
             {
-                var serializer = this.GetCustomPrimitiveSerializer<string>() ?? new IonClobSerializer();
-                return serializer.Deserialize(reader);
+                return new IonClobSerializer().Deserialize(reader);
             }
 
             if (ionType == IonType.List) 
