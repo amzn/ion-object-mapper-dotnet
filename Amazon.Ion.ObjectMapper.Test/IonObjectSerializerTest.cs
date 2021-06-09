@@ -267,15 +267,15 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesWithCustomFloatSerializer()
         {
-            var serialized = SerializeToIonWithCustomSerializer(new NegativeFloatIonSerializer(), (float)3.14);
-            Assert.AreEqual(-(float)3.14, serialized.DoubleValue);
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeFloatIonSerializer(), 3.14f);
+            Assert.AreEqual(-3.14f, serialized.DoubleValue);
         }
 
         [TestMethod]
         public void DeserializesWithCustomFloatSerializer()
         {
-            var deserialized = DeserializeWithCustomSerializer(new NegativeFloatIonSerializer(), (float)3.14);
-            Assert.AreEqual(-(float)3.14, deserialized);
+            var deserialized = DeserializeWithCustomSerializer(new NegativeFloatIonSerializer(), 3.14f);
+            Assert.AreEqual(-3.14f, deserialized);
         }
 
         [TestMethod]
@@ -295,15 +295,15 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesWithCustomDecimalSerializer()
         {
-            var serialized = SerializeToIonWithCustomSerializer(new NegativeDecimalIonSerializer(), (decimal)3.14);
-            Assert.AreEqual(-(decimal)3.14, serialized.DecimalValue);
+            var serialized = SerializeToIonWithCustomSerializer(new NegativeDecimalIonSerializer(), 3.14m);
+            Assert.AreEqual(-3.14m, serialized.DecimalValue);
         }
 
         [TestMethod]
         public void DeserializesWithCustomDecimalSerializer()
         {
-            var deserialized = DeserializeWithCustomSerializer(new NegativeDecimalIonSerializer(), (decimal)3.14);
-            Assert.AreEqual(-(decimal)3.14, deserialized);
+            var deserialized = DeserializeWithCustomSerializer(new NegativeDecimalIonSerializer(), 3.14m);
+            Assert.AreEqual(-3.14m, deserialized);
         }
 
         [TestMethod]
