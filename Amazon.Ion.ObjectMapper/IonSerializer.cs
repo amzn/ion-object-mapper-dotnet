@@ -269,7 +269,7 @@ namespace Amazon.Ion.ObjectMapper
                 serializer.Serialize(writer, (DateTime)(object)item);
                 return;
             }
-            
+
             if (type.IsAssignableTo(typeof(Guid)))
             {
                 var serializer = this.GetCustomPrimitiveSerializer<Guid>() ?? new IonGuidSerializer(options);
