@@ -187,7 +187,7 @@ namespace Amazon.Ion.ObjectMapper
         {
             if (item == null)
             {
-                new IonNullSerializer().Serialize(writer, (object)null);
+                new IonNullSerializer().Serialize(writer, null);
                 return;
             }
 
@@ -279,7 +279,7 @@ namespace Amazon.Ion.ObjectMapper
 
             if (type.IsAssignableTo(typeof(System.Collections.IList)))
             {
-                NewIonListSerializer(type).Serialize(writer, (System.Collections.IList)(object)item);
+                NewIonListSerializer(type).Serialize(writer, (System.Collections.IList)item);
                 return;
             }
 
