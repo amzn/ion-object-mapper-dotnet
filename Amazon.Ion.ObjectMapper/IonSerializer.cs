@@ -191,101 +191,99 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
-            var type = item.GetType();
-
-            if (type.IsAssignableTo(typeof(bool)))
+            if (item is bool)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<bool>() ?? new IonBooleanSerializer();
                 serializer.Serialize(writer, Convert.ToBoolean(item));
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(int)))
+            if (item is int)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<int>() ?? new IonIntSerializer();
                 serializer.Serialize(writer, Convert.ToInt32(item));
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(long)))
+            if (item is long)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<long>() ?? new IonLongSerializer();
                 serializer.Serialize(writer, Convert.ToInt64(item));
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(float)))
+            if (item is float)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<float>() ?? new IonFloatSerializer();
                 serializer.Serialize(writer, Convert.ToSingle(item));
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(double)))
+            if (item is double)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<double>() ?? new IonDoubleSerializer();
                 serializer.Serialize(writer, Convert.ToDouble(item));
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(decimal)))
+            if (item is decimal)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<decimal>() ?? new IonDecimalSerializer();
                 serializer.Serialize(writer, Convert.ToDecimal(item));
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(BigDecimal)))
+            if (item is BigDecimal)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<BigDecimal>() ?? new IonBigDecimalSerializer();
                 serializer.Serialize(writer, (BigDecimal)(object)item);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(byte[])))
+            if (item is byte[])
             {
                 var serializer = this.GetCustomPrimitiveSerializer<byte[]>() ?? new IonByteArraySerializer();
                 serializer.Serialize(writer, (byte[])(object)item);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(string)))
+            if (item is string)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<string>() ?? new IonStringSerializer();
                 serializer.Serialize(writer, item as string);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(SymbolToken)))
+            if (item is SymbolToken)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<SymbolToken>() ?? new IonSymbolSerializer();
                 serializer.Serialize(writer, (SymbolToken)(object)item);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(DateTime)))
+            if (item is DateTime)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<DateTime>() ?? new IonDateTimeSerializer();
                 serializer.Serialize(writer, (DateTime)(object)item);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(Guid)))
+            if (item is Guid)
             {
                 var serializer = this.GetCustomPrimitiveSerializer<Guid>() ?? new IonGuidSerializer(options);
                 serializer.Serialize(writer, (Guid)(object)item);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(System.Collections.IList)))
+            if (item is System.Collections.IList)
             {
-                NewIonListSerializer(type).Serialize(writer, (System.Collections.IList)item);
+                NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)item);
                 return;
             }
 
-            if (type.IsAssignableTo(typeof(object))) 
+            if (item is object)
             {
-                new IonObjectSerializer(this, options, type).Serialize(writer, item);
+                new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
                 return;
             }
 
