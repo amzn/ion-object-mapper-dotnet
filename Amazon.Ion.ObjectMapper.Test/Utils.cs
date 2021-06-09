@@ -99,30 +99,31 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
         {
-            var serializer = new IonSerializer(new IonSerializationOptions
-            {
-                IonSerializers = new Dictionary<Type, dynamic>()
-                {
-                    {typeof(T), customSerializer},
-                }
-            });
+            return SerializeToIonWithCustomSerializers(
+                new Dictionary<Type, dynamic>() {{typeof(T), customSerializer}},
+                item);
+        }
+        
+        public static T DeserializeWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
+        {
+            return DeserializeWithCustomSerializers(
+                new Dictionary<Type, dynamic>() {{typeof(T), customSerializer}},
+                item);
+        }
+        
+        public static IIonValue SerializeToIonWithCustomSerializers<T>(Dictionary<Type, dynamic> ionSerializers, T item)
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
 
             var stream = serializer.Serialize(item);
             return StreamToIonValue(stream);
         }
-
-        public static T DeserializeWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
+        
+        public static T DeserializeWithCustomSerializers<T>(Dictionary<Type, dynamic> ionSerializers, T item)
         {
-            var defaultSerializer = new IonSerializer();
-            var serializer = new IonSerializer(new IonSerializationOptions
-            {
-                IonSerializers = new Dictionary<Type, dynamic>()
-                {
-                    {typeof(T), customSerializer},
-                }
-            });
+            var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
 
-            var stream = defaultSerializer.Serialize(item);
+            var stream = new IonSerializer().Serialize(item);
             return serializer.Deserialize<T>(stream);
         }
     }
