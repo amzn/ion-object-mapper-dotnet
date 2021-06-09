@@ -7,10 +7,26 @@ using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
 
 namespace Amazon.Ion.ObjectMapper
 {
-    public interface IonSerializer<T>
+    public interface IIonSerializer
     {
-        void Serialize(IIonWriter writer, T item);
-        T Deserialize(IIonReader reader);
+        void Serialize(IIonWriter writer, object item);
+        object Deserialize(IIonReader reader);
+    }
+
+    public abstract class IonSerializer<T> : IIonSerializer
+    {
+        public abstract void Serialize(IIonWriter writer, T item);
+        public abstract T Deserialize(IIonReader reader);
+
+        void IIonSerializer.Serialize(IIonWriter writer, object item)
+        {
+            Serialize(writer, (T)item);
+        }
+
+        object IIonSerializer.Deserialize(IIonReader reader)
+        {
+            return Deserialize(reader);
+        }
     }
 
     public interface IonSerializationContext
