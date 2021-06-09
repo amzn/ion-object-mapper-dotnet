@@ -401,19 +401,15 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesObjectsWithCustomSerializers()
         {
-            var customSerializer = new IonSerializer(new IonSerializationOptions
+            var customSerializers = new Dictionary<Type, dynamic>()
             {
-                IonSerializers = new Dictionary<Type, dynamic>()
-                {
-                    {typeof(string), new UpperCaseStringIonSerializer()},
-                    {typeof(int), new NegativeIntIonSerializer()},
-                    {typeof(double), new NegativeDoubleIonSerializer()},
-                    {typeof(DateTime), new NextDayDateTimeIonSerializer()},
-                }
-            });
+                {typeof(string), new UpperCaseStringIonSerializer()},
+                {typeof(int), new NegativeIntIonSerializer()},
+                {typeof(double), new NegativeDoubleIonSerializer()},
+                {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+            };
 
-            var stream = customSerializer.Serialize(TestObjects.honda);
-            var serialized = StreamToIonValue(stream);
+            var serialized = SerializeToIonWithCustomSerializers(customSerializers, TestObjects.honda);
 
             Assert.IsTrue(serialized.ContainsField("make"));
             Assert.AreEqual(TestObjects.honda.Make.ToUpper(), serialized.GetField("make").StringValue);
@@ -435,20 +431,15 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializesObjectsWithCustomSerializers()
         {
-            var defaultSerializer = new IonSerializer();
-            var customSerializer = new IonSerializer(new IonSerializationOptions
+            var customSerializers = new Dictionary<Type, dynamic>()
             {
-                IonSerializers = new Dictionary<Type, dynamic>()
-                {
-                    {typeof(string), new UpperCaseStringIonSerializer()},
-                    {typeof(int), new NegativeIntIonSerializer()},
-                    {typeof(double), new NegativeDoubleIonSerializer()},
-                    {typeof(DateTime), new NextDayDateTimeIonSerializer()},
-                }
-            });
+                {typeof(string), new UpperCaseStringIonSerializer()},
+                {typeof(int), new NegativeIntIonSerializer()},
+                {typeof(double), new NegativeDoubleIonSerializer()},
+                {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+            };
 
-            var stream = defaultSerializer.Serialize(TestObjects.honda);
-            var deserialized = customSerializer.Deserialize<Car>(stream);
+            var deserialized = DeserializeWithCustomSerializers(customSerializers, TestObjects.honda);
 
             Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserialized.Make);
             Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserialized.YearOfManufacture);
