@@ -6,9 +6,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 {
 
     [IonAnnotateType]
-    public abstract class Vehicle
+    public class Vehicle
     {
-
+        public override string ToString()
+        {
+            return "<Vehicle>";
+        }
     }
 
     [IonAnnotateType(Prefix = "my.universal.namespace", Name="BussyMcBusface")] 
@@ -143,6 +146,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         };
 
         public static Truck nativeTruck = new Truck();
+
+        public static string truckIonText = "Truck:: { }";
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
