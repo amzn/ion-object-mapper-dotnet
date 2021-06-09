@@ -26,7 +26,7 @@ namespace Amazon.Ion.ObjectMapper
             this.isGenericList = false;
         }
 
-        public System.Collections.IList Deserialize(IIonReader reader)
+        public override System.Collections.IList Deserialize(IIonReader reader)
         {
             reader.StepIn();
             var list = new System.Collections.ArrayList();
@@ -68,7 +68,7 @@ namespace Amazon.Ion.ObjectMapper
             throw new NotSupportedException("Don't know how to make a list of type " + listType + " with element type " + elementType);
         }
 
-        public void Serialize(IIonWriter writer, System.Collections.IList item)
+        public override void Serialize(IIonWriter writer, System.Collections.IList item)
         {
             writer.StepIn(IonType.List);
             foreach (var i in item)

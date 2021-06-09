@@ -23,7 +23,7 @@ namespace Amazon.Ion.ObjectMapper
                 () => this.targetType.GetProperties().Where(IsReadOnlyProperty));
         }
 
-        public object Deserialize(IIonReader reader)
+        public override object Deserialize(IIonReader reader)
         {
             var targetObject = options.ObjectFactory.Create(options, reader, targetType);
             reader.StepIn();
@@ -71,7 +71,7 @@ namespace Amazon.Ion.ObjectMapper
             return targetObject;
         }
 
-        public void Serialize(IIonWriter writer, object item)
+        public override void Serialize(IIonWriter writer, object item)
         {
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
