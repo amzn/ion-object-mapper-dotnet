@@ -104,13 +104,15 @@ namespace Amazon.Ion.ObjectMapper
             {
                 var typeName = annotations[0];
                 Type typeToCreate = null;
-                try
+
+                foreach (string assemblyName in options.AnnotatedTypeAssemblies)
                 {
-                    // First throws InvalidOperationException if no elements match the condition
-                    var assemblyName = options.AnnotatedTypeAssemblies.First(a => Type.GetType(FullName(typeName, a)) != null);
-                    typeToCreate = Type.GetType(FullName(typeName, assemblyName));
+                    if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null) {
+                        break;
+                    }
                 }
-                catch (InvalidOperationException)
+
+                if (typeToCreate == null && options.AnnotatedTypeAssemblies.Length == 0)
                 {
                     typeToCreate = AppDomain.CurrentDomain
                         .GetAssemblies()
@@ -128,7 +130,7 @@ namespace Amazon.Ion.ObjectMapper
 
         private string FullName(string typeName, string assemblyName)
         {
-            return typeName + ", " + assemblyName;
+            return assemblyName + "." + typeName + "," + assemblyName;
         }
     }
 

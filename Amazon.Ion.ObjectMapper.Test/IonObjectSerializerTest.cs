@@ -11,6 +11,7 @@ namespace Amazon.Ion.ObjectMapper.Test
     [TestClass]
     public class IonObjectSerializerTest
     {
+        IonSerializer defaultSerializer = new IonSerializer();
         [TestMethod]
         public void SerializesAndDeserializesObjects()
         {
@@ -490,27 +491,21 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializeAnnotatedIonToParentClassNameMatchingAnnotation()
         {
-            string truckIonText = "Truck:: { }";
+            IIonReader reader = IonReaderBuilder.Build(TestObjects.truckIonText);
 
-            IIonReader reader = IonReaderBuilder.Build(truckIonText);
+            Vehicle truck = defaultSerializer.Deserialize<Vehicle>(reader);
 
-            IonSerializer ionSerializer = new IonSerializer();
-            Vehicle truck = ionSerializer.Deserialize<Vehicle>(reader);
-
-            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+            AssertIsTruck(truck);
         }
 
         [TestMethod]
         public void DeserializeAnnotatedIonToClassNameMatchingAnnotation()
         {
-            string truckIonText = "Truck:: { }";
+            IIonReader reader = IonReaderBuilder.Build(TestObjects.truckIonText);
 
-            IIonReader reader = IonReaderBuilder.Build(truckIonText);
+            Truck truck = defaultSerializer.Deserialize<Truck>(reader);
 
-            IonSerializer ionSerializer = new IonSerializer();
-            Truck truck = ionSerializer.Deserialize<Truck>(reader);
-
-            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+            AssertIsTruck(truck);
         }
 
         [TestMethod]
@@ -520,10 +515,9 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             IIonReader reader = IonReaderBuilder.Build(annotatedIonText);
 
-            IonSerializer ionSerializer = new IonSerializer();
-            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+            Truck truck = defaultSerializer.Deserialize<Truck>(reader);
 
-            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+            AssertIsTruck(truck);
         }
 
         [TestMethod]
@@ -537,14 +531,27 @@ namespace Amazon.Ion.ObjectMapper.Test
                 }
             };
 
-            string truckIonText = "Truck:: { }";
-
-            IIonReader reader = IonReaderBuilder.Build(truckIonText);
+            IIonReader reader = IonReaderBuilder.Build(TestObjects.truckIonText);
 
             IonSerializer ionSerializer = new IonSerializer(options);
-            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+            Vehicle truck = ionSerializer.Deserialize<Vehicle>(reader);
 
-            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+            AssertIsTruck(truck);
+
+            // Ensure default loaded assemblies are not searched in if annotated type assemblies are given
+            options = new IonSerializationOptions
+            {
+                AnnotatedTypeAssemblies = new string[]
+                {
+                    "mockAssemblyName"
+                }
+            };
+
+            reader = IonReaderBuilder.Build(TestObjects.truckIonText);
+            ionSerializer = new IonSerializer(options);
+            truck = ionSerializer.Deserialize<Vehicle>(reader);
+
+            Assert.AreNotEqual(TestObjects.nativeTruck.ToString(), truck.ToString());
         }
 
         [TestMethod]
@@ -557,10 +564,14 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             IIonReader reader = IonReaderBuilder.Build(ionTruck);
 
-            IonSerializer ionSerializer = new IonSerializer();
-            Truck truck = ionSerializer.Deserialize<Truck>(reader);
+            Truck truck = defaultSerializer.Deserialize<Truck>(reader);
 
-            Assert.AreEqual(truck.ToString(), TestObjects.nativeTruck.ToString());
+            AssertIsTruck(truck);
+        }
+
+        private void AssertIsTruck(object actual)
+        {
+            Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
         }
     }
 }
