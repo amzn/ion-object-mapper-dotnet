@@ -145,7 +145,7 @@ namespace Amazon.Ion.ObjectMapper
 
         public readonly bool PermissiveMode;
         
-        public Dictionary<Type, dynamic> IonSerializers { get; init; }
+        public Dictionary<Type, IIonSerializer> IonSerializers { get; init; }
     }
 
     public interface IonSerializerFactory<T, TContext> where TContext : IonSerializationContext
@@ -436,7 +436,7 @@ namespace Amazon.Ion.ObjectMapper
             return (T) Deserialize(reader, typeof(T));
         }
 
-        private IonSerializer<T> GetPrimitiveSerializer<T>(IonSerializer<T> defaultSerializer)
+        private IIonSerializer GetPrimitiveSerializer<T>(IIonSerializer defaultSerializer)
         {
             if (this.options.IonSerializers != null && this.options.IonSerializers.ContainsKey(typeof(T)))
             {
