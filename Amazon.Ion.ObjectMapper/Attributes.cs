@@ -37,40 +37,43 @@ namespace Amazon.Ion.ObjectMapper
     }
 
     /// <summary>
-    /// Attribute to identify a field/property's getter method to be used
-    /// during serialization of that field/property.
+    /// Attribute to identify an Ion property getter method to be used
+    /// during serialization of that Ion property.
     /// </summary>
     public class IonPropertyGetter : Attribute
     {
         /// <summary>
-        /// Attribute constructor.
+        /// IonPropertyGetter constructor.
         /// </summary>
-        public IonPropertyGetter(string fieldName)
+        public IonPropertyGetter(string ionPropertyName)
         {
-            this.FieldName = fieldName;
+            this.IonPropertyName = ionPropertyName;
         }
 
         /// <summary>
-        /// The name of the field to be serialized with the getter method.
+        /// The name of the Ion property to be serialized with the getter method.
         /// </summary>
-        public string FieldName { get; }
+        public string IonPropertyName { get; }
     }
 
     /// <summary>
-    /// Attribute to identify a field/property's setter method to be used
-    /// during deserialization of that field/property.
+    /// Attribute to identify an Ion property setter method to be used
+    /// during deserialization of that Ion property.
     /// </summary>
     public class IonPropertySetter : Attribute
     {
-        public IonPropertySetter(string fieldName)
+        /// <summary>
+        /// IonPropertySetter constructor.
+        /// </summary>
+        public IonPropertySetter(string ionPropertyName)
         {
-            FieldName = fieldName;
+            IonPropertyName = ionPropertyName;
         }
 
         /// <summary>
-        /// The name of the field to be deserialized with the setter method.
+        /// The name of the Ion property to be deserialized with the setter method.
         /// </summary>
-        public string FieldName { get; }
+        public string IonPropertyName { get; }
     }
 
     public class IonField : Attribute

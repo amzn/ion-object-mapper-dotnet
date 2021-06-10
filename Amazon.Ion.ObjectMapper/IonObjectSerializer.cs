@@ -107,16 +107,16 @@ namespace Amazon.Ion.ObjectMapper
                 var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
                 
                 // A getter method should have zero parameters.
-                if (getMethod?.FieldName == null || method.GetParameters().Length != 0)
+                if (getMethod?.IonPropertyName == null || method.GetParameters().Length != 0)
                 {
                     continue;
                 }
 
-                writer.SetFieldName(getMethod.FieldName);
+                writer.SetFieldName(getMethod.IonPropertyName);
                 var getValue = method.Invoke(item, Array.Empty<object>());
                 ionSerializer.Serialize(writer, getValue);
                 
-                serializedWithGetter.Add(getMethod.FieldName);
+                serializedWithGetter.Add(getMethod.IonPropertyName);
             }
 
             // Serialize any properties that satisfy the options/attributes.
@@ -188,7 +188,7 @@ namespace Amazon.Ion.ObjectMapper
             return targetType.GetMethods().FirstOrDefault(m =>
             {
                 var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
-                return setMethod != null && setMethod.FieldName == name;
+                return setMethod != null && setMethod.IonPropertyName == name;
             });
         }
 
