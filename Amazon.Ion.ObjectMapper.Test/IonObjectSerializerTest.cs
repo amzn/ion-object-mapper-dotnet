@@ -401,7 +401,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesListsWithCustomSerializers()
         {
-            var customSerializers = new Dictionary<Type, dynamic>()
+            var customSerializers = new Dictionary<Type, IIonSerializer>()
             {
                 {typeof(string), new UpperCaseStringIonSerializer()},
                 {typeof(int), new NegativeIntIonSerializer()},
@@ -421,7 +421,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializesListsWithCustomSerializers()
         {
-            var customSerializers = new Dictionary<Type, dynamic>()
+            var customSerializers = new Dictionary<Type, IIonSerializer>()
             {
                 {typeof(string), new UpperCaseStringIonSerializer()},
                 {typeof(int), new NegativeIntIonSerializer()},
@@ -441,7 +441,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesObjectsWithCustomSerializers()
         {
-            var customSerializers = new Dictionary<Type, dynamic>()
+            var customSerializers = new Dictionary<Type, IIonSerializer>()
             {
                 {typeof(string), new UpperCaseStringIonSerializer()},
                 {typeof(int), new NegativeIntIonSerializer()},
@@ -471,7 +471,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DeserializesObjectsWithCustomSerializers()
         {
-            var customSerializers = new Dictionary<Type, dynamic>()
+            var customSerializers = new Dictionary<Type, IIonSerializer>()
             {
                 {typeof(string), new UpperCaseStringIonSerializer()},
                 {typeof(int), new NegativeIntIonSerializer()},

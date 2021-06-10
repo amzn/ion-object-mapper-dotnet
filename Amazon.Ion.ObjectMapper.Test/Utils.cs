@@ -100,18 +100,19 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
         {
             return SerializeToIonWithCustomSerializers(
-                new Dictionary<Type, dynamic>() {{typeof(T), customSerializer}},
+                new Dictionary<Type, IIonSerializer>() {{typeof(T), customSerializer}},
                 item);
         }
         
         public static T DeserializeWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
         {
             return DeserializeWithCustomSerializers(
-                new Dictionary<Type, dynamic>() {{typeof(T), customSerializer}},
+                new Dictionary<Type, IIonSerializer>() {{typeof(T), customSerializer}},
                 item);
         }
         
-        public static IIonValue SerializeToIonWithCustomSerializers<T>(Dictionary<Type, dynamic> ionSerializers, T item)
+        public static IIonValue SerializeToIonWithCustomSerializers<T>(
+            Dictionary<Type, IIonSerializer> ionSerializers, T item)
         {
             var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
 
@@ -119,7 +120,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             return StreamToIonValue(stream);
         }
         
-        public static T DeserializeWithCustomSerializers<T>(Dictionary<Type, dynamic> ionSerializers, T item)
+        public static T DeserializeWithCustomSerializers<T>(Dictionary<Type, IIonSerializer> ionSerializers, T item)
         {
             var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
 
