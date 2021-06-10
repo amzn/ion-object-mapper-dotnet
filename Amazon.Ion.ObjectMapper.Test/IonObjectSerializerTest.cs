@@ -149,6 +149,10 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             var stream = serializer.Serialize(ruler);
             IIonStruct serialized = StreamToIonValue(stream);
+
+            // We should have exactly two fields. ie. we did not double serialize length or unit.
+            Assert.AreEqual(2, serialized.Count);
+            
             Assert.IsTrue(serialized.ContainsField("length"));
             Assert.IsTrue(serialized.ContainsField("unit"));
 
