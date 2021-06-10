@@ -72,7 +72,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void AssertHasAnnotation(string annotation, Stream stream)
         {
-            AssertHasAnnotation(annotation, StreamToIonValue(Copy(stream)));
+            AssertHasAnnotation(annotation, StreamToIonValue(stream));
         }
 
         public static void AssertHasAnnotation(string annotation, IIonValue ionValue)
@@ -83,7 +83,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public static void AssertHasNoAnnotations(Stream stream)
         {
-            var count = StreamToIonValue(Copy(stream)).GetTypeAnnotationSymbols().Count;
+            var count = StreamToIonValue(stream).GetTypeAnnotationSymbols().Count;
             Assert.IsTrue(count == 0, "Has " + count + " annotations");
         }
 
@@ -94,7 +94,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public static IIonValue StreamToIonValue(Stream stream)
         {
-            return IonLoader.Default.Load(stream).GetElementAt(0);
+            return IonLoader.Default.Load(Copy(stream)).GetElementAt(0);
         }
         
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
