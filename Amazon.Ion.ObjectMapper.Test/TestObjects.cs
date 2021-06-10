@@ -372,6 +372,8 @@ namespace Amazon.Ion.ObjectMapper.Test
     public class Ruler
     {
         public int length { get; set; }
+        
+        [IonField]
         internal string unit;
 
         [IonPropertyGetter("length")]
