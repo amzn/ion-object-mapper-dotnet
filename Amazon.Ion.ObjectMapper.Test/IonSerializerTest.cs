@@ -35,8 +35,6 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesAndDeserializesLists()
         {
             Check(new int[] { 1, 1, 2, 3, 5, 8, 11 });
-
-            var d = new Dictionary<Type, IonSerializer<dynamic>>();
         }
     }
 }
