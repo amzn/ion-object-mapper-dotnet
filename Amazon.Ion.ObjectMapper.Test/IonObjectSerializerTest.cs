@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Amazon.IonDotnet;
+using Amazon.IonDotnet.Builders;
 using Amazon.IonDotnet.Tree;
+using Amazon.IonDotnet.Tree.Impl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.Ion.ObjectMapper.Test.Utils;
 
@@ -12,6 +14,8 @@ namespace Amazon.Ion.ObjectMapper.Test
     public class IonObjectSerializerTest
     {
         IonSerializer defaultSerializer = new IonSerializer();
+        private IValueFactory valueFactory = new ValueFactory();
+
         [TestMethod]
         public void SerializesAndDeserializesObjects()
         {
@@ -555,7 +559,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void DeserializeMultipleAnnotatedIonToClassNameWithAnnotated()
+        public void DeserializeMultipleAnnotatedIonToClassNameWithFirstAnnotated()
         {
             // Multiple annotations are ignored, it will only pick the first one.
             IIonValue ionTruck = valueFactory.NewEmptyStruct();
@@ -564,9 +568,24 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             IIonReader reader = IonReaderBuilder.Build(ionTruck);
 
-            Truck truck = defaultSerializer.Deserialize<Truck>(reader);
+            Vehicle truck = defaultSerializer.Deserialize<Vehicle>(reader);
 
             AssertIsTruck(truck);
+        }
+
+        [TestMethod]
+        public void DeserializeMultipleAnnotatedIonToClassNameWithSecondAnnotated()
+        {
+            // Multiple annotations are ignored, it will only pick the first one.
+            IIonValue ionTruck = valueFactory.NewEmptyStruct();
+            ionTruck.AddTypeAnnotation("FirstAnnotation");
+            ionTruck.AddTypeAnnotation("Truck");
+
+            IIonReader reader = IonReaderBuilder.Build(ionTruck);
+
+            Vehicle truck = defaultSerializer.Deserialize<Vehicle>(reader);
+
+            Assert.AreNotEqual(TestObjects.nativeTruck.ToString(), truck.ToString());
         }
 
         private void AssertIsTruck(object actual)

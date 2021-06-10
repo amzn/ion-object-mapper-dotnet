@@ -105,14 +105,17 @@ namespace Amazon.Ion.ObjectMapper
                 var typeName = annotations[0];
                 Type typeToCreate = null;
 
-                foreach (string assemblyName in options.AnnotatedTypeAssemblies)
+                if (options.AnnotatedTypeAssemblies != null)
                 {
-                    if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null) {
-                        break;
+                    foreach (string assemblyName in options.AnnotatedTypeAssemblies)
+                    {
+                        if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null)
+                        {
+                            break;
+                        }
                     }
                 }
-
-                if (typeToCreate == null && options.AnnotatedTypeAssemblies.Length == 0)
+                else
                 {
                     typeToCreate = AppDomain.CurrentDomain
                         .GetAssemblies()
@@ -160,7 +163,7 @@ namespace Amazon.Ion.ObjectMapper
         public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory();
 
         public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
-        public string[] AnnotatedTypeAssemblies { get; init; } = new string[] {};
+        public IEnumerable<string> AnnotatedTypeAssemblies { get; init; }
 
         public readonly bool PermissiveMode;
         
