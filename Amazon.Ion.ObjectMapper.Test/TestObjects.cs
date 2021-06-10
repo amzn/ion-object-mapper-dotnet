@@ -376,6 +376,36 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    public class Ruler
+    {
+        public int length { get; set; }
+        internal string unit;
+
+        [IonPropertyGetter("length")]
+        public int GetLength() 
+        {
+            return this.length + 10;
+        }
+
+        [IonPropertySetter("length")]
+        public void SetLength(int length) 
+        {
+            this.length = length - 10;
+        }
+        
+        [IonPropertyGetter("unit")]
+        public string GetUnit()
+        {
+            return this.unit == "cm" ? "centimeter" : this.unit;
+        }
+
+        [IonPropertySetter("unit")]
+        public void SetUnit(string unit)
+        {
+            this.unit = unit == "centimeter" ? "cm" : unit;
+        }
+    }
+
     public class Country
     {
         public string Name { get; init; }
