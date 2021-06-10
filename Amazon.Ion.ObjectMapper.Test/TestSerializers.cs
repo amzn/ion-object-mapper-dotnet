@@ -5,12 +5,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 {
     public class NegationBoolIonSerializer : IonSerializer<bool>
     {
-        public bool Deserialize(IIonReader reader)
+        public override bool Deserialize(IIonReader reader)
         {
             return !reader.BoolValue();
         }
 
-        public void Serialize(IIonWriter writer, bool item)
+        public override void Serialize(IIonWriter writer, bool item)
         {
             writer.WriteBool(!item);
         }
@@ -18,25 +18,25 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class ZeroByteArrayIonSerializer : IonSerializer<byte[]>
     {
-        public byte[] Deserialize(IIonReader reader)
+        public override byte[] Deserialize(IIonReader reader)
         {
             return new byte[reader.GetLobByteSize()];
         }
 
-        public void Serialize(IIonWriter writer, byte[] item)
+        public override void Serialize(IIonWriter writer, byte[] item)
         {
             writer.WriteBlob(new byte[item.Length]);
         }
     }
 
     public class UpperCaseStringIonSerializer : IonSerializer<string>
-        {
-        public string Deserialize(IIonReader reader)
+    {
+        public override string Deserialize(IIonReader reader)
         {
             return reader.StringValue().ToUpper();
         }
 
-        public void Serialize(IIonWriter writer, string item)
+        public override void Serialize(IIonWriter writer, string item)
         {
             writer.WriteString(item.ToUpper());
         }
@@ -44,12 +44,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NegativeIntIonSerializer : IonSerializer<int>
     {
-        public int Deserialize(IIonReader reader)
+        public override int Deserialize(IIonReader reader)
         {
             return -reader.IntValue();
         }
 
-        public void Serialize(IIonWriter writer, int item)
+        public override void Serialize(IIonWriter writer, int item)
         {
             writer.WriteInt(-item);
         }
@@ -57,12 +57,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NegativeLongIonSerializer : IonSerializer<long>
     {
-        public long Deserialize(IIonReader reader)
+        public override long Deserialize(IIonReader reader)
         {
             return -reader.LongValue();
         }
 
-        public void Serialize(IIonWriter writer, long item)
+        public override void Serialize(IIonWriter writer, long item)
         {
             writer.WriteInt(-item);
         }
@@ -70,12 +70,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NegativeFloatIonSerializer : IonSerializer<float>
     {
-        public float Deserialize(IIonReader reader)
+        public override float Deserialize(IIonReader reader)
         {
             return -Convert.ToSingle(reader.DoubleValue());
         }
 
-        public void Serialize(IIonWriter writer, float item)
+        public override void Serialize(IIonWriter writer, float item)
         {
             writer.WriteFloat(-item);
         }
@@ -83,12 +83,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NegativeDoubleIonSerializer : IonSerializer<double>
     {
-        public double Deserialize(IIonReader reader)
+        public override double Deserialize(IIonReader reader)
         {
             return -reader.DoubleValue();
         }
 
-        public void Serialize(IIonWriter writer, double item)
+        public override void Serialize(IIonWriter writer, double item)
         {
             writer.WriteFloat(-item);
         }
@@ -96,12 +96,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NegativeDecimalIonSerializer : IonSerializer<decimal>
     {
-        public decimal Deserialize(IIonReader reader)
+        public override decimal Deserialize(IIonReader reader)
         {
             return -reader.DecimalValue().ToDecimal();
         }
 
-        public void Serialize(IIonWriter writer, decimal item)
+        public override void Serialize(IIonWriter writer, decimal item)
         {
             writer.WriteDecimal(-item);
         }
@@ -109,12 +109,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NegativeBigDecimalIonSerializer : IonSerializer<BigDecimal>
     {
-        public BigDecimal Deserialize(IIonReader reader)
+        public override BigDecimal Deserialize(IIonReader reader)
         {
             return -reader.DecimalValue();
         }
 
-        public void Serialize(IIonWriter writer, BigDecimal item)
+        public override void Serialize(IIonWriter writer, BigDecimal item)
         {
             writer.WriteDecimal(-item);
         }
@@ -122,13 +122,13 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class UpperCaseSymbolIonSerializer : IonSerializer<SymbolToken>
     {
-        public SymbolToken Deserialize(IIonReader reader)
+        public override SymbolToken Deserialize(IIonReader reader)
         {
             var token = reader.SymbolValue();
             return new SymbolToken(token.Text.ToUpper(), token.Sid);
         }
 
-        public void Serialize(IIonWriter writer, SymbolToken item)
+        public override void Serialize(IIonWriter writer, SymbolToken item)
         {
             var token = new SymbolToken(item.Text.ToUpper(), item.Sid);
             writer.WriteSymbolToken(token);
@@ -137,12 +137,12 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class NextDayDateTimeIonSerializer : IonSerializer<DateTime>
     {
-        public DateTime Deserialize(IIonReader reader)
+        public override DateTime Deserialize(IIonReader reader)
         {
             return reader.TimestampValue().DateTimeValue.AddDays(1);
         }
 
-        public void Serialize(IIonWriter writer, DateTime item)
+        public override void Serialize(IIonWriter writer, DateTime item)
         {
             writer.WriteTimestamp(new Timestamp(item.AddDays(1)));
         }
@@ -150,13 +150,13 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class ZeroGuidIonSerializer : IonSerializer<Guid>
     {
-        public Guid Deserialize(IIonReader reader)
+        public override Guid Deserialize(IIonReader reader)
         {
             byte[] blob = new byte[reader.GetLobByteSize()];
             return new Guid(blob);
         }
 
-        public void Serialize(IIonWriter writer, Guid item)
+        public override void Serialize(IIonWriter writer, Guid item)
         {
             writer.WriteBlob(new byte[item.ToByteArray().Length]);
         }
