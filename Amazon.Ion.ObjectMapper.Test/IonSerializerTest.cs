@@ -36,5 +36,27 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             Check(new int[] { 1, 1, 2, 3, 5, 8, 11 });
         }
+
+        // This currently fails due to default annotation behavior. Passes when PR #17 is merged
+        // [TestMethod]
+        public void AnnotatedIonSerializer()
+        {
+            var annotatedIonSerializer = new Dictionary<string, IIonSerializer>();
+            var annotatedIonDeserializer = new Dictionary<string, IIonSerializer>();
+            annotatedIonSerializer.Add("OEM.Manufacturer", new SupraManufacturerSerializer());
+            annotatedIonDeserializer.Add("OEM.Manufacturer", new SupraManufacturerDeserializer());
+
+            var customizedSerializer = new IonSerializer(new IonSerializationOptions { AnnotatedIonSerializers = annotatedIonSerializer });
+            var customizedDeserializer = new IonSerializer(new IonSerializationOptions { AnnotatedIonSerializers = annotatedIonDeserializer });
+
+            var stream = customizedSerializer.Serialize(TestObjects.a90);
+            var defaultStream = customizedDeserializer.Serialize(TestObjects.a90);
+
+            var outputCustomSerialize = customizedSerializer.Deserialize<Supra>(stream);
+            var outputCustomDeserialize = customizedDeserializer.Deserialize<Supra>(defaultStream);
+
+            Assert.AreEqual("BMW", outputCustomSerialize.Brand);
+            Assert.AreEqual("BMW", outputCustomDeserialize.Brand);
+        }
     }
 }

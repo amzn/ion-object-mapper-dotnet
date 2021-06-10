@@ -63,7 +63,13 @@ namespace Amazon.Ion.ObjectMapper.Test
             return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
-    
+
+    public class Supra : Vehicle
+    {
+        [IonAnnotateType(Name = "Manufacturer", Prefix = "OEM")]
+        public string Brand { get; set; } = "Toyota";
+    }
+
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
     {
@@ -141,6 +147,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
+
+        public static Supra a90 = new Supra();
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 
