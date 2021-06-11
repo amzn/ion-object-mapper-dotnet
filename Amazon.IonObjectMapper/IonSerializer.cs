@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
-using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
+using static Amazon.IonObjectMapper.IonSerializationFormat;
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     public interface IIonSerializer
     {

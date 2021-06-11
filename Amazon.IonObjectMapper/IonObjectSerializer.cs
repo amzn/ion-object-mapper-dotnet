@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Amazon.IonDotnet;
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {

@@ -1,6 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
     [TestClass]
     public class NamingConventionTest

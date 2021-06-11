@@ -5,7 +5,7 @@ using System.Linq;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     public interface TypeAnnotationPrefix
     {
