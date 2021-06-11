@@ -304,10 +304,51 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Wheel
     {
-        [IonConstructor]
-        public Wheel([IonPropertyName("specification")] string specification)
-        {
+        public string Specification { get; init; }
+        public int Size { get; init; }
+        
+        public string Brand { get; init; }
 
+        [IonField]
+        internal string color;
+
+        public Wheel(string specification, int size, string brand, string color)
+        {
+            this.Specification = specification;
+            this.Size = size;
+            this.Brand = brand;
+            this.color = color;
+        }
+
+        [IonConstructor]
+        private Wheel(
+            [IonPropertyName("specification")] string specification,
+            [IonPropertyName("size")] int size)
+        {
+            this.Specification = $"Specification: {specification}, Size: {size} inches";
+            this.Size = size;
+        }
+    }
+
+    public class Tire
+    {
+        public string specification { get; init; }
+        public int size { get; init; }
+
+        [IonConstructor]
+        public Tire(string specification, int size)
+        {
+            this.specification = specification;
+            this.size = size;
+        }
+
+        [IonConstructor]
+        private Tire(
+            [IonPropertyName("size")] int size,
+            [IonPropertyName("specification")] string specification)
+        {
+            this.specification = $"Specification: {specification}, Size: {size} inches";
+            this.size = size;
         }
     }
 
