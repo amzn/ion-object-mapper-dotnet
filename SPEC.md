@@ -268,7 +268,7 @@ public class Car
 
 ### Methods
 
-By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name.
+By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name. In the event of a naming conflict between the specified annotated Ion property name and a property or field name of the class, the annotated Ion property name will get precedence over the class's property or field name during serialization and deserialization.
 
 ```c#
 public class Car
