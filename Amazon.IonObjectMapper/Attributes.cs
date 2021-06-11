@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     public class IonIgnore : Attribute
     {

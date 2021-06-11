@@ -1,4 +1,4 @@
-namespace Amazon.Ion.ObjectMapper
+﻿namespace Amazon.IonObjectMapper
 {
     public interface IonPropertyNamingConvention
     {

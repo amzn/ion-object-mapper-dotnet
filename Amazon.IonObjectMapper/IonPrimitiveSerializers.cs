@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic; 
 using System.Numerics;
 using System.Text;
 using Amazon.IonDotnet;
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     public class IonNullSerializer : IonSerializer<object>
     {
