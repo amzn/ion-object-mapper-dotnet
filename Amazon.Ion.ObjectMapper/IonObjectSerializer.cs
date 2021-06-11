@@ -52,6 +52,11 @@ namespace Amazon.Ion.ObjectMapper
                     }
 
                     var deserialized = ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
+                    if (options.IgnoreDefaults && deserialized == default)
+                    {
+                        continue;
+                    }
+
                     method.Invoke(targetObject, new[]{ deserialized });
                 }
                 // Check if current Ion field is a .NET property.
@@ -112,8 +117,17 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                writer.SetFieldName(getMethod.IonPropertyName);
                 var getValue = method.Invoke(item, Array.Empty<object>());
+                if (options.IgnoreNulls && getValue == null)
+                {
+                    continue;
+                }
+                if (options.IgnoreDefaults && getValue == default)
+                {
+                    continue;
+                }
+                
+                writer.SetFieldName(getMethod.IonPropertyName);
                 ionSerializer.Serialize(writer, getValue);
                 
                 serializedWithGetter.Add(getMethod.IonPropertyName);
