@@ -39,7 +39,7 @@ namespace Amazon.Ion.ObjectMapper
                 if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
                     // A setter should be a void method.
-                    if (method.ReturnParameter == null || method.ReturnParameter.ParameterType != typeof(void))
+                    if (method.ReturnParameter?.ParameterType != typeof(void))
                     {
                         continue;
                     }
