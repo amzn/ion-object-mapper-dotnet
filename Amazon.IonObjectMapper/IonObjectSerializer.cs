@@ -25,6 +25,19 @@ namespace Amazon.IonObjectMapper
 
         public override object Deserialize(IIonReader reader)
         {
+            var ionConstructors = targetType.GetConstructors(BINDINGS).Where(IsIonConstructor);
+            if (ionConstructors.Any())
+            {
+                if (ionConstructors.Count() > 1)
+                {
+                    throw new NotSupportedException(
+                        $"More than one constructor in class {targetType.Name} " +
+                        "is annotated with the [IonConstructor] attribute");
+                }
+
+                return this.DeserializeWithIonConstructor(ionConstructors.First(), reader);
+            }
+
             var targetObject = options.ObjectFactory.Create(options, reader, targetType);
             reader.StepIn();
 
@@ -54,37 +67,20 @@ namespace Amazon.IonObjectMapper
                 // Check if current Ion field is a .NET property.
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
-                    if (IsReadOnlyProperty(property))
+                    var deserialized = new object();
+                    if (this.DeserializeProperty(property, reader, ionType, ref deserialized))
                     {
-                        // property.SetValue() does not work with a readonly property.
-                        // logic for handling deserializing readonly properties happens during field processing
-                        // when we detect backing fields for the property.
-                        continue;
+                        property.SetValue(targetObject, deserialized);
                     }
-
-                    var deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-                    if (options.IgnoreDefaults && deserialized == default)
-                    {
-                        continue;
-                    }
-
-                    property.SetValue(targetObject, deserialized);
                 }
                 // Check if current Ion field is a .NET field.
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
-                    var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
-                    
-                    if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+                    var deserialized = new object();
+                    if (this.DeserializeField(field, reader, ionType, ref deserialized))
                     {
-                        continue;
+                        field.SetValue(targetObject, deserialized);
                     }
-                    if (options.IgnoreDefaults && deserialized == default)
-                    {
-                        continue;
-                    }
-
-                    field.SetValue(targetObject, deserialized);
                 }
             }
             reader.StepOut();
@@ -175,6 +171,118 @@ namespace Amazon.IonObjectMapper
             writer.StepOut();
         }
 
+        private bool DeserializeProperty(PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
+        {
+            if (IsReadOnlyProperty(property))
+            {
+                // property.SetValue() does not work with a readonly property.
+                // logic for handling deserializing readonly properties happens during field processing
+                // when we detect backing fields for the property.
+                return false;
+            }
+
+            deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
+            if (options.IgnoreDefaults && deserialized == default)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        
+        private bool DeserializeField(FieldInfo field, IIonReader reader, IonType ionType, ref object deserialized)
+        {
+            deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
+            
+            if (options.IgnoreReadOnlyFields && field.IsInitOnly)
+            {
+                return false;
+            }
+            
+            if (options.IgnoreDefaults && deserialized == default)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private object DeserializeWithIonConstructor(ConstructorInfo ionConstructor, IIonReader reader)
+        {
+            var parameters = ionConstructor.GetParameters();
+
+            // Compute mapping between parameter names and index in parameter array so we can figure out the
+            // correct order of the constructor arguments.
+            var paramIndexMap = new Dictionary<string, int>();
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var ionPropertyName = (IonPropertyName) parameters[i].GetCustomAttribute(typeof(IonPropertyName));
+                if (ionPropertyName == null)
+                {
+                    throw new NotSupportedException(
+                        $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
+                        $"for {targetType.Name}'s IonConstructor. All constructor arguments must be annotated " +
+                        "so we know which parameters to set at construction time.");
+                }
+
+                paramIndexMap.Add(ionPropertyName.Name, i);
+            }
+
+            reader.StepIn();
+
+            // Deserialize Ion and organize deserialized results into three categories:
+            // 1. Values to be passed into the Ion constructor.
+            // 2. Properties to be set after construction.
+            // 3. Fields to be set after construction.
+            var constructorArgs = new object[parameters.Length];
+            var remainingProperties = new List<(PropertyInfo, object)>();
+            var remainingFields = new List<(FieldInfo, object)>();
+            IonType ionType;
+            while ((ionType = reader.MoveNext()) != IonType.None)
+            {
+                PropertyInfo property;
+                FieldInfo field;
+                if (paramIndexMap.ContainsKey(reader.CurrentFieldName))
+                {
+                    var index = paramIndexMap[reader.CurrentFieldName];
+                    var deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                    constructorArgs[index] = deserialized;
+                }
+                else if ((property = FindProperty(reader.CurrentFieldName)) != null)
+                {
+                    var deserialized = new object();
+                    if (this.DeserializeProperty(property, reader, ionType, ref deserialized))
+                    {
+                        remainingProperties.Add((property, deserialized));
+                    }
+                }
+                else if ((field = FindField(reader.CurrentFieldName)) != null)
+                {
+                    var deserialized = new object();
+                    if (this.DeserializeField(field, reader, ionType, ref deserialized))
+                    {
+                        remainingFields.Add((field, deserialized));
+                    }
+                }
+            }
+
+            reader.StepOut();
+
+            var targetObject = ionConstructor.Invoke(constructorArgs);
+
+            // Set remaining properties/fields after construction.
+            foreach (var (property, deserialized) in remainingProperties)
+            {
+                property.SetValue(targetObject, deserialized);
+            }
+            foreach (var (field, deserialized) in remainingFields)
+            {
+                field.SetValue(targetObject, deserialized);
+            }
+
+            return targetObject;
+        }
+
         private IEnumerable<(MethodInfo, string)> GetGetters()
         {
             var getters = new List<(MethodInfo, string)>();
@@ -263,6 +371,11 @@ namespace Amazon.IonObjectMapper
                 }
                 return false;
             });
+        }
+
+        private static bool IsIonConstructor(ConstructorInfo constructor)
+        {
+            return constructor.GetCustomAttribute(typeof(IonConstructor)) != null;
         }
 
         private static bool IsIonField(FieldInfo field)
