@@ -136,9 +136,10 @@ namespace Amazon.Ion.ObjectMapper
             // Serialize any properties that satisfy the options/attributes.
             foreach (var property in targetType.GetProperties())
             {
-                if (serializedViaMethod.Contains(property.Name))
+                var ionPropertyName = IonFieldNameFromProperty(property);
+                if (serializedViaMethod.Contains(ionPropertyName))
                 {
-                    // This property name was already serialized using an annotated method.
+                    // This Ion property name was already serialized using an annotated method.
                     continue;
                 }
                 
@@ -162,16 +163,17 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                writer.SetFieldName(IonFieldNameFromProperty(property));
+                writer.SetFieldName(ionPropertyName);
                 ionSerializer.Serialize(writer, propertyValue);
             }
 
             // Serialize any fields that satisfy the options/attributes.
             foreach (var field in Fields())
             {
-                if (serializedViaMethod.Contains(field.Name))
+                var ionFieldName = GetFieldName(field);
+                if (serializedViaMethod.Contains(ionFieldName))
                 {
-                    // This field name was already serialized using an annotated method.
+                    // This Ion field name was already serialized using an annotated method.
                     continue;
                 }
                 
@@ -190,7 +192,7 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                writer.SetFieldName(GetFieldName(field));
+                writer.SetFieldName(ionFieldName);
                 ionSerializer.Serialize(writer, fieldValue);
             }
 
