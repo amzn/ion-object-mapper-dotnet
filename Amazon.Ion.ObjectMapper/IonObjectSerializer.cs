@@ -104,7 +104,7 @@ namespace Amazon.Ion.ObjectMapper
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
 
-            var serializedWithGetter = new List<string>();
+            var serializedViaMethod = new HashSet<string>();
             
             // Serialize the values returned from IonPropertyGetter annotated getter methods.
             foreach (var method in targetType.GetMethods())
@@ -130,15 +130,15 @@ namespace Amazon.Ion.ObjectMapper
                 writer.SetFieldName(getMethod.IonPropertyName);
                 ionSerializer.Serialize(writer, getValue);
                 
-                serializedWithGetter.Add(getMethod.IonPropertyName);
+                serializedViaMethod.Add(getMethod.IonPropertyName);
             }
 
             // Serialize any properties that satisfy the options/attributes.
             foreach (var property in targetType.GetProperties())
             {
-                if (serializedWithGetter.Contains(property.Name))
+                if (serializedViaMethod.Contains(property.Name))
                 {
-                    // This property was already serialized using a getter method.
+                    // This property name was already serialized using an annotated method.
                     continue;
                 }
                 
@@ -169,9 +169,9 @@ namespace Amazon.Ion.ObjectMapper
             // Serialize any fields that satisfy the options/attributes.
             foreach (var field in Fields())
             {
-                if (serializedWithGetter.Contains(field.Name))
+                if (serializedViaMethod.Contains(field.Name))
                 {
-                    // This field was already serialized using a getter method.
+                    // This field name was already serialized using an annotated method.
                     continue;
                 }
                 
