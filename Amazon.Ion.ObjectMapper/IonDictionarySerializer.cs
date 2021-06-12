@@ -17,7 +17,6 @@ namespace Amazon.Ion.ObjectMapper
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Reflection;
 
     public class IonDictionarySerializer : IonSerializer<IDictionary>
     {
@@ -52,22 +51,15 @@ namespace Amazon.Ion.ObjectMapper
             reader.StepIn();
 
             Type typedDictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), this.valueType);
-            MethodInfo methodInfo = typedDictionaryType.GetMethod("Add");
-            var dictionary = Activator.CreateInstance(typedDictionaryType);
+            var dictionary = (IDictionary)Activator.CreateInstance(typedDictionaryType);
             IonType currentType;
             while ((currentType = reader.MoveNext()) != IonType.None)
             {
-                object[] parameters = new object[] 
-                { 
-                    reader.CurrentFieldName, 
-                    Convert.ChangeType(this.serializer.Deserialize(reader, valueType, currentType), valueType) 
-                };
-                methodInfo.Invoke(dictionary, parameters);
-
+                dictionary.Add(reader.CurrentFieldName, this.serializer.Deserialize(reader, valueType, currentType));
             }
 
             reader.StepOut();
-            return (IDictionary)dictionary;
+            return dictionary;
         }
 
         /// <summary>
