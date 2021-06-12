@@ -31,8 +31,8 @@ namespace Amazon.IonObjectMapper
                 if (ionConstructors.Count() > 1)
                 {
                     throw new NotSupportedException(
-                        $"More than one constructor in class {targetType.Name} " +
-                        "is annotated with the [IonConstructor] attribute");
+                        $"Only one constructor in class {targetType.Name} may be annotated " +
+                        "with the [IonConstructor] attribute and more than one was detected");
                 }
 
                 return this.DeserializeWithIonConstructor(ionConstructors.First(), reader);
