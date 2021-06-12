@@ -173,6 +173,8 @@ namespace Amazon.IonObjectMapper
 
         private bool TryDeserializeProperty(PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
         {
+            deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
+            
             if (IsReadOnlyProperty(property))
             {
                 // property.SetValue() does not work with a readonly property.
@@ -180,8 +182,6 @@ namespace Amazon.IonObjectMapper
                 // when we detect backing fields for the property.
                 return false;
             }
-
-            deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
 
             return !options.IgnoreDefaults || deserialized != default;
         }
