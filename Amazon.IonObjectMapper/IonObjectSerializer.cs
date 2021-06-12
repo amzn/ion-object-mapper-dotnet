@@ -182,12 +182,8 @@ namespace Amazon.IonObjectMapper
             }
 
             deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-            if (options.IgnoreDefaults && deserialized == default)
-            {
-                return false;
-            }
 
-            return true;
+            return !options.IgnoreDefaults || deserialized != default;
         }
         
         private bool TryDeserializeField(FieldInfo field, IIonReader reader, IonType ionType, ref object deserialized)
@@ -198,13 +194,8 @@ namespace Amazon.IonObjectMapper
             {
                 return false;
             }
-            
-            if (options.IgnoreDefaults && deserialized == default)
-            {
-                return false;
-            }
 
-            return true;
+            return !options.IgnoreDefaults || deserialized != default;
         }
 
         private object DeserializeWithIonConstructor(ConstructorInfo ionConstructor, IIonReader reader)
