@@ -1,22 +1,52 @@
-﻿using Amazon.IonDotnet;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+﻿/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.Ion.ObjectMapper
 {
+    using Amazon.IonDotnet;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Reflection;
+
     public class IonDictionarySerializer : IonSerializer<IDictionary>
     {
-        private IonSerializer serializer;
-        private Type valueType;
+        private readonly IonSerializer serializer;
+        private readonly Type valueType;
 
+        /// <summary>
+        /// Initializes a new instance of an <see cref="IonDictionarySerializer"/>.
+        /// </summary>
+        ///
+        /// <param name="ionSerializer">
+        /// The Ion serializer to use for serializing and deserializing the values of the IDictionary.
+        /// </param>
+        /// <param name="valueType">
+        /// The Type of the Value of the IDictionary.
+        /// </param>
         public IonDictionarySerializer(IonSerializer ionSerializer, Type valueType)
         {
             this.serializer = ionSerializer;
             this.valueType = valueType;
         }
 
+        /// <summary>
+        /// Deserialize an Ion Struct into an IDictionary.
+        /// </summary>
+        /// 
+        /// <returns>
+        /// A Dictionary of Key Type string and Value Type valueType.
+        /// </returns>
         public override IDictionary Deserialize(IIonReader reader)
         {
             reader.StepIn();
@@ -27,9 +57,11 @@ namespace Amazon.Ion.ObjectMapper
             IonType currentType;
             while ((currentType = reader.MoveNext()) != IonType.None)
             {
-                object[] parameters = new object[] { 
+                object[] parameters = new object[] 
+                { 
                     reader.CurrentFieldName, 
-                    Convert.ChangeType(this.serializer.Deserialize(reader, valueType, currentType), valueType) };
+                    Convert.ChangeType(this.serializer.Deserialize(reader, valueType, currentType), valueType) 
+                };
                 methodInfo.Invoke(dictionary, parameters);
 
             }
@@ -38,10 +70,22 @@ namespace Amazon.Ion.ObjectMapper
             return (IDictionary)dictionary;
         }
 
+        /// <summary>
+        /// Serializes an IDictionary into an Ion Struct where the Key is the struct field name
+        /// and the Value is the struct field value.
+        /// </summary>
+        /// 
+        /// <param name="writer">
+        /// The IIonWriter to use to write the Ion Struct.
+        /// </param>
+        /// <param name="item">
+        /// The IDictionary to serialize into an Ion Struct.
+        /// </param>
         public override void Serialize(IIonWriter writer, IDictionary item)
         {
             writer.StepIn(IonType.Struct);
-            foreach (DictionaryEntry nameValuePair in item) {
+            foreach (DictionaryEntry nameValuePair in item) 
+            {
                 writer.SetFieldName((string)nameValuePair.Key);
                 this.serializer.Serialize(writer, nameValuePair.Value);
             }

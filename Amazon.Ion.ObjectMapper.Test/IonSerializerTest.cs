@@ -36,5 +36,16 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             Check(new int[] { 1, 1, 2, 3, 5, 8, 11 });
         }
+
+        [TestMethod]
+        public void SerializesAndDeserializesDictionaries()
+        {
+            var dictionary = new TestDictionary();
+            dictionary.Add("one", 1);
+            dictionary.Add("two", 2);
+            dictionary.Add("three", 3);
+            Assert.AreEqual(TestDictionary.PrettyString(dictionary), 
+                TestDictionary.PrettyString(Serde<Dictionary<string, int>>(dictionary)));
+        }
     }
 }

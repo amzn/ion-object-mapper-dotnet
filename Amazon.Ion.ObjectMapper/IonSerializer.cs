@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Amazon.IonDotnet;
 using Amazon.IonDotnet.Builders;
 using static Amazon.Ion.ObjectMapper.IonSerializationFormat;
@@ -283,17 +282,19 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
-            if (item.GetType().GetInterfaces().Any(t => t.GetGenericTypeDefinition().IsAssignableTo(typeof(IDictionary<,>))))
+            Type genericDictionaryType = item.GetType().GetInterfaces().FirstOrDefault(t => t.GetGenericTypeDefinition().IsAssignableTo(typeof(IDictionary<,>)));
+            if (genericDictionaryType != null)
             {
-                var genericArguments = item.GetType().GetGenericArguments();
-                if (!genericArguments[0].IsAssignableTo(typeof(string)))
-                {
-                    throw new NotSupportedException("Can not serialize IDictionary when key is not of type string");
-                }
-                else
+                var genericArguments = genericDictionaryType.GetGenericArguments();
+
+                if (genericArguments[0].IsAssignableTo(typeof(string)))
                 {
                     new IonDictionarySerializer(this, genericArguments[1]).Serialize(writer, (IDictionary)item);
                     return;
+                }
+                else
+                {
+                    throw new NotSupportedException("Can not serialize IDictionary when key is not of type string");
                 }
             }
 
