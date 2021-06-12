@@ -68,7 +68,7 @@ namespace Amazon.IonObjectMapper
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = new object();
-                    if (this.DeserializeProperty(property, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeProperty(property, reader, ionType, ref deserialized))
                     {
                         property.SetValue(targetObject, deserialized);
                     }
@@ -77,7 +77,7 @@ namespace Amazon.IonObjectMapper
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = new object();
-                    if (this.DeserializeField(field, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeField(field, reader, ionType, ref deserialized))
                     {
                         field.SetValue(targetObject, deserialized);
                     }
@@ -171,7 +171,7 @@ namespace Amazon.IonObjectMapper
             writer.StepOut();
         }
 
-        private bool DeserializeProperty(PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
+        private bool TryDeserializeProperty(PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
         {
             if (IsReadOnlyProperty(property))
             {
@@ -190,7 +190,7 @@ namespace Amazon.IonObjectMapper
             return true;
         }
         
-        private bool DeserializeField(FieldInfo field, IIonReader reader, IonType ionType, ref object deserialized)
+        private bool TryDeserializeField(FieldInfo field, IIonReader reader, IonType ionType, ref object deserialized)
         {
             deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
             
@@ -251,7 +251,7 @@ namespace Amazon.IonObjectMapper
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = new object();
-                    if (this.DeserializeProperty(property, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeProperty(property, reader, ionType, ref deserialized))
                     {
                         remainingProperties.Add((property, deserialized));
                     }
@@ -259,7 +259,7 @@ namespace Amazon.IonObjectMapper
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = new object();
-                    if (this.DeserializeField(field, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeField(field, reader, ionType, ref deserialized))
                     {
                         remainingFields.Add((field, deserialized));
                     }
