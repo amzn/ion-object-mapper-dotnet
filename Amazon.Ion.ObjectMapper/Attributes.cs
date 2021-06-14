@@ -18,13 +18,23 @@ namespace Amazon.Ion.ObjectMapper
         public bool ExcludeDescendants { get; init; }
     }
 
+    /// <summary>
+    /// Attribute to identify a custom Ion Serializer to be used to serialize
+    /// and deserialize instances of the class annotated with this attribute.
+    /// </summary>
     public class IonSerializerAttribute : Attribute
     {
+        /// <summary>
+        /// IonSerializerAttribute constructor.
+        /// </summary>
         public IonSerializerAttribute(Type serializerType)
         {
             SerializerType = serializerType;
         }
 
+        /// <summary>
+        /// The type of the custom Ion Serializer.
+        /// </summary>
         public Type SerializerType { get; }
     }
 
