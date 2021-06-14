@@ -106,7 +106,7 @@ namespace Amazon.Ion.ObjectMapper
             if (customObjectSerializer != null)
             {
                 writer.StepIn(IonType.Struct);
-                Utils.Serialize(targetType, customObjectSerializer, writer, item);
+                customObjectSerializer.Serialize(writer, item);
                 writer.StepOut();
                 return;
             }
@@ -329,22 +329,16 @@ namespace Amazon.Ion.ObjectMapper
             return field.Name;
         }
 
-        private dynamic GetCustomObjectSerializer()
+        private IIonSerializer GetCustomObjectSerializer()
         {
-            var serializerAttribute = 
+            var serializerAttribute =
                 (IonSerializerAttribute)targetType.GetCustomAttribute(typeof(IonSerializerAttribute));
             if (serializerAttribute == null)
             {
                 return null;
             }
 
-            var customObjectSerializer = Activator.CreateInstance(serializerAttribute.SerializerType);
-            if (!Utils.IsSerializerValid(targetType, customObjectSerializer))
-            {
-                throw new NotSupportedException(
-                    $"The class {targetType}'s [IonSerializer] annotated serializer is invalid");
-            }
-            return customObjectSerializer;
+            return (IIonSerializer)Activator.CreateInstance(serializerAttribute.SerializerType);
         }
     }
 }
