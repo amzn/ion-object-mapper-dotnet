@@ -48,8 +48,21 @@ namespace Amazon.Ion.ObjectMapper
                     {
                         continue;
                     }
-
-                    property.SetValue(targetObject, deserialized);
+                    try
+                    {
+                        property.SetValue(targetObject, deserialized);
+                    }
+                    catch (ArgumentException)
+                    {
+                        if (options.PermissiveMode)
+                        {
+                            property.SetValue(targetObject, Activator.CreateInstance(property.PropertyType));
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                 }
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {

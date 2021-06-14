@@ -486,5 +486,18 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
             Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void DeserializeObjectWithMismatchTypePropertyAndPermissiveModeOff()
+        {
+            CheckPermissiveMode(TestObjects.JohnGreenwood, false, new StudentWithIntFirstName(0, "Greenwood", "Physics"));
+        }
+
+        [TestMethod]
+        public void DeserializeObjectWithMismatchTypePropertyAndPermissiveModeOn()
+        {
+            CheckPermissiveMode(TestObjects.JohnGreenwood, true, new StudentWithIntFirstName(0, "Greenwood", "Physics"));
+        }
     }
 }

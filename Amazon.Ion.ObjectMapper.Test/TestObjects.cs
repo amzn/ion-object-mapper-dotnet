@@ -369,6 +369,32 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    public class StudentWithIntFirstName
+    {
+        public int FirstName { get; init; }
+        public string LastName { get; init; }
+        public string Major { get; }
+
+        public StudentWithIntFirstName()
+        {
+            this.FirstName = default;
+            this.LastName = default;
+            this.Major = default;
+        }
+
+        public StudentWithIntFirstName(int firstName, string lastName, string major)
+        {
+            this.FirstName = firstName;
+            this.LastName = lastName;
+            this.Major = major;
+        }
+
+        public override string ToString()
+        {
+            return $"<Student>{{ FirstName: {FirstName}, LastName: {LastName}, Major: {Major} }}";
+        }
+    }
+
     public class Country
     {
         public string Name { get; init; }
