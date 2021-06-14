@@ -526,7 +526,7 @@ namespace Amazon.Ion.ObjectMapper.Test
     {
         public MyIonDogSerializer() {}
         
-        public Dog Deserialize(IIonReader reader)
+        public override Dog Deserialize(IIonReader reader)
         {
             string name = default;
             string gender = default;
@@ -551,7 +551,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             return new Dog(name, gender, breed);
         }
 
-        public void Serialize(IIonWriter writer, Dog item)
+        public override void Serialize(IIonWriter writer, Dog item)
         {
             if (item.Name != null)
             {
