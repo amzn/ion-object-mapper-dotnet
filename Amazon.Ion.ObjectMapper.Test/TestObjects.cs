@@ -498,29 +498,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.Breed = breed;
         }
     }
-    
-    // For testing invalid custom object serializer
-    [IonSerializer(typeof(MyIonDogSerializer))]
-    public class Cat
-    {
-        public string Name { get; init; }
-        public string Gender { get; init; }
-        public string Breed { get; init; }
-
-        public Cat()
-        {
-            this.Name = default;
-            this.Gender = default;
-            this.Breed = default;
-        }
-
-        public Cat(string name, string gender, string breed)
-        {
-            this.Name = name;
-            this.Gender = gender;
-            this.Breed = breed;
-        }
-    }
 
     public class MyIonDogSerializer : IonSerializer<Dog>
     {
