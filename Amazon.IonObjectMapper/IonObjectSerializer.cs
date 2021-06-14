@@ -25,7 +25,7 @@ namespace Amazon.IonObjectMapper
 
         public override object Deserialize(IIonReader reader)
         {
-            var ionConstructors = targetType.GetConstructors(BINDINGS).Where(IsIonConstructor);
+            var ionConstructors = targetType.GetConstructors(BINDINGS).Where(IsIonConstructor).Take(2);
             if (ionConstructors.Any())
             {
                 if (ionConstructors.Count() > 1)
