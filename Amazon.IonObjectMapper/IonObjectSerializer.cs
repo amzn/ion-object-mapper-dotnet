@@ -171,8 +171,12 @@ namespace Amazon.IonObjectMapper
             writer.StepOut();
         }
 
-        private bool TryDeserializeProperty(PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
+        // Deserialize the given property and return bool to indicate whether the deserialized result should be used.
+        private bool TryDeserializeProperty(
+            PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
         {
+            // We deserialize whether or not we ultimately use the result because values
+            // for some Ion types need to be consumed in order to advance the reader.
             deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
             
             if (IsReadOnlyProperty(property))
@@ -186,8 +190,11 @@ namespace Amazon.IonObjectMapper
             return !options.IgnoreDefaults || deserialized != default;
         }
         
+        // Deserialize the given field and return bool to indicate whether the deserialized result should be used.
         private bool TryDeserializeField(FieldInfo field, IIonReader reader, IonType ionType, ref object deserialized)
         {
+            // We deserialize whether or not we ultimately use the result because values
+            // for some Ion types need to be consumed in order to advance the reader.
             deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
             
             if (options.IgnoreReadOnlyFields && field.IsInitOnly)
