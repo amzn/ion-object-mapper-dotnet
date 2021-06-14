@@ -266,14 +266,17 @@ public class Car
 }
 ```
 
+If the specified property name conflicts with a field name of the same class, the property will get precedence over the field during serialiation and/or deserialization.
+
 ### Methods
 
-By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name.
+By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name. In the event of a naming conflict between the specified annotated Ion property name and a property or field name of the class (such as the below example), the annotated Ion property name will get precedence over the class's property or field name during serialization and/or deserialization.
 
 ```c#
 public class Car
 {
-     private string color;
+    [IonField]
+    private string color;
     
     [IonPropertyGetter("color")]
     public string GetColor() 
