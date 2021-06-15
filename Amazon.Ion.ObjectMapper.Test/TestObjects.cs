@@ -408,6 +408,19 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    public class Chalkboard
+    {
+        public int width { get; set; }
+        public int height { get; set; }
+
+        [IonPropertySetter("width")]
+        public void SetSize(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
     public class Country
     {
         public string Name { get; init; }

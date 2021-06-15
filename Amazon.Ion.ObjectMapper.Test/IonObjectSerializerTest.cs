@@ -172,6 +172,16 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void ExceptionOnMultiParameterIonPropertySetterMethods()
+        {
+            var serializer = new IonSerializer();
+            var chalkboard = new Chalkboard {width = 48, height = 36};
+
+            var stream = serializer.Serialize(chalkboard);
+            Assert.ThrowsException<NotSupportedException>(() => serializer.Deserialize<Chalkboard>(stream));
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
             Check(
