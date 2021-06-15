@@ -30,11 +30,9 @@ Execute("insert into myTable {JsonConvert(person).replace("\"", "'")}")
 
 ```
 
-Which is arguably still clumsy, possibly incorrect, and definitely dangerous in potentially causing SQL injection attacks.
+Which is arguably still clumsy, possibly incorrect, slow, and definitely dangerous in potentially causing SQL injection attacks.
 
-## Solution
-
-We will enhance the QLDB .NET Driver to allow for .NET objects to be passed to it, rather than `IIonValue`. We will provide standard and comprehensive mappings from objects to Ion and back, but if we miss a case, we will provide extension points allowing for complete control over the Ion serialization processing. This solution is influenced by the new [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json?view=net-5.0) namespace, therefore aligning ourselves with Microsoft’s vision for object serialization and providing developers with a least-surprise API.
+## We can do better
 
 Given a `Car` object defined as follows:
 
@@ -71,52 +69,84 @@ var hondaYears = driver.Execute(tx =>
 
 (The interaction with Linq for illustration purposes only. Obviously you would do the filtering and selection in the PartiQL statement itself).
 
-This leverages [Linq](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/) to operate on the resultant `IEnumerable` returned by the driver. With the `Query<Car>` method it leans on C# reification to deserialize the desired type from the database. By adding these two interfaces the inconvenience of converting to and from Ion can be completely avoided in the client code. 
+This leverages [Linq](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/) to operate on the resultant `IEnumerable` returned by the driver. With the `Select<Car>` method it leans on C# reification to deserialize the desired type from the database. By adding these two interfaces the inconvenience of converting to and from Ion can be completely avoided in the client code. 
 
-If finer grained control over the results is required, the `IQuery<ResultT>` object passed to `Execute` can be created in whatever way the client code wants conforming to this inteface:
+If finer grained control over the results is required, an alternate incantation is:
 
 ```c#
-public interface IQuery<T>
+Func<Stream, Car> myMappingFunc = stream => ... my custom mapping code ...
+IEnumerable<Car> cars = tx.Execute("select * from Car").Select(myMappingFunc);
+```
+
+Which allows for the user to pass in a custom mapping function (`Func<Stream , T>`) to interpret the raw Ion binary however they see fit.
+
+## Solution
+
+We will enhance the QLDB .NET Driver to allow for .NET objects to be passed to it, rather than `IIonValue`. We will provide standard and comprehensive mappings from objects to Ion and back, but if we miss a case, we will provide extension points allowing for complete control over the Ion serialization processing. This solution is influenced by the new [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json?view=net-5.0) namespace, therefore aligning ourselves with Microsoft’s vision for object serialization and providing developers with a least-surprise API.
+
+## QLDB Driver Updates
+
+To prevent further bloating of the `TransactionExecutor` interface and with a look to the future where Ion or JSON types might be possible to pass in, we will add the functionality to accept arbitrary objects as parameters to `Execute` as an extension method:
+
+```c#
+namespace Amazon.QLDB.Driver
 {
-    string Statement { get; }
-    ValueHolder[] Parameters { get; }
-    T Deserialize(ValueHolder ionValueHolder);
-}1
-```
-
-So long as the users `IQuery` provides a `Statement` `string`, can supply `Parameters` as `ValueHolder`s (which is a QLDB type which contains the raw Ion text or binary), and can convert from a result `ValueHolder` into a desired `T` representing the
-object to deserialize from the database, they can interpret the raw Ion binary however they see fit.
-
-To support this new `IQuery` interface, the following two methods will be added to the driver's `TransactionExecutor` class:
-
-```c#
-IResult<T> Execute<T>(IQuery<T> query)
-IQuery<T> Query<T>(string statement, params object[] parameters)
-```
-
-which allows for an `IQuery` to be created as well as executed against the current transaction.
-
-The most common usage would be to supply the Object Mapper described in this spec to the driver when the driver is built as follows:
-
-```c#
-var driver = QldbDriver.Builder()
-    .WithLedger("cars")
-    .WithSerializer(new ObjectSerializer())
-    .Build();
-```
-
-Where `ObjectSerializer` is an implementation of `ISerializer` which is defined as:
-
-```c#
-public interface ISerializer
-{
-    ValueHolder Serialize(object o);
-    T Deserialize<T>(ValueHolder s);
+    public static class ObjectMapperExtensions
+    {
+        public static IResult Execute(
+            this TransactionExecutor tx, 
+            string statement, 
+            params object[] parameters);
+    }
 }
 ```
 
-This simply converts from `object` to `ValueHolder` (which is just a simple object which contains Ion) and back. In the normal usage, the `transactionExecutor.Query<T>` method provides a way for the driver to supply the `ISerializer` given to the driver
-to each transaction statement. This means developers can easily use the default driver and default Object Mapper described here without coupling the Object Mapper to the Driver or vice versa. It also means developers can write their own if they wish.
+This permits the varargs usage of the driver as follows:
+
+```c#
+tx.Execute(
+    "insert into Car <<?, ?, ?>>>", 
+    new Car { Make = "Opel", Model = "Monza", Year = 1997 },
+    new Car { Make = "Opel", Model = "Astra", Year = 1998 },
+    new Car { Make = "Opel", Model = "Corsa", Year = 1999 }); 
+```
+
+Alternately, one can supply a `List` of `Car` and thus insert multiple objects:
+
+```c#
+tx.Execute(
+    "insert into Car ?", new List<Car> {
+         new Car { Make = "Opel", Model = "Monza", Year = 1997 },
+        new Car { Make = "Opel", Model = "Astra", Year = 1998 },
+        new Car { Make = "Opel", Model = "Corsa", Year = 1999 }}); 
+```
+
+For mapping query result data from the database, new methods are required on `IResult` as follows:
+
+```c#
+namespace Amazon.QLDB.Driver
+{
+    public interface IResult : IEnumerable<IIonValue>
+    {
+        /// <summary>
+        /// Returns an IEnumerable<R> where each element R is the result of mapping
+        /// that result's stream to the desired type.
+        /// </summary>
+         IEnumerable<R> Select<R>(Func<Stream, R> selector);
+         
+        /// <summary>
+        /// Supplies a default function which calls Select with a Func which 
+        /// deserializes a Stream of Ion data into the desired type R.
+        /// </summary>
+        IEnumerable<R> Select<R>()
+        {
+            return Select<R>(new IonSerializer().Deserialize<R>);
+        }
+    }
+}
+```
+
+This is required to open the implementations and provide access to the raw stream that came back from QLDB. This is a forward looking change as, eventually, that stream will either contain Ion or JSON data.
 
 ## New Ion .NET Serialization Library
 
