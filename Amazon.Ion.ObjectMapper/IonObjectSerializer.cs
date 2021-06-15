@@ -38,12 +38,6 @@ namespace Amazon.Ion.ObjectMapper
                 // Check if current Ion field has a IonPropertySetter annotated setter method.
                 if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
-                    // A setter should be a void method.
-                    if (method.ReturnParameter?.ParameterType != typeof(void))
-                    {
-                        continue;
-                    }
-
                     // A setter should have exactly one argument.
                     var parameters = method.GetParameters();
                     if (parameters.Length != 1)
