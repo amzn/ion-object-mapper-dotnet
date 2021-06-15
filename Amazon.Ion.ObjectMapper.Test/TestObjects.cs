@@ -191,6 +191,8 @@ namespace Amazon.Ion.ObjectMapper.Test
             Weight = 52310,
             Capacity = 2230,
         };
+        
+        public static Dog Rover = new Dog("Rover", "Male", "Labrador");
     }
 
     public class Car
@@ -496,6 +498,13 @@ namespace Amazon.Ion.ObjectMapper.Test
             this.Name = name;
             this.Gender = gender;
             this.Breed = breed;
+        }
+
+        public bool Equals(Dog dog)
+        {
+            return this.Name == dog.Name && 
+                   this.Gender == dog.Gender && 
+                   this.Breed == dog.Breed;
         }
     }
 
