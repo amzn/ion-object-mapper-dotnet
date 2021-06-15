@@ -42,7 +42,9 @@ namespace Amazon.Ion.ObjectMapper
                     var parameters = method.GetParameters();
                     if (parameters.Length != 1)
                     {
-                        continue;
+                        throw new NotSupportedException(
+                            "An [IonPropertySetter] annotated method should have exactly one argument " +
+                            $"but {method.Name} has {parameters.Length} arguments");
                     }
 
                     var deserialized = ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
