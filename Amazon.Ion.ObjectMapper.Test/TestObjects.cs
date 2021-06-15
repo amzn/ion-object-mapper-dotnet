@@ -508,6 +508,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    public class DogOwner
+    {
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
+        public Dog Dog { get; init; } 
+    }
+
     public class TestDictionary : Dictionary<string, int>
     {
         public static string PrettyString(IDictionary<string, int> dictionary)
