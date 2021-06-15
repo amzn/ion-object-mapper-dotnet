@@ -103,22 +103,14 @@ namespace Amazon.Ion.ObjectMapper
             var serializedIonFields = new HashSet<string>();
             
             // Serialize the values returned from IonPropertyGetter annotated getter methods.
-            foreach (var method in targetType.GetMethods())
+            foreach (var (method, ionPropertyName) in this.GetGetters())
             {
-                var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
-                
-                // A getter method should have zero parameters.
-                if (getMethod?.IonPropertyName == null || method.GetParameters().Length != 0)
-                {
-                    continue;
-                }
-
                 var getValue = method.Invoke(item, Array.Empty<object>());
                 
-                writer.SetFieldName(getMethod.IonPropertyName);
+                writer.SetFieldName(ionPropertyName);
                 ionSerializer.Serialize(writer, getValue);
                 
-                serializedIonFields.Add(getMethod.IonPropertyName);
+                serializedIonFields.Add(ionPropertyName);
             }
 
             // Serialize any properties that satisfy the options/attributes.
@@ -187,6 +179,25 @@ namespace Amazon.Ion.ObjectMapper
             writer.StepOut();
         }
 
+        private IEnumerable<(MethodInfo, string)> GetGetters()
+        {
+            var getters = new List<(MethodInfo, string)>();
+            foreach (var method in targetType.GetMethods())
+            {
+                var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
+                
+                // A getter method should have zero parameters.
+                if (getMethod?.IonPropertyName == null || method.GetParameters().Length != 0)
+                {
+                    continue;
+                }
+                
+                getters.Add((method, getMethod.IonPropertyName));
+            }
+
+            return getters;
+        }
+        
         private MethodInfo FindSetter(string name)
         {
             return targetType.GetMethods().FirstOrDefault(m =>
