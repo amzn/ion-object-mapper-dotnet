@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -308,6 +309,22 @@ namespace Amazon.Ion.ObjectMapper
                 return;
             }
 
+            Type genericDictionaryType = item.GetType().GetInterfaces().FirstOrDefault(t => t.GetGenericTypeDefinition().IsAssignableTo(typeof(IDictionary<,>)));
+            if (genericDictionaryType != null)
+            {
+                var genericArguments = genericDictionaryType.GetGenericArguments();
+
+                if (genericArguments[0].IsAssignableTo(typeof(string)))
+                {
+                    new IonDictionarySerializer(this, genericArguments[1]).Serialize(writer, (IDictionary)item);
+                    return;
+                }
+                else
+                {
+                    throw new NotSupportedException("Can not serialize IDictionary when key is not of type string");
+                }
+            }
+
             if (item is object)
             {
                 new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
@@ -452,6 +469,21 @@ namespace Amazon.Ion.ObjectMapper
 
             if (ionType == IonType.Struct) 
             {
+                if (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>)))
+                {
+                    var genericArguments = type.GetGenericArguments();
+                    if (genericArguments[0].IsAssignableTo(typeof(string)))
+                    {
+                        var dictionarySerializer = new IonDictionarySerializer(this, genericArguments[1]);
+                        var deserialized = dictionarySerializer.Deserialize(reader);
+
+                        return deserialized;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Can not deserialize into Dictionary when key is not of type string");
+                    }
+                }
                 return new IonObjectSerializer(this, options, type).Deserialize(reader);
             }
 
