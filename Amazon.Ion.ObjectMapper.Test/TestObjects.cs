@@ -162,6 +162,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public static Desk SchoolDesk = new Desk {width = 48, Depth = 24, Height = 30};
         public static Ruler Ruler = new Ruler {length = 30, unit = "cm"};
+        public static Chalkboard Chalkboard = new Chalkboard {width = 48, height = 36};
 
         private static Politician GeorgeAdams = new Politician {FirstName = "George", LastName = "Adams" };
         private static Politician SuzanneBenson = new Politician {FirstName = "Suzanne", LastName = "Benson" };
