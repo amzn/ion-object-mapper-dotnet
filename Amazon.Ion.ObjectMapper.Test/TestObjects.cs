@@ -161,6 +161,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
         
         public static Desk SchoolDesk = new Desk {width = 48, Depth = 24, Height = 30};
+        public static Ruler Ruler = new Ruler {length = 30, unit = "cm"};
 
         private static Politician GeorgeAdams = new Politician {FirstName = "George", LastName = "Adams" };
         private static Politician SuzanneBenson = new Politician {FirstName = "Suzanne", LastName = "Benson" };
@@ -412,25 +413,25 @@ namespace Amazon.Ion.ObjectMapper.Test
         [IonPropertyGetter("length")]
         public int GetLength() 
         {
-            return this.length + 10;
+            return this.length;
         }
 
         [IonPropertySetter("length")]
         public void SetLength(int length) 
         {
-            this.length = length - 10;
+            this.length = length;
         }
         
         [IonPropertyGetter("unit")]
         public string GetUnit()
         {
-            return this.unit == "cm" ? "centimeter" : this.unit;
+            return this.unit;
         }
 
         [IonPropertySetter("unit")]
         public void SetUnit(string unit)
         {
-            this.unit = unit == "centimeter" ? "cm" : unit;
+            this.unit = unit;
         }
     }
 

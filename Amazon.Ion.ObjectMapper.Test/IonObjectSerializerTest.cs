@@ -148,6 +148,15 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void DoesNotDoubleSerializeIonFieldsAlreadySerializedByMethods()
+        {
+            IIonStruct serialized = SerializeToIonValue(TestObjects.Ruler);
+
+            // We should have exactly two fields. ie. we did not double serialize the Ruler's length or unit members.
+            Assert.AreEqual(2, serialized.Count);
+        }
+
+        [TestMethod]
         public void ExceptionOnMultiParameterIonPropertySetterMethods()
         {
             var serializer = new IonSerializer();
