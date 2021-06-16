@@ -152,6 +152,8 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
         
         public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
+        
+        public static Desk SchoolDesk = new Desk {width = 48, Depth = 24, Height = 30};
 
         private static Politician GeorgeAdams = new Politician {FirstName = "George", LastName = "Adams" };
         private static Politician SuzanneBenson = new Politician {FirstName = "Suzanne", LastName = "Benson" };
@@ -366,6 +368,30 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return $"<Student>{{ FirstName: {FirstName}, LastName: {LastName}, Major: {Major} }}";
+        }
+    }
+
+    public class Desk
+    {
+        public int width;
+        public int Depth { get; init; }
+        public int Height { get; init; }
+
+        [IonPropertyGetter("length")]
+        public int GetWidth() 
+        {
+            return this.width;
+        }
+        
+        [IonPropertySetter("length")]
+        public void SetWidth(int width) 
+        {
+            this.width = width;
+        }
+
+        public override string ToString()
+        {
+            return $"<Desk>{{ width: {width},  Depth: {Depth}, Height: {Height} }}";
         }
     }
 

@@ -139,31 +139,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesGetterAndSetterMethods()
         {
-            var serializer = new IonSerializer();
-            var ruler = new Ruler {length = 30, unit = "cm"};
-
-            var stream = serializer.Serialize(ruler);
-            IIonStruct serialized = StreamToIonValue(stream);
-
-            // We should have exactly two fields. ie. we did not double serialize length or unit.
-            Assert.AreEqual(2, serialized.Count);
-            
-            Assert.IsTrue(serialized.ContainsField("length"));
-            Assert.IsTrue(serialized.ContainsField("unit"));
-
-            // The ruler's length getter returns 10 more than the actual size.
-            Assert.AreEqual(ruler.length + 10, serialized.GetField("length").IntValue);
-            
-            // The ruler's unit getter returns "centimeter" when the internal unit is "cm".
-            Assert.AreEqual("centimeter", serialized.GetField("unit").StringValue);
-
-            var deserialized = serializer.Deserialize<Ruler>(stream);
-
-            // The ruler's length setter subtracts 10 when setting the size which cancels out the 10 added by the getter.
-            Assert.AreEqual(ruler.length, deserialized.length);
-            
-            // The ruler's unit setter converts "centimeter" back to "cm".
-            Assert.AreEqual(ruler.unit, deserialized.unit);
+            Check(TestObjects.SchoolDesk);
         }
 
         [TestMethod]
