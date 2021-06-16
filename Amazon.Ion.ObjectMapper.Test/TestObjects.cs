@@ -512,7 +512,14 @@ namespace Amazon.Ion.ObjectMapper.Test
     {
         public string FirstName { get; init; }
         public string LastName { get; init; }
-        public Dog Dog { get; init; } 
+        public Dog Dog { get; init; }
+        
+        public bool Equals(DogOwner owner)
+        {
+            return this.FirstName == owner.FirstName && 
+                   this.LastName == owner.LastName && 
+                   this.Dog.Equals(owner.Dog);
+        }
     }
 
     public class TestDictionary : Dictionary<string, int>

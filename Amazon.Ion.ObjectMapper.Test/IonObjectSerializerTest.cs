@@ -184,6 +184,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             AssertContainsFields(serializedDog, new string[] {"Given Name", "Male or Female", "Classification"});
 
             var deserialized = serializer.Deserialize<DogOwner>(stream);
+            Assert.IsTrue(owner.Equals(deserialized));
             Assert.IsTrue(TestObjects.Rover.Equals(deserialized.Dog));
         }
 
