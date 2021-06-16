@@ -145,7 +145,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void DoesNotDoubleSerializeIonFieldsAlreadySerializedByMethods()
         {
-            IIonStruct serialized = SerializeToIonValue(TestObjects.Ruler);
+            IIonStruct serialized = ToIonValue(new IonSerializer(), TestObjects.Ruler);
 
             Assert.IsTrue(serialized.ContainsField("length"));
             Assert.IsTrue(serialized.ContainsField("unit"));
