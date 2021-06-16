@@ -386,13 +386,13 @@ namespace Amazon.Ion.ObjectMapper.Test
         public int Depth { get; init; }
         public int Height { get; init; }
 
-        [IonPropertyGetter("length")]
+        [IonPropertyGetter("desk width")]
         public int GetWidth() 
         {
             return this.width;
         }
         
-        [IonPropertySetter("length")]
+        [IonPropertySetter("desk width")]
         public void SetWidth(int width) 
         {
             this.width = width;
