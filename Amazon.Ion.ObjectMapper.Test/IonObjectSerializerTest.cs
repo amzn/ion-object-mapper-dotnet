@@ -147,6 +147,9 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             IIonStruct serialized = SerializeToIonValue(TestObjects.Ruler);
 
+            Assert.IsTrue(serialized.ContainsField("length"));
+            Assert.IsTrue(serialized.ContainsField("unit"));
+
             // We should have exactly two fields. ie. we did not double serialize the Ruler's length or unit members.
             Assert.AreEqual(2, serialized.Count);
         }
