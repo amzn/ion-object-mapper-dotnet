@@ -94,15 +94,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         
         public static IIonValue StreamToIonValue(Stream stream)
         {
-            return IonLoader.Default.Load(Copy(stream)).GetElementAt(0);
-        }
-        
-        public static void AssertContainsFields(IIonStruct serialized, IEnumerable<string> fields)
-        {
-            foreach (var field in fields)
-            {
-                Assert.IsTrue(serialized.ContainsField(field));
-            }
+            return IonLoader.Default.Load(stream).GetElementAt(0);
         }
         
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
