@@ -192,7 +192,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             Capacity = 2230,
         };
         
-        public static Dog Rover = new Dog("Rover", "Male", "Labrador");
+        public static Dog Rover = new Dog {name = "Rover", gender = "Male", breed = "Labrador"};
         public static DogOwner JohnDoe = new DogOwner {FirstName = "John", LastName = "Doe", Dog = Rover};
     }
 
@@ -486,20 +486,6 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string name;
         public string gender;
         public string breed;
-
-        public Dog()
-        {
-            this.name = default;
-            this.gender = default;
-            this.breed = default;
-        }
-
-        public Dog(string name, string gender, string breed)
-        {
-            this.name = name;
-            this.gender = gender;
-            this.breed = breed;
-        }
 
         public override string ToString()
         {

@@ -186,7 +186,7 @@ namespace Amazon.Ion.ObjectMapper.Test
                 }
             }
 
-            return new Dog(name, gender, breed);
+            return new Dog{name = name, gender = gender, breed = breed};
         }
 
         public override void Serialize(IIonWriter writer, Dog item)
