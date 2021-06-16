@@ -193,6 +193,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         };
         
         public static Dog Rover = new Dog("Rover", "Male", "Labrador");
+        public static DogOwner JohnDoe = new DogOwner {FirstName = "John", LastName = "Doe", Dog = Rover};
     }
 
     public class Car
@@ -512,11 +513,9 @@ namespace Amazon.Ion.ObjectMapper.Test
         public string LastName { get; init; }
         public Dog Dog { get; init; }
         
-        public bool Equals(DogOwner owner)
+        public override string ToString()
         {
-            return this.FirstName == owner.FirstName && 
-                   this.LastName == owner.LastName && 
-                   this.Dog.Equals(owner.Dog);
+            return $"<DogOwner>{{ FirstName: {FirstName}, LastName: {LastName}, Dog: {Dog} }}";
         }
     }
 

@@ -171,21 +171,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesChildObjectWithCustomObjectSerializer()
         {
-            var serializer = new IonSerializer();
-            var owner = new DogOwner {FirstName = "John", LastName = "Doe", Dog = TestObjects.Rover};
-
-            var stream = serializer.Serialize(owner);
-            IIonStruct serialized = StreamToIonValue(stream);
-
-            Assert.IsTrue(serialized.ContainsField("dog"));
-            var serializedDog = serialized.GetField("dog");
-
-            // These field names come from the custom serializer.
-            AssertContainsFields(serializedDog, new string[] {"Given Name", "Male or Female", "Classification"});
-
-            var deserialized = serializer.Deserialize<DogOwner>(stream);
-            Assert.IsTrue(owner.Equals(deserialized));
-            Assert.IsTrue(TestObjects.Rover.Equals(deserialized.Dog));
+            Check(TestObjects.JohnDoe);
         }
 
         [TestMethod]
