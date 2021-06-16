@@ -482,29 +482,27 @@ namespace Amazon.Ion.ObjectMapper.Test
     [IonSerializer(typeof(MyIonDogSerializer))]
     public class Dog
     {
-        public string Name { get; init; }
-        public string Gender { get; init; }
-        public string Breed { get; init; }
+        public string name;
+        public string gender;
+        public string breed;
 
         public Dog()
         {
-            this.Name = default;
-            this.Gender = default;
-            this.Breed = default;
+            this.name = default;
+            this.gender = default;
+            this.breed = default;
         }
 
         public Dog(string name, string gender, string breed)
         {
-            this.Name = name;
-            this.Gender = gender;
-            this.Breed = breed;
+            this.name = name;
+            this.gender = gender;
+            this.breed = breed;
         }
 
-        public bool Equals(Dog dog)
+        public override string ToString()
         {
-            return this.Name == dog.Name && 
-                   this.Gender == dog.Gender && 
-                   this.Breed == dog.Breed;
+            return $"<Dog>{{ name: {name}, gender: {gender}, breed: {breed} }}";
         }
     }
 

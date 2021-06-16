@@ -164,8 +164,6 @@ namespace Amazon.Ion.ObjectMapper.Test
     
     public class MyIonDogSerializer : IonSerializer<Dog>
     {
-        public MyIonDogSerializer() {}
-        
         public override Dog Deserialize(IIonReader reader)
         {
             string name = default;
@@ -176,13 +174,13 @@ namespace Amazon.Ion.ObjectMapper.Test
             {
                 switch (reader.CurrentFieldName)
                 {
-                    case "Given Name":
+                    case "Name":
                         name = reader.StringValue();
                         break;
-                    case "Male or Female":
+                    case "Gender":
                         gender = reader.StringValue();
                         break;
-                    case "Classification":
+                    case "Breed":
                         breed = reader.StringValue();
                         break;
                 }
@@ -193,22 +191,22 @@ namespace Amazon.Ion.ObjectMapper.Test
 
         public override void Serialize(IIonWriter writer, Dog item)
         {
-            if (item.Name != null)
+            if (item.name != null)
             {
-                writer.SetFieldName("Given Name");
-                writer.WriteString(item.Name);
+                writer.SetFieldName("Name");
+                writer.WriteString(item.name);
             }
 
-            if (item.Gender != null)
+            if (item.gender != null)
             {
-                writer.SetFieldName("Male or Female");
-                writer.WriteString(item.Gender);
+                writer.SetFieldName("Gender");
+                writer.WriteString(item.gender);
             }
 
-            if (item.Breed != null)
+            if (item.breed != null)
             {
-                writer.SetFieldName("Classification");
-                writer.WriteString(item.Breed);
+                writer.SetFieldName("Breed");
+                writer.WriteString(item.breed);
             }
         }
     }
