@@ -382,7 +382,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class Desk
     {
-        public int width;
+        internal int width;
         public int Depth { get; init; }
         public int Height { get; init; }
 
