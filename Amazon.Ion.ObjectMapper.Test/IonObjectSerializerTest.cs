@@ -167,12 +167,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             var stream = serializer.Serialize(TestObjects.Chalkboard);
             Assert.ThrowsException<InvalidOperationException>(() => serializer.Deserialize<Chalkboard>(stream));
         }
-        
-        [TestMethod]
-        public void SerializesAndDeserializesChildObjectWithCustomObjectSerializer()
-        {
-            Check(TestObjects.JohnDoe);
-        }
 
         [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
@@ -526,6 +520,12 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializesAndDeserializesWithCustomObjectSerializer()
+        {
+            Check(TestObjects.JohnDoe);
+        }
+
+        [TestMethod]
         public void DeserializeAnnotatedIonToParentClassNameMatchingAnnotation()
         {
             IIonReader reader = IonReaderBuilder.Build(TestObjects.truckIonText);
@@ -619,21 +619,6 @@ namespace Amazon.Ion.ObjectMapper.Test
             Vehicle truck = defaultSerializer.Deserialize<Vehicle>(reader);
 
             Assert.AreNotEqual(TestObjects.nativeTruck.ToString(), truck.ToString());
-        }
-
-        [TestMethod]
-        public void SerializesAndDeserializesWithCustomObjectSerializer()
-        {
-            Check(TestObjects.Rover);
-        }
-
-        [TestMethod]
-        public void ExceptionOnInvalidCustomObjectSerializer()
-        {
-            var serializer = new IonSerializer();
-            var cat = new Cat("Kitty", "Female", "Bengal");
-
-            Assert.ThrowsException<NotSupportedException>(() => serializer.Serialize(cat));
         }
 
         private void AssertIsTruck(object actual)
