@@ -96,7 +96,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             return IonLoader.Default.Load(stream).GetElementAt(0);
         }
-
+        
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
         {
             return SerializeToIonWithCustomSerializers(
