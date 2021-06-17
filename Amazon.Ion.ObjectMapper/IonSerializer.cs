@@ -174,11 +174,22 @@ namespace Amazon.Ion.ObjectMapper
         public readonly bool PermissiveMode;
         
         public Dictionary<Type, IIonSerializer> IonSerializers { get; init; }
+        public Dictionary<string, object> CustomContext { get; init; }
     }
 
-    public interface IonSerializerFactory<T, TContext> where TContext : IonSerializationContext
+    public interface IIonSerializerFactory
     {
-        public IonSerializer<T> create(IonSerializationOptions options, TContext context);
+        IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> CustomContext);
+    }
+
+    public abstract class IonSerializerFactory<T> : IIonSerializerFactory
+    {
+        public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> CustomContext);
+
+        IIonSerializer IIonSerializerFactory.Create(IonSerializationOptions options, Dictionary<string, object> CustomContext)
+        {
+            return Create(options, CustomContext);
+        }
     }
 
     public class IonSerializer
@@ -327,6 +338,15 @@ namespace Amazon.Ion.ObjectMapper
 
             if (item is object)
             {
+                var customSerializerAttribute = item.GetType().GetCustomAttribute<IonSerializerAttribute>();
+
+                if (customSerializerAttribute != null) {
+                    var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
+                    var customSerializer = customSerializerFactory.Create(options, options.CustomContext);
+                    customSerializer.Serialize(writer, item);
+                    return;
+                }
+
                 new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
                 return;
             }
@@ -369,6 +389,17 @@ namespace Amazon.Ion.ObjectMapper
             if (reader.CurrentDepth > this.options.MaxDepth)
             {
                 return null;
+            }
+
+            if (type != null) 
+            {
+                var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
+
+                if (customSerializerAttribute != null) {
+                    var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
+                    var customSerializer = customSerializerFactory.Create(options, options.CustomContext);
+                    return customSerializer.Deserialize(reader);
+                }
             }
 
             if (ionType == IonType.None || ionType == IonType.Null)
