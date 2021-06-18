@@ -172,13 +172,14 @@ namespace Amazon.IonObjectMapper.Test
         public void SerializesAndDeserializesObjectsWithIonConstructor()
         {
             var serializer = new IonSerializer();
-            var wheel = new Wheel("default", 17, "MSW", "black");
+            var wheel = new Wheel("default", 17, 20, "MSW", "black");
 
             var stream = serializer.Serialize(wheel);
             var deserialized = serializer.Deserialize<Wheel>(stream);
 
             Assert.AreEqual(
                 $"Specification: {wheel.Specification}, Size: {wheel.Size} inches", deserialized.Specification);
+            Assert.AreEqual(wheel.offset, deserialized.offset);
             Assert.AreEqual(wheel.Brand, deserialized.Brand);
             Assert.AreEqual(wheel.color, deserialized.color);
         }
