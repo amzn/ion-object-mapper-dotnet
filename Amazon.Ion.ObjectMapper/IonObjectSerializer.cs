@@ -216,6 +216,34 @@ namespace Amazon.Ion.ObjectMapper
             return true;
         }
 
+        private IEnumerable<(MethodInfo, string)> GetGetters()
+        {
+            var getters = new List<(MethodInfo, string)>();
+            foreach (var method in targetType.GetMethods())
+            {
+                var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
+                
+                // A getter method should have zero parameters.
+                if (getMethod?.IonPropertyName == null || method.GetParameters().Length != 0)
+                {
+                    continue;
+                }
+                
+                getters.Add((method, getMethod.IonPropertyName));
+            }
+
+            return getters;
+        }
+        
+        private MethodInfo FindSetter(string name)
+        {
+            return targetType.GetMethods().FirstOrDefault(m =>
+            {
+                var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
+                return setMethod != null && setMethod.IonPropertyName == name;
+            });
+        }
+
         private string IonFieldNameFromProperty(PropertyInfo property)
         {
             var ionPropertyName = property.GetCustomAttribute(typeof(IonPropertyName));
@@ -322,34 +350,6 @@ namespace Amazon.Ion.ObjectMapper
                 return ((IonPropertyName)propertyName).Name;
             }
             return field.Name;
-        }
-
-        private IEnumerable<(MethodInfo, string)> GetGetters()
-        {
-            var getters = new List<(MethodInfo, string)>();
-            foreach (var method in targetType.GetMethods())
-            {
-                var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
-                
-                // A getter method should have zero parameters.
-                if (getMethod?.IonPropertyName == null || method.GetParameters().Length != 0)
-                {
-                    continue;
-                }
-                
-                getters.Add((method, getMethod.IonPropertyName));
-            }
-
-            return getters;
-        }
-        
-        private MethodInfo FindSetter(string name)
-        {
-            return targetType.GetMethods().FirstOrDefault(m =>
-            {
-                var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
-                return setMethod != null && setMethod.IonPropertyName == name;
-            });
         }
 
         private IIonSerializer GetCustomObjectSerializer()
