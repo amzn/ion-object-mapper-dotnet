@@ -134,7 +134,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers, CustomContext = customContext });
 
-            var stream = new IonSerializer().Serialize(item);
+            var stream = new IonSerializer(new IonSerializationOptions { CustomContext = customContext }).Serialize(item);
             return serializer.Deserialize<T>(stream);
         }
     }

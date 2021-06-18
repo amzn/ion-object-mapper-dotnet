@@ -242,32 +242,32 @@ namespace Amazon.Ion.ObjectMapper.Test
 
     public class EngineSerializer : IonSerializer<Engine>
     {
-        private readonly CustomSerializerValue translator;
-        public EngineSerializer(CustomSerializerValue translator)
+        private readonly CustomSerializerValue customSerializerValue;
+        public EngineSerializer(CustomSerializerValue customSerializerValue)
         {
-            this.translator = translator;
+            this.customSerializerValue = customSerializerValue;
         }
 
         public override Engine Deserialize(IIonReader reader)
         {
-            return new Engine { Cylinders = translator.ToCylinder(reader.IntValue()), ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z")};
+            return new Engine { Cylinders = customSerializerValue.AddCylinder(reader.IntValue()), ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z")};
         }
 
         public override void Serialize(IIonWriter writer, Engine item)
         {
-            writer.WriteInt(translator.ToIdleCylinder(item.Cylinders));
+            writer.WriteInt(customSerializerValue.RemoveCylinder(item.Cylinders));
         }
     }
 
     public class CustomSerializerValue
     {
-        public int ToIdleCylinder(int Cylinders)
+        public int RemoveCylinder(int Cylinders)
         {
             var idleCylinder = Cylinders - 1;
             return idleCylinder;
         }
 
-        public int ToCylinder(int idleCylinder)
+        public int AddCylinder(int idleCylinder)
         {
             var cylinders = idleCylinder + 1;
             return cylinders;
