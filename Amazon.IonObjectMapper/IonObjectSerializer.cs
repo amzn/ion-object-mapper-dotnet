@@ -51,18 +51,11 @@ namespace Amazon.IonObjectMapper
                 // Check if current Ion field has a IonPropertySetter annotated setter method.
                 if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
-                    // A setter should have exactly one argument.
-                    var parameters = method.GetParameters();
-                    if (parameters.Length != 1)
+                    var deserialized = new object();
+                    if (this.TryDeserializeMethod(method, reader, ionType, ref deserialized))
                     {
-                        throw new InvalidOperationException(
-                            "An [IonPropertySetter] annotated method should have exactly one argument " +
-                            $"but {method.Name} has {parameters.Length} arguments");
+                        method.Invoke(targetObject, new[]{ deserialized });
                     }
-
-                    var deserialized = ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
-
-                    method.Invoke(targetObject, new[]{ deserialized });
                 }
                 // Check if current Ion field is a .NET property.
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
@@ -171,6 +164,23 @@ namespace Amazon.IonObjectMapper
             writer.StepOut();
         }
 
+        // Deserialize the given method and return bool to indicate whether the deserialized result should be used.
+        private bool TryDeserializeMethod(MethodInfo method, IIonReader reader, IonType ionType, ref object deserialized)
+        {
+            // A setter should have exactly one argument.
+            var parameters = method.GetParameters();
+            if (parameters.Length != 1)
+            {
+                throw new NotSupportedException(
+                    "An [IonPropertySetter] annotated method should have exactly one argument " +
+                    $"but {method.Name} has {parameters.Length} arguments");
+            }
+
+            deserialized = ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
+
+            return true;
+        }
+        
         // Deserialize the given property and return bool to indicate whether the deserialized result should be used.
         private bool TryDeserializeProperty(
             PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
@@ -228,16 +238,19 @@ namespace Amazon.IonObjectMapper
 
             reader.StepIn();
 
-            // Deserialize Ion and organize deserialized results into three categories:
+            // Deserialize Ion and organize deserialized results into four categories:
             // 1. Values to be passed into the Ion constructor.
-            // 2. Properties to be set after construction.
-            // 3. Fields to be set after construction.
+            // 2. Values to be set via annotated setters after construction.
+            // 3. Properties to be set after construction.
+            // 4. Fields to be set after construction.
             var constructorArgs = new object[parameters.Length];
+            var setterMethods = new List<(MethodInfo, object)>();
             var remainingProperties = new List<(PropertyInfo, object)>();
             var remainingFields = new List<(FieldInfo, object)>();
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
+                MethodInfo method;
                 PropertyInfo property;
                 FieldInfo field;
                 if (paramIndexMap.ContainsKey(reader.CurrentFieldName))
@@ -245,6 +258,14 @@ namespace Amazon.IonObjectMapper
                     var index = paramIndexMap[reader.CurrentFieldName];
                     var deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
                     constructorArgs[index] = deserialized;
+                }
+                else if ((method = FindSetter(reader.CurrentFieldName)) != null)
+                {
+                    var deserialized = new object();
+                    if (this.TryDeserializeMethod(method, reader, ionType, ref deserialized))
+                    {
+                        setterMethods.Add((method, deserialized));
+                    }
                 }
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
@@ -268,7 +289,13 @@ namespace Amazon.IonObjectMapper
 
             var targetObject = ionConstructor.Invoke(constructorArgs);
 
-            // Set remaining properties/fields after construction.
+            // Set values with annotated setters.
+            foreach (var (method, deserialized) in setterMethods)
+            {
+                method.Invoke(targetObject, new[]{ deserialized });
+            }
+            
+            // Set remaining properties/fields.
             foreach (var (property, deserialized) in remainingProperties)
             {
                 property.SetValue(targetObject, deserialized);
