@@ -236,21 +236,21 @@ namespace Amazon.Ion.ObjectMapper.Test
     {
         public override IonSerializer<Engine> Create(IonSerializationOptions options, Dictionary<string, object> context)
         {
-            return new EngineSerializer((Translator)context.GetValueOrDefault("translator", null));
+            return new EngineSerializer((CustomSerializerValue)context.GetValueOrDefault("customSerializerKey", null));
         }
     }
 
     public class EngineSerializer : IonSerializer<Engine>
     {
-        private readonly Translator translator;
-        public EngineSerializer(Translator translator)
+        private readonly CustomSerializerValue translator;
+        public EngineSerializer(CustomSerializerValue translator)
         {
             this.translator = translator;
         }
 
         public override Engine Deserialize(IIonReader reader)
         {
-            return new Engine { Cylinders = translator.ToCylinder(reader.IntValue()) };
+            return new Engine { Cylinders = translator.ToCylinder(reader.IntValue()), ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z")};
         }
 
         public override void Serialize(IIonWriter writer, Engine item)
@@ -259,7 +259,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
-    public class Translator
+    public class CustomSerializerValue
     {
         public int ToIdleCylinder(int Cylinders)
         {

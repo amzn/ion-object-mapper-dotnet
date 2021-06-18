@@ -16,7 +16,7 @@ namespace Amazon.Ion.ObjectMapper.Test
 
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
                 {
-                    { "translator", new Translator()}
+                    { "customSerializerKey", new CustomSerializerValue()}
                 }
             });
             var stream = customSerializer.Serialize(TestObjects.honda);
@@ -30,7 +30,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         {
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
                 {
-                    { "translator", new Translator()}
+                    { "customSerializerKey", new CustomSerializerValue()}
                 }
             });
 
