@@ -11,7 +11,7 @@ namespace Amazon.Ion.ObjectMapper.Test
     public class CustomIonSerializerTest
     {
         [TestMethod]
-        public void CanUseACustomSerializerAnnotation()
+        public void CanUseACustomSerializerFactory()
         {
 
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
@@ -26,7 +26,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
 
         [TestMethod]
-        public void CanUseACustomDeserializerAnnotation()
+        public void CanUseACustomDeserializerFactory()
         {
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
                 {

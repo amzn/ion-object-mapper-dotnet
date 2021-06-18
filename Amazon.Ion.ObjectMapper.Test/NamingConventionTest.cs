@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -31,12 +32,17 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual("StartsWithAnUnderscore", new SnakeCaseNamingConvention().ToProperty("_starts_with_an_underscore"));
         }
 
-        // [TestMethod]
-        // public void CanUseTheNamingConventionOnAnObject()
-        // {
-        //     var stream = new IonSerializer(new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention() }).Serialize(TestObjects.honda);
-        //     var serialized = Utils.StreamToIonValue(stream);
-        //     Assert.AreEqual(2010, serialized.GetField("year_of_manufacture").IntValue);
-        // }
+        [TestMethod]
+        public void CanUseTheNamingConventionOnAnObject()
+        {
+            Dictionary<string, object> customContext = new Dictionary<string, object>() 
+            {
+                { "translator", new Translator()}
+            };
+            
+            var stream = new IonSerializer(new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention(), CustomContext =  customContext}).Serialize(TestObjects.honda);
+            var serialized = Utils.StreamToIonValue(stream);
+            Assert.AreEqual(2010, serialized.GetField("year_of_manufacture").IntValue);
+        }
     }
 }
