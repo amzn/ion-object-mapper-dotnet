@@ -165,7 +165,7 @@ namespace Amazon.Ion.ObjectMapper.Test
             var serializer = new IonSerializer();
 
             var stream = serializer.Serialize(TestObjects.Chalkboard);
-            Assert.ThrowsException<NotSupportedException>(() => serializer.Deserialize<Chalkboard>(stream));
+            Assert.ThrowsException<InvalidOperationException>(() => serializer.Deserialize<Chalkboard>(stream));
         }
 
         [TestMethod]
