@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
 
     [IonAnnotateType]

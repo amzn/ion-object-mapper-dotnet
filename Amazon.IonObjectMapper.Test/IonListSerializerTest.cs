@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Amazon.Ion.ObjectMapper.Test.Utils;
+using static Amazon.IonObjectMapper.Test.Utils;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
     [TestClass]
     public class IonListSerializerTest
