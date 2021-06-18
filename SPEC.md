@@ -153,7 +153,7 @@ public class Engine
 }
 ```
 
-the `init` keyword is a C# modifier which indicates that the property is only settable at construction time. In reality the Intermediate Language (IL) code just contains a regular setter and so long as properties in general have a getter and setter, the library will be able to use them. By default, all public gettable properties will be serialized and all public settable properties will be deserialized, but this can be configured as specified later in this document.
+the `init` keyword is a C# modifier which indicates that the property is only settable at construction time. In reality the Intermediate Language (IL) code just contains a regular setter and so long as properties in general have a getter and setter, the library will be able to use them. By default, all gettable public properties will be serialized and all settable public properties will be deserialized, but this can be configured as specified later in this document.
 
 ### Default behavior when deserializing annotated Ion
 
