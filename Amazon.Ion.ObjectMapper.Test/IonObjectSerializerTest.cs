@@ -16,11 +16,11 @@ namespace Amazon.Ion.ObjectMapper.Test
         IonSerializer defaultSerializer = new IonSerializer();
         private IValueFactory valueFactory = new ValueFactory();
 
-        [TestMethod]
-        public void SerializesAndDeserializesObjects()
-        {
-            Check(TestObjects.honda);
-        }
+        // [TestMethod]
+        // public void SerializesAndDeserializesObjects()
+        // {
+        //     Check(TestObjects.honda);
+        // }
         
         [TestMethod]
         public void SerializesAndDeserializesObjectsWithIncludeFields()
@@ -443,54 +443,54 @@ namespace Amazon.Ion.ObjectMapper.Test
             Assert.AreEqual(-3.14f, deserialized[2]);
         }
 
-        [TestMethod]
-        public void SerializesObjectsWithCustomSerializers()
-        {
-            var customSerializers = new Dictionary<Type, IIonSerializer>()
-            {
-                {typeof(string), new UpperCaseStringIonSerializer()},
-                {typeof(int), new NegativeIntIonSerializer()},
-                {typeof(double), new NegativeDoubleIonSerializer()},
-                {typeof(DateTime), new NextDayDateTimeIonSerializer()},
-            };
+        // [TestMethod]
+        // public void SerializesObjectsWithCustomSerializers()
+        // {
+        //     var customSerializers = new Dictionary<Type, IIonSerializer>()
+        //     {
+        //         {typeof(string), new UpperCaseStringIonSerializer()},
+        //         {typeof(int), new NegativeIntIonSerializer()},
+        //         {typeof(double), new NegativeDoubleIonSerializer()},
+        //         {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+        //     };
 
-            var serialized = SerializeToIonWithCustomSerializers(customSerializers, TestObjects.honda);
+        //     var serialized = SerializeToIonWithCustomSerializers(customSerializers, TestObjects.honda);
 
-            Assert.IsTrue(serialized.ContainsField("make"));
-            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), serialized.GetField("make").StringValue);
+        //     Assert.IsTrue(serialized.ContainsField("make"));
+        //     Assert.AreEqual(TestObjects.honda.Make.ToUpper(), serialized.GetField("make").StringValue);
 
-            Assert.IsTrue(serialized.ContainsField("yearOfManufacture"));
-            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, serialized.GetField("yearOfManufacture").IntValue);
+        //     Assert.IsTrue(serialized.ContainsField("yearOfManufacture"));
+        //     Assert.AreEqual(-TestObjects.honda.YearOfManufacture, serialized.GetField("yearOfManufacture").IntValue);
 
-            Assert.IsTrue(serialized.ContainsField("weightInKg"));
-            Assert.AreEqual(-TestObjects.honda.Weight, serialized.GetField("weightInKg").DoubleValue);
+        //     Assert.IsTrue(serialized.ContainsField("weightInKg"));
+        //     Assert.AreEqual(-TestObjects.honda.Weight, serialized.GetField("weightInKg").DoubleValue);
 
-            Assert.IsTrue(serialized.ContainsField("engine"));
-            var engine = serialized.GetField("engine");
-            Assert.IsTrue(engine.ContainsField("manufactureDate"));
-            Assert.AreEqual(
-                TestObjects.honda.Engine.ManufactureDate.AddDays(1), 
-                engine.GetField("manufactureDate").TimestampValue.DateTimeValue);
-        }
+        //     Assert.IsTrue(serialized.ContainsField("engine"));
+        //     var engine = serialized.GetField("engine");
+        //     Assert.IsTrue(engine.ContainsField("manufactureDate"));
+        //     Assert.AreEqual(
+        //         TestObjects.honda.Engine.ManufactureDate.AddDays(1), 
+        //         engine.GetField("manufactureDate").TimestampValue.DateTimeValue);
+        // }
 
-        [TestMethod]
-        public void DeserializesObjectsWithCustomSerializers()
-        {
-            var customSerializers = new Dictionary<Type, IIonSerializer>()
-            {
-                {typeof(string), new UpperCaseStringIonSerializer()},
-                {typeof(int), new NegativeIntIonSerializer()},
-                {typeof(double), new NegativeDoubleIonSerializer()},
-                {typeof(DateTime), new NextDayDateTimeIonSerializer()},
-            };
+        // [TestMethod]
+        // public void DeserializesObjectsWithCustomSerializers()
+        // {
+        //     var customSerializers = new Dictionary<Type, IIonSerializer>()
+        //     {
+        //         {typeof(string), new UpperCaseStringIonSerializer()},
+        //         {typeof(int), new NegativeIntIonSerializer()},
+        //         {typeof(double), new NegativeDoubleIonSerializer()},
+        //         {typeof(DateTime), new NextDayDateTimeIonSerializer()},
+        //     };
 
-            var deserialized = DeserializeWithCustomSerializers(customSerializers, TestObjects.honda);
+        //     var deserialized = DeserializeWithCustomSerializers(customSerializers, TestObjects.honda);
 
-            Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserialized.Make);
-            Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserialized.YearOfManufacture);
-            Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
-            Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
-        }
+        //     Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserialized.Make);
+        //     Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserialized.YearOfManufacture);
+        //     Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
+        //     Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
+        // }
 
         [TestMethod]
         public void DeserializeAnnotatedIonToParentClassNameMatchingAnnotation()

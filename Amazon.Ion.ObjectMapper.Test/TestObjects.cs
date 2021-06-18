@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Amazon.IonDotnet;
 
 namespace Amazon.Ion.ObjectMapper.Test
 {
@@ -219,6 +220,7 @@ namespace Amazon.Ion.ObjectMapper.Test
         }
     }
 
+    [IonSerializer(Factory = typeof(EngineSerializerFactory))]
     public class Engine
     {
         public int Cylinders { get; init; }
@@ -227,6 +229,48 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return "<Engine>{ Cylinders: " + Cylinders + ", ManufactureDate: " + ManufactureDate + " }";
+        }
+    }
+
+    public class EngineSerializerFactory : IonSerializerFactory<Engine>
+    {
+        public override IonSerializer<Engine> Create(IonSerializationOptions options, Dictionary<string, object> context)
+        {
+            return new EngineSerializer((Translator)context.GetValueOrDefault("translator", null));
+        }
+    }
+
+    public class EngineSerializer : IonSerializer<Engine>
+    {
+        private readonly Translator translator;
+        public EngineSerializer(Translator translator)
+        {
+            this.translator = translator;
+        }
+
+        public override Engine Deserialize(IIonReader reader)
+        {
+            return new Engine { Cylinders = translator.ToCylinder(reader.IntValue()) };
+        }
+
+        public override void Serialize(IIonWriter writer, Engine item)
+        {
+            writer.WriteInt(translator.ToIdleCylinder(item.Cylinders));
+        }
+    }
+
+    public class Translator
+    {
+        public int ToIdleCylinder(int Cylinders)
+        {
+            var idleCylinder = Cylinders - 1;
+            return idleCylinder;
+        }
+
+        public int ToCylinder(int idleCylinder)
+        {
+            var cylinders = idleCylinder + 1;
+            return cylinders;
         }
     }
 

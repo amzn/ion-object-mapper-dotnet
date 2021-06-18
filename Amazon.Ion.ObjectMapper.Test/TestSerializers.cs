@@ -161,4 +161,5 @@ namespace Amazon.Ion.ObjectMapper.Test
             writer.WriteBlob(new byte[item.ToByteArray().Length]);
         }
     }
+
 }

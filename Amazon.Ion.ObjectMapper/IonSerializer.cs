@@ -32,11 +32,6 @@ namespace Amazon.Ion.ObjectMapper
         }
     }
 
-    public interface IonSerializationContext
-    {
-
-    }
-
     public enum IonSerializationFormat 
     {
         BINARY,
