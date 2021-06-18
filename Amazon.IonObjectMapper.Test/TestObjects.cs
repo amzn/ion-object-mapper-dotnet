@@ -306,16 +306,17 @@ namespace Amazon.IonObjectMapper.Test
     {
         public string Specification { get; init; }
         public int Size { get; init; }
-        
         public string Brand { get; init; }
 
         [IonField]
         internal string color;
+        internal int offset;
 
-        public Wheel(string specification, int size, string brand, string color)
+        public Wheel(string specification, int size, int offset, string brand, string color)
         {
             this.Specification = specification;
             this.Size = size;
+            this.offset = offset;
             this.Brand = brand;
             this.color = color;
         }
@@ -327,6 +328,18 @@ namespace Amazon.IonObjectMapper.Test
         {
             this.Specification = $"Specification: {specification}, Size: {size} inches";
             this.Size = size;
+        }
+        
+        [IonPropertyGetter("wheel offset")]
+        public int GetOffset() 
+        {
+            return this.offset;
+        }
+        
+        [IonPropertySetter("wheel offset")]
+        public void SetOffset(int offset) 
+        {
+            this.offset = offset;
         }
     }
 
