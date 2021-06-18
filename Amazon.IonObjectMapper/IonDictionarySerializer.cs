@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
     using System;

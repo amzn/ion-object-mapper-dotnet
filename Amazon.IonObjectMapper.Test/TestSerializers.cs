@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using Amazon.IonDotnet;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
     public class NegationBoolIonSerializer : IonSerializer<bool>
     {

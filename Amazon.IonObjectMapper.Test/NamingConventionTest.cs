@@ -1,7 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace Amazon.Ion.ObjectMapper.Test
+
+namespace Amazon.IonObjectMapper.Test
 {
     [TestClass]
     public class NamingConventionTest

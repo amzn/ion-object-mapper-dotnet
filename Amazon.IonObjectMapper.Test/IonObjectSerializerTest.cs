@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Amazon.IonDotnet;
@@ -6,9 +6,9 @@ using Amazon.IonDotnet.Builders;
 using Amazon.IonDotnet.Tree;
 using Amazon.IonDotnet.Tree.Impl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Amazon.Ion.ObjectMapper.Test.Utils;
+using static Amazon.IonObjectMapper.Test.Utils;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
     [TestClass]
     public class IonObjectSerializerTest
@@ -133,6 +133,33 @@ namespace Amazon.Ion.ObjectMapper.Test
         public void SerializesAndDeserializesCustomPropertyNames()
         {
             Check(TestObjects.fmRadio);
+        }
+
+        [TestMethod]
+        public void SerializesAndDeserializesGetterAndSetterMethods()
+        {
+            Check(TestObjects.SchoolDesk);
+        }
+
+        [TestMethod]
+        public void DoesNotDoubleSerializeIonFieldsAlreadySerializedByMethods()
+        {
+            IIonStruct serialized = ToIonValue(new IonSerializer(), TestObjects.Ruler);
+
+            Assert.IsTrue(serialized.ContainsField("length"));
+            Assert.IsTrue(serialized.ContainsField("unit"));
+
+            // We should have exactly two fields. ie. we did not double serialize the Ruler's length or unit members.
+            Assert.AreEqual(2, serialized.Count);
+        }
+
+        [TestMethod]
+        public void ExceptionOnMultiParameterIonPropertySetterMethods()
+        {
+            var serializer = new IonSerializer();
+
+            var stream = serializer.Serialize(TestObjects.Chalkboard);
+            Assert.ThrowsException<InvalidOperationException>(() => serializer.Deserialize<Chalkboard>(stream));
         }
 
         [TestMethod]

@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Amazon.IonDotnet;
 
-namespace Amazon.Ion.ObjectMapper
+namespace Amazon.IonObjectMapper
 {
     public class IonObjectSerializer : IonSerializer<object>
     {
@@ -31,9 +31,28 @@ namespace Amazon.Ion.ObjectMapper
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
-                var property = FindProperty(reader.CurrentFieldName);
+                MethodInfo method;
+                PropertyInfo property;
                 FieldInfo field;
-                if (property != null)
+
+                // Check if current Ion field has a IonPropertySetter annotated setter method.
+                if ((method = FindSetter(reader.CurrentFieldName)) != null)
+                {
+                    // A setter should have exactly one argument.
+                    var parameters = method.GetParameters();
+                    if (parameters.Length != 1)
+                    {
+                        throw new InvalidOperationException(
+                            "An [IonPropertySetter] annotated method should have exactly one argument " +
+                            $"but {method.Name} has {parameters.Length} arguments");
+                    }
+
+                    var deserialized = ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
+
+                    method.Invoke(targetObject, new[]{ deserialized });
+                }
+                // Check if current Ion field is a .NET property.
+                else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
                     if (IsReadOnlyProperty(property))
                     {
@@ -51,6 +70,7 @@ namespace Amazon.Ion.ObjectMapper
 
                     property.SetValue(targetObject, deserialized);
                 }
+                // Check if current Ion field is a .NET field.
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
                     var deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
@@ -75,8 +95,30 @@ namespace Amazon.Ion.ObjectMapper
         {
             options.TypeAnnotator.Apply(options, writer, targetType);
             writer.StepIn(IonType.Struct);
+
+            var serializedIonFields = new HashSet<string>();
+            
+            // Serialize the values returned from IonPropertyGetter annotated getter methods.
+            foreach (var (method, ionPropertyName) in this.GetGetters())
+            {
+                var getValue = method.Invoke(item, Array.Empty<object>());
+                
+                writer.SetFieldName(ionPropertyName);
+                ionSerializer.Serialize(writer, getValue);
+                
+                serializedIonFields.Add(ionPropertyName);
+            }
+
+            // Serialize any properties that satisfy the options/attributes.
             foreach (var property in targetType.GetProperties())
             {
+                var ionPropertyName = IonFieldNameFromProperty(property);
+                if (serializedIonFields.Contains(ionPropertyName))
+                {
+                    // This Ion property name was already serialized.
+                    continue;
+                }
+                
                 if (property.GetCustomAttributes(true).Any(it => it is IonIgnore))
                 {
                     continue;
@@ -97,12 +139,20 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                writer.SetFieldName(IonFieldNameFromProperty(property));
+                writer.SetFieldName(ionPropertyName);
                 ionSerializer.Serialize(writer, propertyValue);
             }
 
+            // Serialize any fields that satisfy the options/attributes.
             foreach (var field in Fields())
             {
+                var ionFieldName = GetFieldName(field);
+                if (serializedIonFields.Contains(ionFieldName))
+                {
+                    // This Ion field name was already serialized.
+                    continue;
+                }
+                
                 if (options.IgnoreReadOnlyFields && field.IsInitOnly)
                 {
                     continue;
@@ -118,10 +168,39 @@ namespace Amazon.Ion.ObjectMapper
                     continue;
                 }
 
-                writer.SetFieldName(GetFieldName(field));
+                writer.SetFieldName(ionFieldName);
                 ionSerializer.Serialize(writer, fieldValue);
             }
+
             writer.StepOut();
+        }
+
+        private IEnumerable<(MethodInfo, string)> GetGetters()
+        {
+            var getters = new List<(MethodInfo, string)>();
+            foreach (var method in targetType.GetMethods())
+            {
+                var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
+                
+                // A getter method should have zero parameters.
+                if (getMethod?.IonPropertyName == null || method.GetParameters().Length != 0)
+                {
+                    continue;
+                }
+                
+                getters.Add((method, getMethod.IonPropertyName));
+            }
+
+            return getters;
+        }
+        
+        private MethodInfo FindSetter(string name)
+        {
+            return targetType.GetMethods().FirstOrDefault(m =>
+            {
+                var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
+                return setMethod != null && setMethod.IonPropertyName == name;
+            });
         }
 
         private string IonFieldNameFromProperty(PropertyInfo property)

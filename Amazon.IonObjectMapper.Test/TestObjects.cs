@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Amazon.IonDotnet;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
 
     [IonAnnotateType]
@@ -160,6 +160,10 @@ namespace Amazon.Ion.ObjectMapper.Test
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
         
         public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
+        
+        public static Desk SchoolDesk = new Desk {width = 48, Depth = 24, Height = 30};
+        public static Ruler Ruler = new Ruler {length = 30, unit = "cm"};
+        public static Chalkboard Chalkboard = new Chalkboard {width = 48, height = 36};
 
         private static Politician GeorgeAdams = new Politician {FirstName = "George", LastName = "Adams" };
         private static Politician SuzanneBenson = new Politician {FirstName = "Suzanne", LastName = "Benson" };
@@ -417,6 +421,75 @@ namespace Amazon.Ion.ObjectMapper.Test
         public override string ToString()
         {
             return $"<Student>{{ FirstName: {FirstName}, LastName: {LastName}, Major: {Major} }}";
+        }
+    }
+
+    public class Desk
+    {
+        internal int width;
+        public int Depth { get; init; }
+        public int Height { get; init; }
+
+        [IonPropertyGetter("desk width")]
+        public int GetWidth() 
+        {
+            return this.width;
+        }
+        
+        [IonPropertySetter("desk width")]
+        public void SetWidth(int width) 
+        {
+            this.width = width;
+        }
+
+        public override string ToString()
+        {
+            return $"<Desk>{{ width: {width},  Depth: {Depth}, Height: {Height} }}";
+        }
+    }
+
+    public class Ruler
+    {
+        public int length { get; set; }
+        
+        [IonField]
+        internal string unit;
+
+        [IonPropertyGetter("length")]
+        public int GetLength() 
+        {
+            return this.length;
+        }
+
+        [IonPropertySetter("length")]
+        public void SetLength(int length) 
+        {
+            this.length = length;
+        }
+        
+        [IonPropertyGetter("unit")]
+        public string GetUnit()
+        {
+            return this.unit;
+        }
+
+        [IonPropertySetter("unit")]
+        public void SetUnit(string unit)
+        {
+            this.unit = unit;
+        }
+    }
+
+    public class Chalkboard
+    {
+        public int width { get; set; }
+        public int height { get; set; }
+
+        [IonPropertySetter("width")]
+        public void SetSize(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
         }
     }
 
