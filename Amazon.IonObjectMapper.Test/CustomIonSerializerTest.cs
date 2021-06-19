@@ -5,7 +5,7 @@ using Amazon.IonDotnet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.IonObjectMapper.Test.Utils;
 
-namespace Amazon.Ion.ObjectMapper.Test
+namespace Amazon.IonObjectMapper.Test
 {
     [TestClass]
     public class CustomIonSerializerTest
