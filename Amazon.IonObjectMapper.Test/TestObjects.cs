@@ -259,7 +259,13 @@ namespace Amazon.IonObjectMapper.Test
 
         public override void Serialize(IIonWriter writer, Engine item)
         {
+            writer.StepIn(IonType.Struct);
+            writer.SetFieldName("Cylinders");
             writer.WriteInt(customSerializerValue.RemoveCylinder(item.Cylinders));
+            writer.SetFieldName("ManufactureDate");
+            writer.WriteString(customSerializerValue.ShowCurrentTime());
+            writer.StepOut();
+
         }
     }
 
@@ -275,6 +281,11 @@ namespace Amazon.IonObjectMapper.Test
         {
             var cylinders = idleCylinder + 1;
             return cylinders;
+        }
+
+        public string ShowCurrentTime ()
+        {
+            return DateTime.Now.ToString();
         }
     }
 

@@ -21,8 +21,8 @@ namespace Amazon.IonObjectMapper.Test
             });
             var stream = customSerializer.Serialize(TestObjects.honda);
             var serialized = StreamToIonValue(stream);
-
-            Assert.AreEqual(3, serialized.GetField("engine").IntValue);
+            var engine = serialized.GetField("engine");
+            Assert.AreEqual(3, engine.GetField("Cylinders").IntValue);
         }
 
         [TestMethod]

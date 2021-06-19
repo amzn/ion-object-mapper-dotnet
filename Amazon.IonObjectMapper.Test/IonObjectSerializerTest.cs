@@ -488,8 +488,12 @@ namespace Amazon.IonObjectMapper.Test
 
             Assert.IsTrue(serialized.ContainsField("engine"));
             var engine = serialized.GetField("engine");
-            // Assert.AreEqual(3, serialized.GetField("engine").IntValue);
-            // Assert.AreEqual(3, serialized.ToPrettyString());
+            Assert.IsTrue(engine.ContainsField("Cylinders"));
+            Assert.AreEqual(3, engine.GetField("Cylinders").IntValue);
+            Assert.IsTrue(engine.ContainsField("ManufactureDate"));
+            Assert.AreEqual(
+                DateTime.Now.ToString(), 
+                engine.GetField("ManufactureDate").StringValue);
         }
 
         [TestMethod]
