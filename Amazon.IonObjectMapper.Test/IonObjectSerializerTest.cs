@@ -176,6 +176,7 @@ namespace Amazon.IonObjectMapper.Test
             var stream = defaultSerializer.Serialize(wheel);
             var deserialized = defaultSerializer.Deserialize<Wheel>(stream);
 
+            // Verify custom IonConstructor was used and remaining properties/fields were set after construction.
             Assert.AreEqual(
                 $"Specification: {wheel.Specification}, Size: {wheel.Size} inches", deserialized.Specification);
             Assert.AreEqual(wheel.offset, deserialized.offset);
