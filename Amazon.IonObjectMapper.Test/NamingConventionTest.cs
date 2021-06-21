@@ -1,7 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-
 namespace Amazon.IonObjectMapper.Test
 {
     [TestClass]
@@ -40,9 +39,9 @@ namespace Amazon.IonObjectMapper.Test
             {
                 { "customSerializerKey", new CustomSerializerValue()}
             };
-            
             var stream = new IonSerializer(new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention(), CustomContext =  customContext}).Serialize(TestObjects.honda);
             var serialized = Utils.StreamToIonValue(stream);
+            
             Assert.AreEqual(2010, serialized.GetField("year_of_manufacture").IntValue);
         }
     }

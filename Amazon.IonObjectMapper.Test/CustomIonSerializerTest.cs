@@ -13,7 +13,6 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void CanUseACustomSerializerFactory()
         {
-
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
                 {
                     { "customSerializerKey", new CustomSerializerValue()}
@@ -22,6 +21,7 @@ namespace Amazon.IonObjectMapper.Test
             var stream = customSerializer.Serialize(TestObjects.honda);
             var serialized = StreamToIonValue(stream);
             var engine = serialized.GetField("engine");
+            
             Assert.AreEqual(3, engine.GetField("Cylinders").IntValue);
         }
 

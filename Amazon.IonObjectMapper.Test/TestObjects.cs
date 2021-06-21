@@ -271,9 +271,9 @@ namespace Amazon.IonObjectMapper.Test
 
     public class CustomSerializerValue
     {
-        public int RemoveCylinder(int Cylinders)
+        public int RemoveCylinder(int cylinders)
         {
-            var idleCylinder = Cylinders - 1;
+            var idleCylinder = cylinders - 1;
             return idleCylinder;
         }
 
