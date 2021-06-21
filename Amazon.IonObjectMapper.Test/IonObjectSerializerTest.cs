@@ -169,13 +169,12 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void SerializesAndDeserializesObjectsWithIonConstructor()
+        public void DeserializesObjectsWithIonConstructor()
         {
-            var serializer = new IonSerializer();
             var wheel = new Wheel("default", 17, 20, "MSW", "black");
 
-            var stream = serializer.Serialize(wheel);
-            var deserialized = serializer.Deserialize<Wheel>(stream);
+            var stream = defaultSerializer.Serialize(wheel);
+            var deserialized = defaultSerializer.Deserialize<Wheel>(stream);
 
             Assert.AreEqual(
                 $"Specification: {wheel.Specification}, Size: {wheel.Size} inches", deserialized.Specification);
