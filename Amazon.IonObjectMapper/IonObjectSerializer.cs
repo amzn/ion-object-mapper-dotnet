@@ -240,7 +240,7 @@ namespace Amazon.IonObjectMapper
 
             // Deserialize Ion and organize deserialized results into four categories:
             // 1. Values to be passed into the Ion constructor.
-            // 2. Values to be set via annotated setters after construction.
+            // 2. Values to be set via annotated methods after construction.
             // 3. Properties to be set after construction.
             // 4. Fields to be set after construction.
             var constructorArgs = new object[parameters.Length];
@@ -289,7 +289,7 @@ namespace Amazon.IonObjectMapper
 
             var targetObject = ionConstructor.Invoke(constructorArgs);
 
-            // Set values with annotated setters.
+            // Set values with annotated methods.
             foreach (var (method, deserialized) in setterMethods)
             {
                 method.Invoke(targetObject, new[]{ deserialized });
