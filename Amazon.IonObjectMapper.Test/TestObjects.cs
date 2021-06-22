@@ -721,4 +721,113 @@ namespace Amazon.IonObjectMapper.Test
             return $"{DefaultProperty}";
         }
     }
+
+    public class ClassWithMethods
+    {
+        public string publicValue;
+        public string defaultValue;
+        public string protectedValue;
+        public string protectedInternalValue;
+        public string internalValue;
+        public string privateValue;
+        public string privateProtectedValue;
+
+        public ClassWithMethods() { }
+
+        public ClassWithMethods(string publicValue, string defaultValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
+        {
+            this.publicValue = publicValue;
+            this.defaultValue = defaultValue;
+            this.protectedValue = protectedValue;
+            this.protectedInternalValue = protectedInternalValue;
+            this.internalValue = internalValue;
+            this.privateValue = privateValue;
+            this.privateProtectedValue = privateProtectedValue;
+        }
+
+        [IonPropertyGetter("public value")]
+        public string GetPublicValue()
+        {
+            return this.publicValue;
+        }
+
+        [IonPropertySetter("public value")]
+        public void SetPublicValue(string value)
+        {
+            this.publicValue = value;
+        }
+
+        [IonPropertyGetter("default value")]
+        string GetDefaultValue()
+        {
+            return this.defaultValue;
+        }
+
+        [IonPropertySetter("default value")]
+        void SetDefaultValue(string value)
+        {
+            this.defaultValue = value;
+        }
+
+        [IonPropertyGetter("protected value")]
+        protected string GetProtectedValue()
+        { 
+            return this.protectedValue;
+        }
+
+        [IonPropertySetter("protected value")]
+        protected void SetProtectedValue(string value)
+        {
+            this.protectedValue = value;
+        }
+
+        [IonPropertyGetter("protected internal value")]
+        protected internal string GetProtectedInternalValue()
+        {
+            return this.protectedInternalValue;
+        }
+
+        [IonPropertySetter("protected internal value")]
+        protected internal void SetProtectedInternalValue(string value)
+        {
+            this.protectedInternalValue = value;
+        }
+
+        [IonPropertyGetter("internal value")]
+        internal string GetInternalValue()
+        {
+            return this.internalValue;
+        }
+
+        [IonPropertySetter("internal value")]
+        internal void SetInternalValue(string value)
+        {
+            this.internalValue = value;
+        }
+
+        [IonPropertyGetter("private value")]
+        private string GetPrivateValue()
+        {
+            return this.privateValue;
+        }
+
+        [IonPropertySetter("private value")]
+        private void SetPrivateValue(string value)
+        {
+            this.privateValue = value;
+        }
+
+        [IonPropertyGetter("private protected value")]
+        private protected string GetPrivateProtectedValue()
+        {
+            return this.privateProtectedValue;
+        }
+
+        [IonPropertySetter("private protected value")]
+        private protected void SetPrivateProtectedValue(string value)
+        {
+            this.privateProtectedValue = value;
+        }
+    }
 }
