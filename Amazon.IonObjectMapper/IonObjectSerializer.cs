@@ -178,7 +178,7 @@ namespace Amazon.IonObjectMapper
         private IEnumerable<(MethodInfo, string)> GetGetters()
         {
             var getters = new List<(MethodInfo, string)>();
-            foreach (var method in targetType.GetRuntimeMethods().Where(HasValidAccessModifier))
+            foreach (var method in targetType.GetMethods(BINDINGS))
             {
                 var getMethod = (IonPropertyGetter)method.GetCustomAttribute(typeof(IonPropertyGetter));
                 
@@ -196,7 +196,7 @@ namespace Amazon.IonObjectMapper
         
         private MethodInfo FindSetter(string name)
         {
-            return targetType.GetRuntimeMethods().Where(HasValidAccessModifier).FirstOrDefault(m =>
+            return targetType.GetMethods(BINDINGS).FirstOrDefault(m =>
             {
                 var setMethod = (IonPropertySetter)m.GetCustomAttribute(typeof(IonPropertySetter));
                 return setMethod != null && setMethod.IonPropertyName == name;
@@ -291,14 +291,6 @@ namespace Amazon.IonObjectMapper
             {
                 return methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly;
             }
-        }
-
-        /// <summary>
-        /// We only serde public, internal, and protected internal methods.
-        /// </summary>
-        private static bool HasValidAccessModifier(MethodInfo methodInfo)
-        {
-            return methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly;
         }
 
         private bool IsField(FieldInfo field)
