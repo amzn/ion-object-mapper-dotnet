@@ -36,7 +36,6 @@ namespace Amazon.IonObjectMapper.Test
         {
             var stream = new IonSerializer(new IonSerializationOptions { NamingConvention = new SnakeCaseNamingConvention() }).Serialize(TestObjects.honda);
             var serialized = Utils.StreamToIonValue(stream);
-            
             Assert.AreEqual(2010, serialized.GetField("year_of_manufacture").IntValue);
         }
     }

@@ -115,6 +115,7 @@ namespace Amazon.IonObjectMapper.Test
             Dictionary<Type, IIonSerializer> ionSerializers, T item)
         {
             var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
+
             var stream = serializer.Serialize(item);
             return StreamToIonValue(stream);
         }
@@ -122,6 +123,7 @@ namespace Amazon.IonObjectMapper.Test
         public static T DeserializeWithCustomSerializers<T>(Dictionary<Type, IIonSerializer> ionSerializers, T item)
         {
             var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
+            
             var stream = new IonSerializer().Serialize(item);
             return serializer.Deserialize<T>(stream);
         }
