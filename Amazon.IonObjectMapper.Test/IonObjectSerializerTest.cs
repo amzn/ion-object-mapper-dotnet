@@ -619,5 +619,59 @@ namespace Amazon.IonObjectMapper.Test
         {
             Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
         }
+
+        [TestMethod]
+        public void TestSerializingAndDeserializingPropertiesWithAccessModifiers()
+        {
+            var classWithProperties = new ClassWithProperties(PublicProperty: "PublicProperty", DefaultProperty: "DefaultProperty",
+                ProtectedProperty: "ProtectedProperty", ProtectedInternalProperty: "ProtectedInternalProperty", InternalProperty: "InternalProperty",
+                PrivateProperty: "PrivateProperty", PrivateProtectedProperty: "PrivateProtectedProperty");
+
+            var deserializedObject = Serde(classWithProperties);
+
+            Assert.AreEqual("PublicProperty", deserializedObject.PublicProperty);
+            Assert.AreEqual("", deserializedObject.GetDefaultProperty());
+            Assert.AreEqual("", deserializedObject.GetProtectedProperty());
+            Assert.AreEqual("ProtectedInternalProperty", deserializedObject.ProtectedInternalProperty);
+            Assert.AreEqual("InternalProperty", deserializedObject.InternalProperty);
+            Assert.AreEqual("", deserializedObject.GetPrivateProperty());
+            Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
+        }
+
+        [TestMethod]
+        public void TestSerializingAndDeserializingReadOnlyPropertiesWithAccessModifiers()
+        {
+            var classWithReadonlyProperties = new ClassWithReadonlyProperties(PublicProperty: "PublicProperty", DefaultProperty: "DefaultProperty",
+                ProtectedProperty: "ProtectedProperty", ProtectedInternalProperty: "ProtectedInternalProperty", InternalProperty: "InternalProperty",
+                PrivateProperty: "PrivateProperty", PrivateProtectedProperty: "PrivateProtectedProperty");
+
+            var deserializedObject = Serde(classWithReadonlyProperties);
+
+            Assert.AreEqual("PublicProperty", deserializedObject.PublicProperty);
+            Assert.AreEqual("", deserializedObject.GetDefaultProperty());
+            Assert.AreEqual("", deserializedObject.GetProtectedProperty());
+            Assert.AreEqual("ProtectedInternalProperty", deserializedObject.ProtectedInternalProperty);
+            Assert.AreEqual("InternalProperty", deserializedObject.InternalProperty);
+            Assert.AreEqual("", deserializedObject.GetPrivateProperty());
+            Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
+        }
+
+        [TestMethod]
+        public void TestSerializingAndDeserializingIonPropertyNamesWithAccessModifiers()
+        {
+            var classWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute(PublicProperty: "PublicProperty", DefaultProperty: "DefaultProperty",
+                ProtectedProperty: "ProtectedProperty", ProtectedInternalProperty: "ProtectedInternalProperty", InternalProperty: "InternalProperty",
+                PrivateProperty: "PrivateProperty", PrivateProtectedProperty: "PrivateProtectedProperty");
+
+            var deserializedObject = Serde(classWithIonPropertyNames);
+
+            Assert.AreEqual("PublicProperty", deserializedObject.PublicProperty);
+            Assert.AreEqual("", deserializedObject.GetDefaultProperty());
+            Assert.AreEqual("", deserializedObject.GetProtectedProperty());
+            Assert.AreEqual("ProtectedInternalProperty", deserializedObject.ProtectedInternalProperty);
+            Assert.AreEqual("InternalProperty", deserializedObject.InternalProperty);
+            Assert.AreEqual("", deserializedObject.GetPrivateProperty());
+            Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
+        }
     }
 }
