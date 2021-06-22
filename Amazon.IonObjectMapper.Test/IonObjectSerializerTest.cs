@@ -630,11 +630,11 @@ namespace Amazon.IonObjectMapper.Test
             var deserializedObject = Serde(objectWithProperties);
 
             Assert.AreEqual("PublicProperty", deserializedObject.PublicProperty);
-            Assert.AreEqual("", deserializedObject.GetProtectedProperty());
+            Assert.IsNull(deserializedObject.GetProtectedProperty());
             Assert.AreEqual("ProtectedInternalProperty", deserializedObject.ProtectedInternalProperty);
             Assert.AreEqual("InternalProperty", deserializedObject.InternalProperty);
-            Assert.AreEqual("", deserializedObject.GetPrivateProperty());
-            Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
+            Assert.IsNull(deserializedObject.GetPrivateProperty());
+            Assert.IsNull(deserializedObject.GetPrivateProtectedProperty());
         }
 
         [TestMethod]
@@ -647,11 +647,11 @@ namespace Amazon.IonObjectMapper.Test
             var deserializedObject = Serde(objectWithReadonlyProperties);
 
             Assert.AreEqual("PublicProperty", deserializedObject.PublicProperty);
-            Assert.AreEqual("", deserializedObject.GetProtectedProperty());
+            Assert.IsNull(deserializedObject.GetProtectedProperty());
             Assert.AreEqual("ProtectedInternalProperty", deserializedObject.ProtectedInternalProperty);
             Assert.AreEqual("InternalProperty", deserializedObject.InternalProperty);
-            Assert.AreEqual("", deserializedObject.GetPrivateProperty());
-            Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
+            Assert.IsNull(deserializedObject.GetPrivateProperty());
+            Assert.IsNull(deserializedObject.GetPrivateProtectedProperty());
         }
 
         [TestMethod]
@@ -664,11 +664,11 @@ namespace Amazon.IonObjectMapper.Test
             var deserializedObject = Serde(objectWithIonPropertyNames);
 
             Assert.AreEqual("PublicProperty", deserializedObject.PublicProperty);
-            Assert.AreEqual("", deserializedObject.GetProtectedProperty());
+            Assert.IsNull(deserializedObject.GetProtectedProperty());
             Assert.AreEqual("ProtectedInternalProperty", deserializedObject.ProtectedInternalProperty);
             Assert.AreEqual("InternalProperty", deserializedObject.InternalProperty);
-            Assert.AreEqual("", deserializedObject.GetPrivateProperty());
-            Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
+            Assert.IsNull(deserializedObject.GetPrivateProperty());
+            Assert.IsNull(deserializedObject.GetPrivateProtectedProperty());
         }
 
         [TestMethod]

@@ -508,17 +508,17 @@ namespace Amazon.IonObjectMapper.Test
 
         public string GetPrivateProtectedProperty()
         {
-            return $"{PrivateProtectedProperty}";
+            return PrivateProtectedProperty;
         }
 
         public string GetPrivateProperty()
         {
-            return $"{PrivateProperty}";
+            return PrivateProperty;
         }
 
         public string GetProtectedProperty()
         {
-            return $"{ProtectedProperty}";
+            return ProtectedProperty;
         }
     }
 
@@ -546,17 +546,17 @@ namespace Amazon.IonObjectMapper.Test
 
         public string GetPrivateProtectedProperty()
         {
-            return $"{PrivateProtectedProperty}";
+            return PrivateProtectedProperty;
         }
 
         public string GetPrivateProperty()
         {
-            return $"{PrivateProperty}";
+            return PrivateProperty;
         }
 
         public string GetProtectedProperty()
         {
-            return $"{ProtectedProperty}";
+            return ProtectedProperty;
         }
     }
 
@@ -596,17 +596,17 @@ namespace Amazon.IonObjectMapper.Test
 
         public string GetPrivateProtectedProperty()
         {
-            return $"{PrivateProtectedProperty}";
+            return PrivateProtectedProperty;
         }
 
         public string GetPrivateProperty()
         {
-            return $"{PrivateProperty}";
+            return PrivateProperty;
         }
 
         public string GetProtectedProperty()
         {
-            return $"{ProtectedProperty}";
+            return ProtectedProperty;
         }
     }
 
