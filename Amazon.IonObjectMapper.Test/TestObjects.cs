@@ -483,4 +483,242 @@ namespace Amazon.IonObjectMapper.Test
             return string.Join(Environment.NewLine, dictionary);
         }
     }
+
+    public class ClassWithProperties
+    {
+        public ClassWithProperties() { }
+
+        public ClassWithProperties(string PublicProperty, string DefaultProperty, string ProtectedProperty, string ProtectedInternalProperty,
+            string InternalProperty, string PrivateProperty, string PrivateProtectedProperty)
+        {
+            this.PublicProperty = PublicProperty;
+            this.DefaultProperty = DefaultProperty;
+            this.ProtectedProperty = ProtectedProperty;
+            this.ProtectedInternalProperty = ProtectedInternalProperty;
+            this.InternalProperty = InternalProperty;
+            this.PrivateProperty = PrivateProperty;
+            this.PrivateProtectedProperty = PrivateProtectedProperty;
+        }
+
+        public string PublicProperty
+        {
+            get;
+            set;
+        }
+
+        string DefaultProperty
+        {
+            get;
+            set;
+        }
+
+        protected string ProtectedProperty
+        {
+            get;
+            set;
+        }
+
+        protected internal string ProtectedInternalProperty
+        {
+            get;
+            set;
+        }
+
+        internal string InternalProperty
+        {
+            get;
+            set;
+        }
+
+        private string PrivateProperty
+        {
+            get;
+            set;
+        }
+
+        private protected string PrivateProtectedProperty
+        {
+            get;
+            set;
+        }
+
+        public string GetPrivateProtectedProperty()
+        {
+            return $"{PrivateProtectedProperty}";
+        }
+
+        public string GetPrivateProperty()
+        {
+            return $"{PrivateProperty}";
+        }
+
+        public string GetProtectedProperty()
+        {
+            return $"{ProtectedProperty}";
+        }
+
+        public string GetDefaultProperty()
+        {
+            return $"{DefaultProperty}";
+        }
+    }
+
+    public class ClassWithReadonlyProperties
+    {
+        public ClassWithReadonlyProperties() { }
+
+        public ClassWithReadonlyProperties(string PublicProperty, string DefaultProperty, string ProtectedProperty, string ProtectedInternalProperty,
+            string InternalProperty, string PrivateProperty, string PrivateProtectedProperty)
+        {
+            this.PublicProperty = PublicProperty;
+            this.DefaultProperty = DefaultProperty;
+            this.ProtectedProperty = ProtectedProperty;
+            this.ProtectedInternalProperty = ProtectedInternalProperty;
+            this.InternalProperty = InternalProperty;
+            this.PrivateProperty = PrivateProperty;
+            this.PrivateProtectedProperty = PrivateProtectedProperty;
+        }
+
+        public string PublicProperty
+        {
+            get;
+        }
+
+        string DefaultProperty
+        {
+            get;
+        }
+
+        protected string ProtectedProperty
+        {
+            get;
+        }
+
+        protected internal string ProtectedInternalProperty
+        {
+            get;
+        }
+
+        internal string InternalProperty
+        {
+            get;
+        }
+
+        private string PrivateProperty
+        {
+            get;
+        }
+
+        private protected string PrivateProtectedProperty
+        {
+            get;
+        }
+
+        public string GetPrivateProtectedProperty()
+        {
+            return $"{PrivateProtectedProperty}";
+        }
+
+        public string GetPrivateProperty()
+        {
+            return $"{PrivateProperty}";
+        }
+
+        public string GetProtectedProperty()
+        {
+            return $"{ProtectedProperty}";
+        }
+
+        public string GetDefaultProperty()
+        {
+            return $"{DefaultProperty}";
+        }
+    }
+
+
+    public class ClassWithIonPropertyNamesAttribute
+    {
+        public ClassWithIonPropertyNamesAttribute() { }
+
+        public ClassWithIonPropertyNamesAttribute(string PublicProperty, string DefaultProperty, string ProtectedProperty, string ProtectedInternalProperty,
+            string InternalProperty, string PrivateProperty, string PrivateProtectedProperty)
+        {
+            this.PublicProperty = PublicProperty;
+            this.DefaultProperty = DefaultProperty;
+            this.ProtectedProperty = ProtectedProperty;
+            this.ProtectedInternalProperty = ProtectedInternalProperty;
+            this.InternalProperty = InternalProperty;
+            this.PrivateProperty = PrivateProperty;
+            this.PrivateProtectedProperty = PrivateProtectedProperty;
+        }
+
+        [IonPropertyName("PublicPropertyz")]
+        public string PublicProperty
+        {
+            get;
+            set;
+        }
+
+        [IonPropertyName("DefaultPropertyz")]
+        string DefaultProperty
+        {
+            get;
+            set;
+        }
+
+        [IonPropertyName("ProtectedPropertyz")]
+        protected string ProtectedProperty
+        {
+            get;
+            set;
+        }
+
+        [IonPropertyName("ProtectedInternalPropertyz")]
+        protected internal string ProtectedInternalProperty
+        {
+            get;
+            set;
+        }
+
+        [IonPropertyName("InternalPropertyz")]
+        internal string InternalProperty
+        {
+            get;
+            set;
+        }
+
+        [IonPropertyName("PrivatePropertyz")]
+        private string PrivateProperty
+        {
+            get;
+            set;
+        }
+
+        [IonPropertyName("PrivateProtectedPropertyz")]
+        private protected string PrivateProtectedProperty
+        {
+            get;
+            set;
+        }
+
+        public string GetPrivateProtectedProperty()
+        {
+            return $"{PrivateProtectedProperty}";
+        }
+
+        public string GetPrivateProperty()
+        {
+            return $"{PrivateProperty}";
+        }
+
+        public string GetProtectedProperty()
+        {
+            return $"{ProtectedProperty}";
+        }
+
+        public string GetDefaultProperty()
+        {
+            return $"{DefaultProperty}";
+        }
+    }
 }
