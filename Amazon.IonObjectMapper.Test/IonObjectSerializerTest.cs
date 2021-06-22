@@ -15,12 +15,12 @@ namespace Amazon.IonObjectMapper.Test
     {
         IonSerializer defaultSerializer = new IonSerializer();
         private IValueFactory valueFactory = new ValueFactory();
+        
         [TestMethod]
         public void SerializesAndDeserializesObjects()
         {
             Check(TestObjects.honda);
         }
-
         [TestMethod]
         public void SerializesAndDeserializesObjectsWithIncludeFields()
         {
