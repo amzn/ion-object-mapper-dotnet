@@ -673,5 +673,23 @@ namespace Amazon.IonObjectMapper.Test
             Assert.AreEqual("", deserializedObject.GetPrivateProperty());
             Assert.AreEqual("", deserializedObject.GetPrivateProtectedProperty());
         }
+
+        [TestMethod]
+        public void TestSerializingAndDeserializingMethodsWithAccessModifiers()
+        {
+            var classWithMethods = new ClassWithMethods(publicValue: "PublicValue", defaultValue: "DefaultValue",
+                protectedValue: "ProtectedValue", protectedInternalValue: "ProtectedInternalValue", internalValue: "InternalValue",
+                privateValue: "PrivateValue", privateProtectedValue: "PrivateProtectedValue");
+
+            var deserializedObject = Serde(classWithMethods);
+
+            Assert.AreEqual("PublicValue", deserializedObject.publicValue);
+            Assert.IsNull(deserializedObject.defaultValue);
+            Assert.IsNull(deserializedObject.protectedValue);
+            Assert.AreEqual("ProtectedInternalValue", deserializedObject.protectedInternalValue);
+            Assert.AreEqual("InternalValue", deserializedObject.internalValue);
+            Assert.IsNull(deserializedObject.privateValue);
+            Assert.IsNull(deserializedObject.privateProtectedValue);
+        }
     }
 }
