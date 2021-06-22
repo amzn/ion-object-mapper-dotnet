@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Amazon.IonDotnet;
 
 namespace Amazon.IonObjectMapper.Test
 {
@@ -137,13 +136,20 @@ namespace Amazon.IonObjectMapper.Test
     }
 
     public static class TestObjects {
-        public static Car honda = new Car 
+        public static Car honda = new Car
         { 
             Make = "Honda", 
             Model = "Civic", 
             YearOfManufacture = 2010, 
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
+        };
+
+        public static Person bob = new Person
+        { 
+            Name = "Bob", 
+            Id = 123455, 
+            Course = new Course { Sections = 10, MeetingTime = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
         public static Truck nativeTruck = new Truck();
@@ -193,6 +199,29 @@ namespace Amazon.IonObjectMapper.Test
         };
     }
 
+    public class Person
+    {
+        public string Name { get; init; }
+        public int Id { get; init; }
+        public Course Course { get; init; }
+
+        public override string ToString()
+        {
+            return "<Person>{ Name: " + Name + ", Id: " + Id + " }";
+        }
+    }
+
+    [IonSerializer(Factory = typeof(CourseSerializerFactory))]  
+    public class Course
+    {
+        public int Sections { get; init; }
+        public DateTime MeetingTime { get; init; }
+        public override string ToString()
+        {
+            return "<Course>{ Sections: " + Sections + ", MeetingTime: " + MeetingTime + "}";
+        }
+    }
+
     public class Car
     {
         private string color;
@@ -224,7 +253,6 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
-    [IonSerializer(Factory = typeof(EngineSerializerFactory))]
     public class Engine
     {
         public int Cylinders { get; init; }
@@ -233,59 +261,6 @@ namespace Amazon.IonObjectMapper.Test
         public override string ToString()
         {
             return "<Engine>{ Cylinders: " + Cylinders + ", ManufactureDate: " + ManufactureDate + " }";
-        }
-    }
-
-    public class EngineSerializerFactory : IonSerializerFactory<Engine>
-    {
-        public override IonSerializer<Engine> Create(IonSerializationOptions options, Dictionary<string, object> context)
-        {
-            return new EngineSerializer((CustomSerializerValue)context.GetValueOrDefault("customSerializerKey", null));
-        }
-    }
-
-    public class EngineSerializer : IonSerializer<Engine>
-    {
-        private readonly CustomSerializerValue customSerializerValue;
-        public EngineSerializer(CustomSerializerValue customSerializerValue)
-        {
-            this.customSerializerValue = customSerializerValue;
-        }
-
-        public override Engine Deserialize(IIonReader reader)
-        {
-            return new Engine { Cylinders = customSerializerValue.AddCylinder(reader.IntValue()), ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z")};
-        }
-
-        public override void Serialize(IIonWriter writer, Engine item)
-        {
-            writer.StepIn(IonType.Struct);
-            writer.SetFieldName("Cylinders");
-            writer.WriteInt(customSerializerValue.RemoveCylinder(item.Cylinders));
-            writer.SetFieldName("ManufactureDate");
-            writer.WriteString(customSerializerValue.ShowCurrentTime());
-            writer.StepOut();
-
-        }
-    }
-
-    public class CustomSerializerValue
-    {
-        public int RemoveCylinder(int cylinders)
-        {
-            var idleCylinder = cylinders - 1;
-            return idleCylinder;
-        }
-
-        public int AddCylinder(int idleCylinder)
-        {
-            var cylinders = idleCylinder + 1;
-            return cylinders;
-        }
-
-        public string ShowCurrentTime ()
-        {
-            return DateTime.Now.ToString();
         }
     }
 

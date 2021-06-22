@@ -18,11 +18,13 @@ namespace Amazon.IonObjectMapper.Test
                     { "customSerializerKey", new CustomSerializerValue()}
                 }
             });
-            var stream = customSerializer.Serialize(TestObjects.honda);
+            var stream = customSerializer.Serialize(TestObjects.bob);
             var serialized = StreamToIonValue(stream);
-            var engine = serialized.GetField("engine");
-            
-            Assert.AreEqual(3, engine.GetField("Cylinders").IntValue);
+            Assert.IsTrue(serialized.ContainsField("name"));
+            Assert.IsTrue(serialized.ContainsField("course"));
+            Assert.IsTrue(serialized.ContainsField("id"));
+            var course = serialized.GetField("course");
+            Assert.AreEqual(9, course.GetField("Sections").IntValue);
         }
 
         [TestMethod]
@@ -34,10 +36,10 @@ namespace Amazon.IonObjectMapper.Test
                 }
             });
 
-            var stream = customSerializer.Serialize(TestObjects.honda);
-            var deserialized = customSerializer.Deserialize<Car>(stream);
+            var stream = customSerializer.Serialize(TestObjects.bob);
+            var deserialized = customSerializer.Deserialize<Person>(stream);
 
-            Assert.AreEqual(TestObjects.honda.ToString(), deserialized.ToString());
+            Assert.AreEqual(TestObjects.bob.ToString(), deserialized.ToString());
         }
     }
 }

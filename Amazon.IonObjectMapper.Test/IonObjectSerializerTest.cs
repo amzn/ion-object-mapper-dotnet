@@ -17,6 +17,12 @@ namespace Amazon.IonObjectMapper.Test
         private IValueFactory valueFactory = new ValueFactory();
         
         [TestMethod]
+        public void SerializesAndDeserializesObjects()
+        {
+            Check(TestObjects.honda);
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesObjectsWithIncludeFields()
         {
             Check(TestObjects.fieldAcademy, new IonSerializationOptions { IncludeFields = true });
@@ -488,12 +494,10 @@ namespace Amazon.IonObjectMapper.Test
 
             Assert.IsTrue(serialized.ContainsField("engine"));
             var engine = serialized.GetField("engine");
-            Assert.IsTrue(engine.ContainsField("Cylinders"));
-            Assert.AreEqual(3, engine.GetField("Cylinders").IntValue);
-            Assert.IsTrue(engine.ContainsField("ManufactureDate"));
+            Assert.IsTrue(engine.ContainsField("manufactureDate"));
             Assert.AreEqual(
-                DateTime.Now.ToString(), 
-                engine.GetField("ManufactureDate").StringValue);
+                TestObjects.honda.Engine.ManufactureDate.AddDays(1), 
+                engine.GetField("manufactureDate").TimestampValue.DateTimeValue);
         }
 
         [TestMethod]
@@ -512,7 +516,7 @@ namespace Amazon.IonObjectMapper.Test
             Assert.AreEqual(TestObjects.honda.Make.ToUpper(), deserialized.Make);
             Assert.AreEqual(-TestObjects.honda.YearOfManufacture, deserialized.YearOfManufacture);
             Assert.AreEqual(-TestObjects.honda.Weight, deserialized.Weight);
-            Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate, deserialized.Engine.ManufactureDate);
+            Assert.AreEqual(TestObjects.honda.Engine.ManufactureDate.AddDays(1), deserialized.Engine.ManufactureDate);
         }
 
         [TestMethod]
