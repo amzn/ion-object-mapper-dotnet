@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Amazon.IonDotnet;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Amazon.IonObjectMapper.Test.Utils;
 
@@ -15,7 +13,7 @@ namespace Amazon.IonObjectMapper.Test
         {
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
                 {
-                    { "customSerializerKey", new CustomSerializerValue()}
+                    { "customCourseSerializer", new CustomCourseSerializerFactory()}
                 }
             });
             var stream = customSerializer.Serialize(TestObjects.bob);
@@ -32,10 +30,9 @@ namespace Amazon.IonObjectMapper.Test
         {
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = new Dictionary<string, object>() 
                 {
-                    { "customSerializerKey", new CustomSerializerValue()}
+                    { "customCourseSerializer", new CustomCourseSerializerFactory()}
                 }
             });
-
             var stream = customSerializer.Serialize(TestObjects.bob);
             var deserialized = customSerializer.Deserialize<Person>(stream);
 

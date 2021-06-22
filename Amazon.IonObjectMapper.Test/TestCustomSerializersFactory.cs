@@ -7,22 +7,22 @@ public class CourseSerializerFactory : IonSerializerFactory<Course>
     {
         public override IonSerializer<Course> Create(IonSerializationOptions options, Dictionary<string, object> context)
         {
-            return new CourseSerializer((CustomSerializerValue)context.GetValueOrDefault("customSerializerKey", null));
+            return new CourseSerializer((CustomCourseSerializerFactory)context.GetValueOrDefault("customCourseSerializer", null));
         }
     }
 
     public class CourseSerializer : IonSerializer<Course>
     {
-        private readonly CustomSerializerValue customSerializerValue;
-        public CourseSerializer(CustomSerializerValue customSerializerValue)
+        private readonly CustomCourseSerializerFactory customCourseSerializerFactory;
+        public CourseSerializer(CustomCourseSerializerFactory customSerializerValue)
         {
-            this.customSerializerValue = customSerializerValue;
+            this.customCourseSerializerFactory = customSerializerValue;
         }
 
         public override Course Deserialize(IIonReader reader)
         {
             return new Course { 
-                Sections = customSerializerValue.AddSections(reader.IntValue()),
+                Sections = customCourseSerializerFactory.AddSections(reader.IntValue()),
                 MeetingTime = DateTime.Parse("2009-10-10T13:15:21Z")
             };
         }
@@ -31,15 +31,15 @@ public class CourseSerializerFactory : IonSerializerFactory<Course>
         {
             writer.StepIn(IonType.Struct);
             writer.SetFieldName("Sections");
-            writer.WriteInt(customSerializerValue.RemoveSections(item.Sections));
+            writer.WriteInt(customCourseSerializerFactory.RemoveSections(item.Sections));
             writer.SetFieldName("MeetingTime");
-            writer.WriteString(customSerializerValue.ShowCurrentTime());
+            writer.WriteString(customCourseSerializerFactory.ShowCurrentTime());
             writer.StepOut();
 
         }
     }
 
-    public class CustomSerializerValue
+    public class CustomCourseSerializerFactory
     {
         public int RemoveSections(int sections)
         {
