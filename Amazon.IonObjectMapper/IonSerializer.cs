@@ -172,11 +172,18 @@ namespace Amazon.IonObjectMapper
         public Dictionary<string, object> CustomContext { get; init; }
     }
 
+    /// <summary>
+    /// This interface is to create a custom IonSerializer to be used to serialize
+    /// and deserialize instances of the class annotated with Factory IonSerializerAttribute.
+    /// </summary>
     public interface IIonSerializerFactory
     {
         IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> customContext);
     }
 
+    /// <summary>
+    /// This abstract class is to implement IIonSerializerFactory interface.
+    /// </summary>
     public abstract class IonSerializerFactory<T> : IIonSerializerFactory
     {
         public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> customContext);
@@ -387,9 +394,8 @@ namespace Amazon.IonObjectMapper
             if (type != null) 
             {
                 var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
-
                 if (customSerializerAttribute != null) {
-                    var customSerializer = CreateCustomDeserializer(type);
+                    var customSerializer = CreateCustomSerializerForDeserializer(type);
                     return customSerializer.Deserialize(reader);
                 }
             }
@@ -542,7 +548,7 @@ namespace Amazon.IonObjectMapper
             return null;
         }
 
-        private IIonSerializer CreateCustomDeserializer (Type type)
+        private IIonSerializer CreateCustomSerializerForDeserializer (Type type)
         {
             var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
             if (customSerializerAttribute.Factory != null) {
