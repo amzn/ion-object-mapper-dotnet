@@ -20,7 +20,7 @@ namespace Amazon.IonObjectMapper
             this.options = options;
             this.targetType = targetType;
             this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
-                () => this.targetType.GetRuntimeProperties().Where(IsReadOnlyProperty).Where(HasValidAccessModifier));
+                () => this.targetType.GetRuntimeProperties().Where(HasValidAccessModifier).Where(IsReadOnlyProperty));
         }
 
         public override object Deserialize(IIonReader reader)
@@ -283,14 +283,11 @@ namespace Amazon.IonObjectMapper
         {
             var methodInfo = propertyInfo.GetGetMethod(true);
 
-            if (methodInfo is null)
-            {
-                return false;
-            }
-            else
+            if (methodInfo is not null)
             {
                 return methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly;
             }
+            return false;
         }
 
         private bool IsField(FieldInfo field)
