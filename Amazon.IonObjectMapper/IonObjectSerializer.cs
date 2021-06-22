@@ -283,11 +283,7 @@ namespace Amazon.IonObjectMapper
         {
             var methodInfo = propertyInfo.GetGetMethod(true);
 
-            if (methodInfo is not null)
-            {
-                return methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly;
-            }
-            return false;
+            return methodInfo is not null && (methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly);
         }
 
         private bool IsField(FieldInfo field)
