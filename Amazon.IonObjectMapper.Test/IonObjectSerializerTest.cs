@@ -623,9 +623,9 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void TestSerializingAndDeserializingPropertiesWithAccessModifiers()
         {
-            var objectWithProperties = new ClassWithProperties(PublicProperty: "PublicProperty", ProtectedProperty: "ProtectedProperty",
-                ProtectedInternalProperty: "ProtectedInternalProperty", InternalProperty: "InternalProperty",
-                PrivateProperty: "PrivateProperty", PrivateProtectedProperty: "PrivateProtectedProperty");
+            var objectWithProperties = new ClassWithProperties(publicProperty: "PublicProperty", protectedProperty: "ProtectedProperty",
+                protectedInternalProperty: "ProtectedInternalProperty", internalProperty: "InternalProperty",
+                privateProperty: "PrivateProperty", privateProtectedProperty: "PrivateProtectedProperty");
 
             var deserializedObject = Serde(objectWithProperties);
 
@@ -640,9 +640,9 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void TestSerializingAndDeserializingReadOnlyPropertiesWithAccessModifiers()
         {
-            var objectWithReadonlyProperties = new ClassWithReadonlyProperties(PublicProperty: "PublicProperty", ProtectedProperty: "ProtectedProperty",
-                ProtectedInternalProperty: "ProtectedInternalProperty", InternalProperty: "InternalProperty",
-                PrivateProperty: "PrivateProperty", PrivateProtectedProperty: "PrivateProtectedProperty");
+            var objectWithReadonlyProperties = new ClassWithReadonlyProperties(publicProperty: "PublicProperty", protectedProperty: "ProtectedProperty",
+                protectedInternalProperty: "ProtectedInternalProperty", internalProperty: "InternalProperty",
+                privateProperty: "PrivateProperty", privateProtectedProperty: "PrivateProtectedProperty");
 
             var deserializedObject = Serde(objectWithReadonlyProperties);
 
@@ -657,9 +657,9 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void TestSerializingAndDeserializingIonPropertyNamesWithAccessModifiers()
         {
-            var objectWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute(PublicProperty: "PublicProperty", ProtectedProperty: "ProtectedProperty",
-                ProtectedInternalProperty: "ProtectedInternalProperty", InternalProperty: "InternalProperty",
-                PrivateProperty: "PrivateProperty", PrivateProtectedProperty: "PrivateProtectedProperty");
+            var objectWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute(publicProperty: "PublicProperty", protectedProperty: "ProtectedProperty",
+                protectedInternalProperty: "ProtectedInternalProperty", internalProperty: "InternalProperty",
+                privateProperty: "PrivateProperty", privateProtectedProperty: "PrivateProtectedProperty");
 
             var deserializedObject = Serde(objectWithIonPropertyNames);
 
