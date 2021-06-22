@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using Amazon.IonDotnet;
 
 namespace Amazon.IonObjectMapper.Test {
-public class CourseSerializerFactory : IonSerializerFactory<Course>
+    public class CourseSerializerFactory : IonSerializerFactory<Course>
     {
         public override IonSerializer<Course> Create(IonSerializationOptions options, Dictionary<string, object> context)
         {
-            return new CourseSerializer((CustomCourseSerializerFactory)context.GetValueOrDefault("customCourseSerializer", null));
+            return new CourseSerializer((UpdateCourseSections)context.GetValueOrDefault("customCourseSerializer", null));
         }
     }
 
     public class CourseSerializer : IonSerializer<Course>
     {
-        private readonly CustomCourseSerializerFactory customCourseSerializerFactory;
-        public CourseSerializer(CustomCourseSerializerFactory customSerializerValue)
+        private readonly UpdateCourseSections updateCourseSections;
+        public CourseSerializer(UpdateCourseSections updateCourseSections)
         {
-            this.customCourseSerializerFactory = customSerializerValue;
+            this.updateCourseSections = updateCourseSections;
         }
 
         public override Course Deserialize(IIonReader reader)
         {
             return new Course { 
-                Sections = customCourseSerializerFactory.AddSections(reader.IntValue()),
+                Sections = updateCourseSections.AddSections(reader.IntValue()),
                 MeetingTime = DateTime.Parse("2009-10-10T13:15:21Z")
             };
         }
@@ -31,15 +31,14 @@ public class CourseSerializerFactory : IonSerializerFactory<Course>
         {
             writer.StepIn(IonType.Struct);
             writer.SetFieldName("Sections");
-            writer.WriteInt(customCourseSerializerFactory.RemoveSections(item.Sections));
+            writer.WriteInt(updateCourseSections.RemoveSections(item.Sections));
             writer.SetFieldName("MeetingTime");
-            writer.WriteString(customCourseSerializerFactory.ShowCurrentTime());
+            writer.WriteString(updateCourseSections.ShowCurrentTime());
             writer.StepOut();
-
         }
     }
 
-    public class CustomCourseSerializerFactory
+    public class UpdateCourseSections
     {
         public int RemoveSections(int sections)
         {
