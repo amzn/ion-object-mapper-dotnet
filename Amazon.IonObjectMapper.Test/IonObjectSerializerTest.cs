@@ -177,7 +177,7 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void ExceptionOnDeserializingObjectWithMultipleIonConstructors()
         {
-            var stream = defaultSerializer.Serialize(new Tire("default", 17));
+            var stream = defaultSerializer.Serialize(new Tire("default", "MSW"));
             Assert.ThrowsException<InvalidOperationException>(() => defaultSerializer.Deserialize<Tire>(stream));
         }
 
