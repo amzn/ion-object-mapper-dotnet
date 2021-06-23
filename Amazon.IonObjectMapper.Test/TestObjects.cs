@@ -197,10 +197,10 @@ namespace Amazon.IonObjectMapper.Test
         public static ClassWithReadonlyProperties objectWithReadonlyProperties = new ClassWithReadonlyProperties("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
 
-        public static ClassWithIonPropertyNamesAttribute objectWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute("Public Value", "Protected Value",
+        public static ClassWithIonPropertyNamesAttribute objectWithIonPropertyNameAttributes = new ClassWithIonPropertyNamesAttribute("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
 
-        public static ClassWithMethods objectWithmethods = new ClassWithMethods("Public Value", "Protected Value",
+        public static ClassWithMethods objectWithMethods = new ClassWithMethods("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
     }
 
@@ -533,19 +533,10 @@ namespace Amazon.IonObjectMapper.Test
         private string PrivateProperty { get; set; }
         private protected string PrivateProtectedProperty { get; set; }
 
-        public string GetPrivateProtectedProperty()
+        public override string ToString()
         {
-            return PrivateProtectedProperty;
-        }
-
-        public string GetPrivateProperty()
-        {
-            return PrivateProperty;
-        }
-
-        public string GetProtectedProperty()
-        {
-            return ProtectedProperty;
+            return $"<ClassWithProperties>{{ PublicProperty: {PublicProperty}, ProtectedProperty: {ProtectedProperty}, ProtectedInternalProperty: {ProtectedInternalProperty}, " +
+                   $"InternalProperty: {InternalProperty}, PrivateProperty: {PrivateProperty}, PrivateProtectedProperty: {PrivateProtectedProperty} }}";
         }
     }
 
@@ -571,19 +562,10 @@ namespace Amazon.IonObjectMapper.Test
         private string PrivateProperty { get; }
         private protected string PrivateProtectedProperty { get; }
 
-        public string GetPrivateProtectedProperty()
+        public override string ToString()
         {
-            return PrivateProtectedProperty;
-        }
-
-        public string GetPrivateProperty()
-        {
-            return PrivateProperty;
-        }
-
-        public string GetProtectedProperty()
-        {
-            return ProtectedProperty;
+            return $"<ClassWithReadonlyProperties>{{ PublicProperty: {PublicProperty}, ProtectedProperty: {ProtectedProperty}, ProtectedInternalProperty: {ProtectedInternalProperty}, " +
+                   $"InternalProperty: {InternalProperty}, PrivateProperty: {PrivateProperty}, PrivateProtectedProperty: {PrivateProtectedProperty} }}";
         }
     }
 
@@ -621,19 +603,10 @@ namespace Amazon.IonObjectMapper.Test
         [IonPropertyName("Private Protected Property")]
         private protected string PrivateProtectedProperty { get; set; }
 
-        public string GetPrivateProtectedProperty()
+        public override string ToString()
         {
-            return PrivateProtectedProperty;
-        }
-
-        public string GetPrivateProperty()
-        {
-            return PrivateProperty;
-        }
-
-        public string GetProtectedProperty()
-        {
-            return ProtectedProperty;
+            return $"<ClassWithIonPropertyNamesAttribute>{{ PublicProperty: {PublicProperty}, ProtectedProperty: {ProtectedProperty}, ProtectedInternalProperty: {ProtectedInternalProperty}, " +
+                   $"InternalProperty: {InternalProperty}, PrivateProperty: {PrivateProperty}, PrivateProtectedProperty: {PrivateProtectedProperty} }}";
         }
     }
 
@@ -729,6 +702,12 @@ namespace Amazon.IonObjectMapper.Test
         private protected void SetPrivateProtectedValue(string value)
         {
             this.privateProtectedValue = value;
+        }
+
+        public override string ToString()
+        {
+            return $"<ClassWithMethods>{{ PublicValue: {publicValue}, ProtectedValue: {protectedValue}, ProtectedInternalValue: {protectedInternalValue}, " +
+                   $"InternalValue: {internalValue}, PrivateValue: {privateValue}, PrivateProtectedValue: {privateProtectedValue} }}";
         }
     }
 }
