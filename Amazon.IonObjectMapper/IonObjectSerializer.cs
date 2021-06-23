@@ -71,11 +71,13 @@ namespace Amazon.IonObjectMapper
                 PropertyInfo property;
                 FieldInfo field;
                 object deserialized = null;
+                bool isDeserialized = false;
 
                 // Check if current Ion field has an annotated method.
                 if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
-                    if (this.TryDeserializeMethod(method, reader, ionType, out deserialized))
+                    isDeserialized = this.TryDeserializeMethod(method, reader, ionType, out deserialized);
+                    if (isDeserialized)
                     {
                         deserializedMethods.Add((method, deserialized));
                     }
@@ -83,7 +85,8 @@ namespace Amazon.IonObjectMapper
                 // Check if current Ion field is a .NET property.
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
-                    if (this.TryDeserializeProperty(property, reader, ionType, out deserialized))
+                    isDeserialized = this.TryDeserializeProperty(property, reader, ionType, out deserialized);
+                    if (isDeserialized)
                     {
                         deserializedProperties.Add((property, deserialized));
                     }
@@ -91,7 +94,8 @@ namespace Amazon.IonObjectMapper
                 // Check if current Ion field is a .NET field.
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
-                    if (this.TryDeserializeField(field, reader, ionType, out deserialized))
+                    isDeserialized = this.TryDeserializeField(field, reader, ionType, out deserialized);
+                    if (isDeserialized)
                     {
                         deserializedFields.Add((field, deserialized));
                     }
@@ -104,7 +108,10 @@ namespace Amazon.IonObjectMapper
                     
                     // Deserialize current Ion field only if it was not already
                     // deserialized by the above method/property/field logic.
-                    deserialized ??= ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                    if (!isDeserialized)
+                    {
+                        deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                    }
                     
                     constructorArgs[index] = deserialized;
                 }
