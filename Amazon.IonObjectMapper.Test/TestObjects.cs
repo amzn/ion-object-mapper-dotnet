@@ -710,4 +710,19 @@ namespace Amazon.IonObjectMapper.Test
                    $"InternalValue: {internalValue}, PrivateValue: {privateValue}, PrivateProtectedValue: {privateProtectedValue} }}";
         }
     }
+
+    public class ObjectWithPublicGetter
+    {
+        public string Property { init; get; }
+    }
+
+    public class ObjectWithPrivateSetter
+    {
+        public string field;
+
+        private string Property
+        {
+            set { field = value; }
+        }
+    }
 }

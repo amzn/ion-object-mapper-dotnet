@@ -20,7 +20,7 @@ namespace Amazon.IonObjectMapper
             this.options = options;
             this.targetType = targetType;
             this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
-                () => GetValidProperties().Where(IsReadOnlyProperty));
+                () => GetValidGettableProperties().Where(IsReadOnlyProperty));
         }
 
         public override object Deserialize(IIonReader reader)
@@ -110,7 +110,7 @@ namespace Amazon.IonObjectMapper
             }
 
             // Serialize any properties that satisfy the options/attributes.
-            foreach (var property in GetValidProperties())
+            foreach (var property in GetValidGettableProperties())
             {
                 var ionPropertyName = IonFieldNameFromProperty(property);
                 if (serializedIonFields.Contains(ionPropertyName))
@@ -216,7 +216,7 @@ namespace Amazon.IonObjectMapper
 
         private PropertyInfo FindProperty(string readName)
         {
-            var exact = IonNamedProperties().FirstOrDefault(p => 
+            var exact = GetValidSettableProperties().Where(IsIonNamedProperty).FirstOrDefault(p => 
                 {
                     var ionPropertyName = p.GetCustomAttribute<IonPropertyName>();
                     if (ionPropertyName != null)
@@ -232,13 +232,11 @@ namespace Amazon.IonObjectMapper
 
             if (options.PropertyNameCaseInsensitive)
             {
-                return GetValidProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
+                return GetValidSettableProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
             }
 
             var name = options.NamingConvention.ToProperty(readName);
-            var property = targetType.GetProperty(name, BINDINGS);
-
-            return property;
+            return GetValidSettableProperties().FirstOrDefault(p => String.Equals(p.Name, name));
         }
 
         private bool IsReadOnlyProperty(PropertyInfo property)
@@ -276,11 +274,22 @@ namespace Amazon.IonObjectMapper
         }
 
         /// <summary>
-        /// We only serde public, internal, and protected internal properties or properties with IonPropertyName annotation.
+        /// We only serialize public, internal, and protected internal gettable properties or properties with IonPropertyName annotation.
         /// </summary>
-        private static bool HasValidAccessModifier(PropertyInfo propertyInfo)
+        private static bool HasValidAccessModifierForGetter(PropertyInfo propertyInfo)
         {
             var methodInfo = propertyInfo.GetGetMethod(true);
+
+            return methodInfo != null && (methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly
+                || propertyInfo.GetCustomAttribute(typeof(IonPropertyName)) != null);
+        }
+
+        /// <summary>
+        /// We only deserialize public, internal, and protected internal settable properties or properties with IonPropertyName annotation.
+        /// </summary>
+        private static bool HasValidAccessModifierForSetter(PropertyInfo propertyInfo)
+        {
+            var methodInfo = propertyInfo.GetSetMethod(true);
 
             return methodInfo != null && (methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly
                 || propertyInfo.GetCustomAttribute(typeof(IonPropertyName)) != null);
@@ -307,11 +316,6 @@ namespace Amazon.IonObjectMapper
             return targetType.GetFields(BINDINGS).Where(IsField);
         }
 
-        private IEnumerable<PropertyInfo> IonNamedProperties()
-        {
-            return GetValidProperties().Where(IsIonNamedProperty);
-        }
-
         private string GetFieldName(FieldInfo field)
         {
             var propertyName = field.GetCustomAttribute(typeof(IonPropertyName));
@@ -322,9 +326,14 @@ namespace Amazon.IonObjectMapper
             return field.Name;
         }
 
-        private IEnumerable<PropertyInfo> GetValidProperties()
+        private IEnumerable<PropertyInfo> GetValidGettableProperties()
         {
-            return targetType.GetRuntimeProperties().Where(HasValidAccessModifier);
+            return targetType.GetRuntimeProperties().Where(HasValidAccessModifierForGetter);
+        }
+
+        private IEnumerable<PropertyInfo> GetValidSettableProperties()
+        {
+            return targetType.GetRuntimeProperties().Where(HasValidAccessModifierForSetter);
         }
     }
 }
