@@ -276,13 +276,13 @@ namespace Amazon.IonObjectMapper
         }
 
         /// <summary>
-        /// We only serde public, internal, and protected internal properties.
+        /// We only serde public, internal, and protected internal properties or properties with IonPropertyName annotation.
         /// </summary>
         private static bool HasValidAccessModifier(PropertyInfo propertyInfo)
         {
             var methodInfo = propertyInfo.GetGetMethod(true);
 
-            return methodInfo is not null && (methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly);
+            return methodInfo != null && ((methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly)) || propertyInfo.GetCustomAttribute(typeof(IonPropertyName)) != null;
         }
 
         private bool IsField(FieldInfo field)

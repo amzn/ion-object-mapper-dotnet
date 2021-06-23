@@ -662,9 +662,9 @@ namespace Amazon.IonObjectMapper.Test
             Assert.AreEqual("Public Value", serialized.GetField("Public Property").StringValue);
             Assert.AreEqual("Protected Internal Value", serialized.GetField("Protected Internal Property").StringValue);
             Assert.AreEqual("Internal Value", serialized.GetField("Internal Property").StringValue);
-            Assert.IsFalse(serialized.ContainsField("Protected Property"));
-            Assert.IsFalse(serialized.ContainsField("Private Property"));
-            Assert.IsFalse(serialized.ContainsField("Protected Private Property"));
+            Assert.AreEqual("Protected Value", serialized.GetField("Protected Property").StringValue);
+            Assert.AreEqual("Private Value", serialized.GetField("Private Property").StringValue);
+            Assert.AreEqual("Private Protected Value", serialized.GetField("Private Protected Property").StringValue);
         }
 
         [TestMethod]
@@ -699,9 +699,9 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void TestSerializingAndDeserializingIonPropertyNamesWithAccessModifiers()
         {
-            Check("<ClassWithIonPropertyNamesAttribute>{ PublicProperty: Public Value, ProtectedProperty: , " +
+            Check("<ClassWithIonPropertyNamesAttribute>{ PublicProperty: Public Value, ProtectedProperty: Protected Value, " +
                 "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
-                "PrivateProperty: , PrivateProtectedProperty:  }", TestObjects.objectWithIonPropertyNameAttributes);
+                "PrivateProperty: Private Value, PrivateProtectedProperty: Private Protected Value }", TestObjects.objectWithIonPropertyNameAttributes);
         }
 
         [TestMethod]
