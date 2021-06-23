@@ -282,8 +282,8 @@ namespace Amazon.IonObjectMapper
         {
             var methodInfo = propertyInfo.GetGetMethod(true);
 
-            return methodInfo != null && ((methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly))
-                || propertyInfo.GetCustomAttribute(typeof(IonPropertyName)) != null;
+            return methodInfo != null && (methodInfo.IsPublic || methodInfo.IsAssembly || methodInfo.IsFamilyOrAssembly
+                || propertyInfo.GetCustomAttribute(typeof(IonPropertyName)) != null);
         }
 
         private bool IsField(FieldInfo field)
