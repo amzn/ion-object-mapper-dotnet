@@ -190,6 +190,18 @@ namespace Amazon.IonObjectMapper.Test
             Weight = 52310,
             Capacity = 2230,
         };
+         
+        public static ClassWithProperties objectWithProperties = new ClassWithProperties("Public Property", "Protected Property",
+            "Protected Internal Property", "Internal Property", "Private Property", "Private Protected Property");
+
+        public static ClassWithReadonlyProperties objectWithReadonlyProperties = new ClassWithReadonlyProperties("Public Property", "Protected Property",
+            "Protected Internal Property", "Internal Property", "Private Property", "Private Protected Property");
+
+        public static ClassWithIonPropertyNamesAttribute objectWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute("Public Property", "Protected Property",
+            "Protected Internal Property", "Internal Property", "Private Property", "Private Protected Property");
+
+        public static ClassWithMethods objectWithmethods = new ClassWithMethods("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
     }
 
     public class Car
