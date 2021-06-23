@@ -305,20 +305,20 @@ namespace Amazon.IonObjectMapper.Test
     public class Wheel
     {
         public string Brand { get; init; }
-        public string specification { get; init; }
+        public string Specification { get; init; }
 
         [IonConstructor]
         public Wheel(
             [IonPropertyName("specification")] string specification,
             [IonPropertyName("brand")] string brand)
         {
-            this.specification = specification;
+            this.Specification = specification;
             this.Brand = brand;
         }
 
         public override string ToString()
         {
-            return $"<Wheel>{{ Specification: {specification}, Brand: {Brand} }}";
+            return $"<Wheel>{{ Specification: {Specification}, Brand: {Brand} }}";
         }
     }
 
@@ -326,21 +326,21 @@ namespace Amazon.IonObjectMapper.Test
     public class Tire
     {
         public string Brand { get; init; }
-        public string specification { get; init; }
+        public string Specification { get; init; }
 
         [IonConstructor]
         public Tire(
             [IonPropertyName("specification")] string specification,
             [IonPropertyName("brand")] string brand)
         {
-            this.specification = specification;
+            this.Specification = specification;
             this.Brand = brand;
         }
 
         [IonConstructor]
         private Tire([IonPropertyName("specification")] string specification)
         {
-            this.specification = specification;
+            this.Specification = specification;
         }
     }
 
