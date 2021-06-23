@@ -20,7 +20,7 @@ namespace Amazon.IonObjectMapper
             this.options = options;
             this.targetType = targetType;
             this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
-                () => this.targetType.GetRuntimeProperties().Where(HasValidAccessModifier).Where(IsReadOnlyProperty));
+                () => GetValidProperties().Where(IsReadOnlyProperty));
         }
 
         public override object Deserialize(IIonReader reader)
@@ -110,7 +110,7 @@ namespace Amazon.IonObjectMapper
             }
 
             // Serialize any properties that satisfy the options/attributes.
-            foreach (var property in targetType.GetRuntimeProperties().Where(HasValidAccessModifier))
+            foreach (var property in GetValidProperties())
             {
                 var ionPropertyName = IonFieldNameFromProperty(property);
                 if (serializedIonFields.Contains(ionPropertyName))
@@ -232,8 +232,7 @@ namespace Amazon.IonObjectMapper
 
             if (options.PropertyNameCaseInsensitive)
             {
-                return targetType.GetRuntimeProperties().Where(HasValidAccessModifier).
-                    FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
+                return GetValidProperties().FirstOrDefault(p => String.Equals(p.Name, readName, StringComparison.OrdinalIgnoreCase));
             }
 
             var name = options.NamingConvention.ToProperty(readName);
@@ -309,7 +308,7 @@ namespace Amazon.IonObjectMapper
 
         private IEnumerable<PropertyInfo> IonNamedProperties()
         {
-            return targetType.GetRuntimeProperties().Where(IsIonNamedProperty).Where(HasValidAccessModifier);
+            return GetValidProperties().Where(IsIonNamedProperty);
         }
 
         private string GetFieldName(FieldInfo field)
@@ -320,6 +319,11 @@ namespace Amazon.IonObjectMapper
                 return ((IonPropertyName)propertyName).Name;
             }
             return field.Name;
+        }
+
+        private IEnumerable<PropertyInfo> GetValidProperties()
+        {
+            return targetType.GetRuntimeProperties().Where(HasValidAccessModifier);
         }
     }
 }

@@ -621,6 +621,14 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
+        public void TestSerializingPropertiesWithOnlySetter()
+        {
+            IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(new ClassWithOnlySetProperty("test")));
+
+            Assert.IsFalse(serialized.ContainsField("setOnlyProperty"));
+        }
+
+        [TestMethod]
         public void TestSerializingPropertiesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithProperties));

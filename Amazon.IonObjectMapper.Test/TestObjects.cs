@@ -496,6 +496,21 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
+    public class ClassWithOnlySetProperty
+    {
+        private string val;
+
+        public ClassWithOnlySetProperty(string input)
+        {
+            val = input;
+        }
+
+        public string SetOnlyProperty
+        {
+            set { val = value; }
+        }
+    }
+
     public class ClassWithProperties
     {
         public ClassWithProperties() { }
