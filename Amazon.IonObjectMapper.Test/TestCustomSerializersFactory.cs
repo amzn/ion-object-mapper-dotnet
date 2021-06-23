@@ -52,7 +52,7 @@ namespace Amazon.IonObjectMapper.Test {
 
         public string ShowCurrentTime ()
         {
-            return DateTime.Now.ToString();
+            return DateTime.Parse("2021-10-10T13:15:21Z").ToString();
         }
     }
 }

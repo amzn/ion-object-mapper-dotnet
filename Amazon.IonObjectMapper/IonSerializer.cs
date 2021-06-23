@@ -178,6 +178,9 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public interface IIonSerializerFactory
     {
+        /// <summary>
+        /// Create custom IonSerializer with customContext option.
+        /// </summary>
         IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> customContext);
     }
 
@@ -186,6 +189,12 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public abstract class IonSerializerFactory<T> : IIonSerializerFactory
     {
+        /// <summary>
+        /// Create custom IonSerializer with customContext option.
+        /// </summary>
+        /// <returns>
+        /// Customized IonSerializer.
+        /// </returns>
         public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> customContext);
 
         IIonSerializer IIonSerializerFactory.Create(IonSerializationOptions options, Dictionary<string, object> customContext)
