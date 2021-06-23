@@ -73,11 +73,6 @@ namespace Amazon.IonObjectMapper.Test
         public static void Check<T>(string expectedString, T item)
         {
             var serializer = new IonSerializer();
-            if (item == null)
-            {
-                Assert.AreEqual(null, Serde(serializer, (object)null));
-                return;
-            }
             Assert.AreEqual(expectedString, Serde(serializer, item).ToString());
         }
 
