@@ -305,9 +305,7 @@ namespace Amazon.IonObjectMapper.Test
     public class Wheel
     {
         public string Brand { get; init; }
-
-        [IonField]
-        private string specification;
+        public string specification { get; init; }
 
         [IonConstructor]
         public Wheel(
@@ -328,9 +326,7 @@ namespace Amazon.IonObjectMapper.Test
     public class Tire
     {
         public string Brand { get; init; }
-
-        [IonField]
-        private string specification;
+        public string specification { get; init; }
 
         [IonConstructor]
         public Tire(
