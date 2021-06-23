@@ -25,6 +25,13 @@ namespace Amazon.IonObjectMapper
 
         public override object Deserialize(IIonReader reader)
         {
+            object targetObject = null;
+            ConstructorInfo ionConstructor = null;
+            ParameterInfo[] parameters = null;
+            object[] constructorArgs = null;
+            Dictionary<string, int> constructorArgIndexMap = null;
+
+            // Determine if we are using an annotated constructor.
             var ionConstructors = targetType.GetConstructors(BINDINGS).Where(IsIonConstructor).Take(2);
             if (ionConstructors.Any())
             {
@@ -35,48 +42,96 @@ namespace Amazon.IonObjectMapper
                         "with the [IonConstructor] attribute and more than one was detected");
                 }
 
-                return this.DeserializeWithIonConstructor(ionConstructors.First(), reader);
+                ionConstructor = ionConstructors.First();
+                parameters = ionConstructor.GetParameters();
+                constructorArgs = new object[parameters.Length];
+                constructorArgIndexMap = this.BuildConstructorArgIndexMap(parameters);
+            }
+            else
+            {
+                // If we are not using an annotated constructor, then we need to construct the object before stepping
+                // into the reader in case we need to read the type annotations during construction.
+                targetObject = options.ObjectFactory.Create(options, reader, targetType);
             }
 
-            var targetObject = options.ObjectFactory.Create(options, reader, targetType);
             reader.StepIn();
 
+            // Read the Ion and organize deserialized results into three categories:
+            // 1. Values to be set via annotated methods.
+            // 2. Properties to be set.
+            // 3. Fields to be set.
+            // Any of these deserialized results may also be used for the annotated constructor (if there is one). 
+            var deserializedMethods = new List<(MethodInfo, object)>();
+            var deserializedProperties = new List<(PropertyInfo, object)>();
+            var deserializedFields = new List<(FieldInfo, object)>();
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
                 MethodInfo method;
                 PropertyInfo property;
                 FieldInfo field;
+                object deserialized = null;
 
-                // Check if current Ion field has a IonPropertySetter annotated setter method.
+                // Check if current Ion field has an annotated method.
                 if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
-                    var deserialized = new object();
-                    if (this.TryDeserializeMethod(method, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeMethod(method, reader, ionType, out deserialized))
                     {
-                        method.Invoke(targetObject, new[]{ deserialized });
+                        deserializedMethods.Add((method, deserialized));
                     }
                 }
                 // Check if current Ion field is a .NET property.
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
-                    var deserialized = new object();
-                    if (this.TryDeserializeProperty(property, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeProperty(property, reader, ionType, out deserialized))
                     {
-                        property.SetValue(targetObject, deserialized);
+                        deserializedProperties.Add((property, deserialized));
                     }
                 }
                 // Check if current Ion field is a .NET field.
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
-                    var deserialized = new object();
-                    if (this.TryDeserializeField(field, reader, ionType, ref deserialized))
+                    if (this.TryDeserializeField(field, reader, ionType, out deserialized))
                     {
-                        field.SetValue(targetObject, deserialized);
+                        deserializedFields.Add((field, deserialized));
                     }
                 }
+                
+                // Check if current Ion field is also an argument for an annotated constructor.
+                if (constructorArgIndexMap != null && constructorArgIndexMap.ContainsKey(reader.CurrentFieldName))
+                {
+                    var index = constructorArgIndexMap[reader.CurrentFieldName];
+                    deserialized ??= ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                    constructorArgs[index] = deserialized;
+                }
             }
+
             reader.StepOut();
+
+            // Construct object with annotated constructor if we have one.
+            if (ionConstructor != null)
+            {
+                targetObject = ionConstructor.Invoke(constructorArgs);
+            }
+
+            // Set values with annotated methods.
+            foreach (var (method, deserialized) in deserializedMethods)
+            {
+                method.Invoke(targetObject, new[]{ deserialized });
+            }
+            
+            // Set properties.
+            foreach (var (property, deserialized) in deserializedProperties)
+            {
+                property.SetValue(targetObject, deserialized);
+            }
+            
+            // Set fields.
+            foreach (var (field, deserialized) in deserializedFields)
+            {
+                field.SetValue(targetObject, deserialized);
+            }
+
             return targetObject;
         }
 
@@ -165,7 +220,7 @@ namespace Amazon.IonObjectMapper
         }
 
         // Deserialize the given method and return bool to indicate whether the deserialized result should be used.
-        private bool TryDeserializeMethod(MethodInfo method, IIonReader reader, IonType ionType, ref object deserialized)
+        private bool TryDeserializeMethod(MethodInfo method, IIonReader reader, IonType ionType, out object deserialized)
         {
             // A setter should have exactly one argument.
             var parameters = method.GetParameters();
@@ -183,7 +238,7 @@ namespace Amazon.IonObjectMapper
         
         // Deserialize the given property and return bool to indicate whether the deserialized result should be used.
         private bool TryDeserializeProperty(
-            PropertyInfo property, IIonReader reader, IonType ionType, ref object deserialized)
+            PropertyInfo property, IIonReader reader, IonType ionType, out object deserialized)
         {
             // We deserialize whether or not we ultimately use the result because values
             // for some Ion types need to be consumed in order to advance the reader.
@@ -201,7 +256,7 @@ namespace Amazon.IonObjectMapper
         }
         
         // Deserialize the given field and return bool to indicate whether the deserialized result should be used.
-        private bool TryDeserializeField(FieldInfo field, IIonReader reader, IonType ionType, ref object deserialized)
+        private bool TryDeserializeField(FieldInfo field, IIonReader reader, IonType ionType, out object deserialized)
         {
             // We deserialize whether or not we ultimately use the result because values
             // for some Ion types need to be consumed in order to advance the reader.
@@ -215,16 +270,14 @@ namespace Amazon.IonObjectMapper
             return !options.IgnoreDefaults || deserialized != default;
         }
 
-        private object DeserializeWithIonConstructor(ConstructorInfo ionConstructor, IIonReader reader)
+        // Compute mapping between parameter names and index in parameter array so we can figure out the
+        // correct order of the constructor arguments.
+        private Dictionary<string, int> BuildConstructorArgIndexMap(ParameterInfo[] parameters)
         {
-            var parameters = ionConstructor.GetParameters();
-
-            // Compute mapping between parameter names and index in parameter array so we can figure out the
-            // correct order of the constructor arguments.
-            var paramIndexMap = new Dictionary<string, int>();
+            var constructorArgIndexMap = new Dictionary<string, int>();
             for (int i = 0; i < parameters.Length; i++)
             {
-                var ionPropertyName = (IonPropertyName) parameters[i].GetCustomAttribute(typeof(IonPropertyName));
+                var ionPropertyName = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
                 if (ionPropertyName == null)
                 {
                     throw new NotSupportedException(
@@ -233,79 +286,10 @@ namespace Amazon.IonObjectMapper
                         "so we know which parameters to set at construction time.");
                 }
 
-                paramIndexMap.Add(ionPropertyName.Name, i);
+                constructorArgIndexMap.Add(ionPropertyName.Name, i);
             }
 
-            reader.StepIn();
-
-            // Deserialize Ion and organize deserialized results into four categories:
-            // 1. Values to be passed into the Ion constructor.
-            // 2. Values to be set via annotated methods after construction.
-            // 3. Properties to be set after construction.
-            // 4. Fields to be set after construction.
-            var constructorArgs = new object[parameters.Length];
-            var setterMethods = new List<(MethodInfo, object)>();
-            var remainingProperties = new List<(PropertyInfo, object)>();
-            var remainingFields = new List<(FieldInfo, object)>();
-            IonType ionType;
-            while ((ionType = reader.MoveNext()) != IonType.None)
-            {
-                MethodInfo method;
-                PropertyInfo property;
-                FieldInfo field;
-                if (paramIndexMap.ContainsKey(reader.CurrentFieldName))
-                {
-                    var index = paramIndexMap[reader.CurrentFieldName];
-                    var deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
-                    constructorArgs[index] = deserialized;
-                }
-                else if ((method = FindSetter(reader.CurrentFieldName)) != null)
-                {
-                    var deserialized = new object();
-                    if (this.TryDeserializeMethod(method, reader, ionType, ref deserialized))
-                    {
-                        setterMethods.Add((method, deserialized));
-                    }
-                }
-                else if ((property = FindProperty(reader.CurrentFieldName)) != null)
-                {
-                    var deserialized = new object();
-                    if (this.TryDeserializeProperty(property, reader, ionType, ref deserialized))
-                    {
-                        remainingProperties.Add((property, deserialized));
-                    }
-                }
-                else if ((field = FindField(reader.CurrentFieldName)) != null)
-                {
-                    var deserialized = new object();
-                    if (this.TryDeserializeField(field, reader, ionType, ref deserialized))
-                    {
-                        remainingFields.Add((field, deserialized));
-                    }
-                }
-            }
-
-            reader.StepOut();
-
-            var targetObject = ionConstructor.Invoke(constructorArgs);
-
-            // Set values with annotated methods.
-            foreach (var (method, deserialized) in setterMethods)
-            {
-                method.Invoke(targetObject, new[]{ deserialized });
-            }
-            
-            // Set remaining properties/fields.
-            foreach (var (property, deserialized) in remainingProperties)
-            {
-                property.SetValue(targetObject, deserialized);
-            }
-            foreach (var (field, deserialized) in remainingFields)
-            {
-                field.SetValue(targetObject, deserialized);
-            }
-
-            return targetObject;
+            return constructorArgIndexMap;
         }
 
         private IEnumerable<(MethodInfo, string)> GetGetters()
