@@ -181,6 +181,15 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// Create custom IonSerializer with customContext option.
         /// </summary>
+        /// <param name="options">
+        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object.
+        /// </param>
+        /// <param name="customContext">
+        /// The Dictionary<string, object> to use to create custom context. A Dictionary of Key Type string and Value Type object.
+        /// </param>
+        /// <returns>
+        /// Customized IonSerializer.
+        /// </returns>
         IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> customContext);
     }
 
@@ -192,6 +201,12 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// Create custom IonSerializer with customContext option.
         /// </summary>
+        /// <param name="options">
+        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object.
+        /// </param>
+        /// <param name="customContext">
+        /// The Dictionary<string, object> to use to create custom context. A Dictionary of Key Type string and Value Type object.
+        /// </param>
         /// <returns>
         /// Customized IonSerializer.
         /// </returns>
@@ -351,7 +366,7 @@ namespace Amazon.IonObjectMapper
             {
                 var customSerializerAttribute = item.GetType().GetCustomAttribute<IonSerializerAttribute>();
                 if (customSerializerAttribute != null) {
-                    var customSerializer = CreateCustomSerializer(item);
+                    var customSerializer = CreateCustomSerializer(item.GetType());
                     customSerializer.Serialize(writer, item);
                     return;
                 }
@@ -404,7 +419,7 @@ namespace Amazon.IonObjectMapper
             {
                 var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
                 if (customSerializerAttribute != null) {
-                    var customSerializer = CreateCustomSerializerForDeserializer(type);
+                    var customSerializer = CreateCustomSerializer(type);
                     return customSerializer.Deserialize(reader);
                 }
             }
@@ -543,32 +558,19 @@ namespace Amazon.IonObjectMapper
             return defaultSerializer;
         }
 
-        private IIonSerializer CreateCustomSerializer (object item)
+        private IIonSerializer CreateCustomSerializer (Type targetType)
         {
-            var customSerializerAttribute = item.GetType().GetCustomAttribute<IonSerializerAttribute>();
+            var customSerializerAttribute = targetType.GetCustomAttribute<IonSerializerAttribute>();
             if (customSerializerAttribute.Factory != null) {
                 var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
                 var customSerializer = customSerializerFactory.Create(options, options.CustomContext);
                 return customSerializer;
             } else if (customSerializerAttribute.Serializer != null) {
-                // Create customSerializer with serializer attribute
-            } 
-
-            return null;
-        }
-
-        private IIonSerializer CreateCustomSerializerForDeserializer (Type type)
-        {
-            var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
-            if (customSerializerAttribute.Factory != null) {
-                var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
-                var customSerializer = customSerializerFactory.Create(options, options.CustomContext);
+                var customSerializer = (IIonSerializer)Activator.CreateInstance(customSerializerAttribute.Serializer);
                 return customSerializer;
-            } else if (customSerializerAttribute.Serializer != null) {
-                // Create customSerializer with serializer attribute
             } 
 
-            return null;
+            throw new InvalidOperationException($"[IonSerializer] annotated type {targetType} should have a valid IonSerializerAttribute Factory or Serializer");
         }
     }
 }

@@ -15,7 +15,6 @@ namespace Amazon.IonObjectMapper.Test
             { 
                 { "customCourseSerializer", new UpdateCourseSections() }
             };
-            Check(TestObjects.bob, new IonSerializationOptions { CustomContext = customContext });
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = customContext });
             var stream = customSerializer.Serialize(TestObjects.bob);
             var serialized = StreamToIonValue(stream);
@@ -24,7 +23,7 @@ namespace Amazon.IonObjectMapper.Test
             Assert.IsTrue(serialized.ContainsField("id"));
             var course = serialized.GetField("course");
             Assert.AreEqual(9, course.GetField("Sections").IntValue);
-            Assert.AreEqual(DateTime.Parse("2021-10-10T13:15:21Z").ToString(), course.GetField("MeetingTime").StringValue);
+            Assert.AreEqual("2021-10-10T13:15:21Z", course.GetField("MeetingTime").StringValue);
         }
 
         [TestMethod]
@@ -35,11 +34,6 @@ namespace Amazon.IonObjectMapper.Test
                 { "customCourseSerializer", new UpdateCourseSections() }
             };
             Check(TestObjects.bob, new IonSerializationOptions { CustomContext = customContext });
-            var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = customContext });
-            var stream = customSerializer.Serialize(TestObjects.bob);
-            var deserialized = customSerializer.Deserialize<Person>(stream);
-
-            Assert.AreEqual(TestObjects.bob.ToString(), deserialized.ToString());
         }
     }
 }
