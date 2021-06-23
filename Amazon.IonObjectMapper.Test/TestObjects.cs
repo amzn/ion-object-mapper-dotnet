@@ -324,25 +324,27 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
+    // For testing multiple annotated constructors.
     public class Tire
     {
-        public string specification { get; init; }
-        public int size { get; init; }
+        public string Brand { get; init; }
+
+        [IonField]
+        private string specification;
 
         [IonConstructor]
-        public Tire(string specification, int size)
+        public Tire(
+            [IonPropertyName("specification")] string specification,
+            [IonPropertyName("brand")] string brand)
         {
             this.specification = specification;
-            this.size = size;
+            this.Brand = brand;
         }
 
         [IonConstructor]
-        private Tire(
-            [IonPropertyName("size")] int size,
-            [IonPropertyName("specification")] string specification)
+        private Tire([IonPropertyName("specification")] string specification)
         {
-            this.specification = $"Specification: {specification}, Size: {size} inches";
-            this.size = size;
+            this.specification = specification;
         }
     }
 
