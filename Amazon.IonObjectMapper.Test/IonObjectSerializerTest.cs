@@ -621,7 +621,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingPropertiesWithOnlySetter()
+        public void SerializePropertiesWithOnlySetter()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(new ClassWithOnlySetProperty("test")));
 
@@ -629,7 +629,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingPropertiesWithAccessModifiers()
+        public void SerializePropertiesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithProperties));
 
@@ -642,7 +642,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingReadOnlyPropertiesWithAccessModifiers()
+        public void SerializeReadOnlyPropertiesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithReadonlyProperties));
 
@@ -655,7 +655,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingIonPropertyNamesWithAccessModifiers()
+        public void SerializeIonPropertyNamesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithIonPropertyNameAttributes));
 
@@ -668,7 +668,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingMethodsWithAccessModifiers()
+        public void SerializeMethodsWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithMethods));
 
@@ -681,7 +681,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingAndDeserializingPropertiesWithAccessModifiers()
+        public void SerializeAndDeserializePropertiesWithAccessModifiers()
         {
             Check("<ClassWithProperties>{ PublicProperty: Public Value, ProtectedProperty: , " +
                 "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
@@ -689,7 +689,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingAndDeserializingReadOnlyPropertiesWithAccessModifiers()
+        public void SerializeAndDeserializeReadOnlyPropertiesWithAccessModifiers()
         {
             Check("<ClassWithReadonlyProperties>{ PublicProperty: Public Value, ProtectedProperty: , " +
                 "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
@@ -697,7 +697,7 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingAndDeserializingIonPropertyNamesWithAccessModifiers()
+        public void SerializeAndDeserializeIonPropertyNamesWithAccessModifiers()
         {
             Check("<ClassWithIonPropertyNamesAttribute>{ PublicProperty: Public Value, ProtectedProperty: Protected Value, " +
                 "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
@@ -705,11 +705,19 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
-        public void TestSerializingAndDeserializingMethodsWithAccessModifiers()
+        public void SerializeAndDeserializeMethodsWithAccessModifiers()
         {
             Check("<ClassWithMethods>{ PublicValue: Public Value, ProtectedValue: Protected Value, " +
                 "ProtectedInternalValue: Protected Internal Value, InternalValue: Internal Value, " +
                 "PrivateValue: Private Value, PrivateProtectedValue: Private Protected Value }", TestObjects.objectWithMethods);
+        }
+
+        [TestMethod]
+        public void DeserializeToPrivateProperty()
+        {
+            var stream = defaultSerializer.Serialize(new ObjectWithPublicGetter { Property = "value" } );
+            var deserializedObject = defaultSerializer.Deserialize<ObjectWithPrivateSetter>(stream);
+            Assert.IsNull(deserializedObject.field);
         }
     }
 }
