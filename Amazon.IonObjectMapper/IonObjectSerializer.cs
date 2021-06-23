@@ -71,34 +71,34 @@ namespace Amazon.IonObjectMapper
                 PropertyInfo property;
                 FieldInfo field;
                 object deserialized = null;
-                bool isDeserialized = false;
+                bool currentIonFieldProcessed = false;
 
                 // Check if current Ion field has an annotated method.
                 if ((method = FindSetter(reader.CurrentFieldName)) != null)
                 {
-                    isDeserialized = this.TryDeserializeMethod(method, reader, ionType, out deserialized);
-                    if (isDeserialized)
+                    if (this.TryDeserializeMethod(method, reader, ionType, out deserialized))
                     {
                         deserializedMethods.Add((method, deserialized));
                     }
+                    currentIonFieldProcessed = true;
                 }
                 // Check if current Ion field is a .NET property.
                 else if ((property = FindProperty(reader.CurrentFieldName)) != null)
                 {
-                    isDeserialized = this.TryDeserializeProperty(property, reader, ionType, out deserialized);
-                    if (isDeserialized)
+                    if (this.TryDeserializeProperty(property, reader, ionType, out deserialized))
                     {
                         deserializedProperties.Add((property, deserialized));
                     }
+                    currentIonFieldProcessed = true;
                 }
                 // Check if current Ion field is a .NET field.
                 else if ((field = FindField(reader.CurrentFieldName)) != null)
                 {
-                    isDeserialized = this.TryDeserializeField(field, reader, ionType, out deserialized);
-                    if (isDeserialized)
+                    if (this.TryDeserializeField(field, reader, ionType, out deserialized))
                     {
                         deserializedFields.Add((field, deserialized));
                     }
+                    currentIonFieldProcessed = true;
                 }
                 
                 // Check if current Ion field is also an argument for an annotated constructor.
@@ -107,8 +107,8 @@ namespace Amazon.IonObjectMapper
                     var index = constructorArgIndexMap[reader.CurrentFieldName];
                     
                     // Deserialize current Ion field only if it was not already
-                    // deserialized by the above method/property/field logic.
-                    if (!isDeserialized)
+                    // processed by the above method/property/field logic.
+                    if (!currentIonFieldProcessed)
                     {
                         deserialized = ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
                     }
