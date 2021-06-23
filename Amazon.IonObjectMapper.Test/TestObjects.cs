@@ -292,42 +292,23 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Wheel
     {
-        public string Specification { get; init; }
-        public int Size { get; init; }
         public string Brand { get; init; }
 
         [IonField]
-        internal string color;
-        internal int offset;
-
-        public Wheel(string specification, int size, int offset, string brand, string color)
-        {
-            this.Specification = specification;
-            this.Size = size;
-            this.offset = offset;
-            this.Brand = brand;
-            this.color = color;
-        }
+        private string specification;
 
         [IonConstructor]
-        private Wheel(
+        public Wheel(
             [IonPropertyName("specification")] string specification,
-            [IonPropertyName("size")] int size)
+            [IonPropertyName("brand")] string brand)
         {
-            this.Specification = $"Specification: {specification}, Size: {size} inches";
-            this.Size = size;
+            this.specification = specification;
+            this.Brand = brand;
         }
-        
-        [IonPropertyGetter("wheel offset")]
-        public int GetOffset() 
+
+        public override string ToString()
         {
-            return this.offset;
-        }
-        
-        [IonPropertySetter("wheel offset")]
-        public void SetOffset(int offset) 
-        {
-            this.offset = offset;
+            return $"<Wheel>{{ Specification: {specification}, Brand: {Brand} }}";
         }
     }
 
