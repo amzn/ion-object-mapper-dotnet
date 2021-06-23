@@ -624,9 +624,9 @@ namespace Amazon.IonObjectMapper.Test
         public void TestSerializingPropertiesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithProperties));
-            Assert.AreEqual("Public Property", serialized.GetField("publicProperty").StringValue);
-            Assert.AreEqual("Protected Internal Property", serialized.GetField("protectedInternalProperty").StringValue);
-            Assert.AreEqual("Internal Property", serialized.GetField("internalProperty").StringValue);
+            Assert.AreEqual("Public Value", serialized.GetField("publicProperty").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("protectedInternalProperty").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("internalProperty").StringValue);
 
             Assert.IsFalse(serialized.ContainsField("protectedProperty"));
             Assert.IsFalse(serialized.ContainsField("privateProperty"));
@@ -637,9 +637,9 @@ namespace Amazon.IonObjectMapper.Test
         public void TestSerializingReadOnlyPropertiesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithReadonlyProperties));
-            Assert.AreEqual("Public Property", serialized.GetField("<PublicProperty>k__BackingField").StringValue);
-            Assert.AreEqual("Protected Internal Property", serialized.GetField("<ProtectedInternalProperty>k__BackingField").StringValue);
-            Assert.AreEqual("Internal Property", serialized.GetField("<InternalProperty>k__BackingField").StringValue);
+            Assert.AreEqual("Public Value", serialized.GetField("<PublicProperty>k__BackingField").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("<ProtectedInternalProperty>k__BackingField").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("<InternalProperty>k__BackingField").StringValue);
 
             Assert.IsFalse(serialized.ContainsField("<ProtectedProperty>k__BackingField"));
             Assert.IsFalse(serialized.ContainsField("<PrivateProperty>k__BackingField"));
@@ -650,9 +650,9 @@ namespace Amazon.IonObjectMapper.Test
         public void TestSerializingIonPropertyNamesWithAccessModifiers()
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithIonPropertyNames));
-            Assert.AreEqual("Public Property", serialized.GetField("Public Property").StringValue);
-            Assert.AreEqual("Protected Internal Property", serialized.GetField("Protected Internal Property").StringValue);
-            Assert.AreEqual("Internal Property", serialized.GetField("Internal Property").StringValue);
+            Assert.AreEqual("Public Value", serialized.GetField("Public Property").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("Protected Internal Property").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("Internal Property").StringValue);
 
             Assert.IsFalse(serialized.ContainsField("Protected Property"));
             Assert.IsFalse(serialized.ContainsField("Private Property"));
@@ -677,10 +677,10 @@ namespace Amazon.IonObjectMapper.Test
         {
             var deserializedObject = Serde(TestObjects.objectWithProperties);
 
-            Assert.AreEqual("Public Property", deserializedObject.PublicProperty);
+            Assert.AreEqual("Public Value", deserializedObject.PublicProperty);
             Assert.IsNull(deserializedObject.GetProtectedProperty());
-            Assert.AreEqual("Protected Internal Property", deserializedObject.ProtectedInternalProperty);
-            Assert.AreEqual("Internal Property", deserializedObject.InternalProperty);
+            Assert.AreEqual("Protected Internal Value", deserializedObject.ProtectedInternalProperty);
+            Assert.AreEqual("Internal Value", deserializedObject.InternalProperty);
             Assert.IsNull(deserializedObject.GetPrivateProperty());
             Assert.IsNull(deserializedObject.GetPrivateProtectedProperty());
         }
@@ -690,10 +690,10 @@ namespace Amazon.IonObjectMapper.Test
         {
             var deserializedObject = Serde(TestObjects.objectWithReadonlyProperties);
 
-            Assert.AreEqual("Public Property", deserializedObject.PublicProperty);
+            Assert.AreEqual("Public Value", deserializedObject.PublicProperty);
             Assert.IsNull(deserializedObject.GetProtectedProperty());
-            Assert.AreEqual("Protected Internal Property", deserializedObject.ProtectedInternalProperty);
-            Assert.AreEqual("Internal Property", deserializedObject.InternalProperty);
+            Assert.AreEqual("Protected Internal Value", deserializedObject.ProtectedInternalProperty);
+            Assert.AreEqual("Internal Value", deserializedObject.InternalProperty);
             Assert.IsNull(deserializedObject.GetPrivateProperty());
             Assert.IsNull(deserializedObject.GetPrivateProtectedProperty());
         }
@@ -703,10 +703,10 @@ namespace Amazon.IonObjectMapper.Test
         {
             var deserializedObject = Serde(TestObjects.objectWithIonPropertyNames);
 
-            Assert.AreEqual("Public Property", deserializedObject.PublicProperty);
+            Assert.AreEqual("Public Value", deserializedObject.PublicProperty);
             Assert.IsNull(deserializedObject.GetProtectedProperty());
-            Assert.AreEqual("Protected Internal Property", deserializedObject.ProtectedInternalProperty);
-            Assert.AreEqual("Internal Property", deserializedObject.InternalProperty);
+            Assert.AreEqual("Protected Internal Value", deserializedObject.ProtectedInternalProperty);
+            Assert.AreEqual("Internal Value", deserializedObject.InternalProperty);
             Assert.IsNull(deserializedObject.GetPrivateProperty());
             Assert.IsNull(deserializedObject.GetPrivateProtectedProperty());
         }

@@ -191,14 +191,14 @@ namespace Amazon.IonObjectMapper.Test
             Capacity = 2230,
         };
          
-        public static ClassWithProperties objectWithProperties = new ClassWithProperties("Public Property", "Protected Property",
-            "Protected Internal Property", "Internal Property", "Private Property", "Private Protected Property");
+        public static ClassWithProperties objectWithProperties = new ClassWithProperties("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
 
-        public static ClassWithReadonlyProperties objectWithReadonlyProperties = new ClassWithReadonlyProperties("Public Property", "Protected Property",
-            "Protected Internal Property", "Internal Property", "Private Property", "Private Protected Property");
+        public static ClassWithReadonlyProperties objectWithReadonlyProperties = new ClassWithReadonlyProperties("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
 
-        public static ClassWithIonPropertyNamesAttribute objectWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute("Public Property", "Protected Property",
-            "Protected Internal Property", "Internal Property", "Private Property", "Private Protected Property");
+        public static ClassWithIonPropertyNamesAttribute objectWithIonPropertyNames = new ClassWithIonPropertyNamesAttribute("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
 
         public static ClassWithMethods objectWithmethods = new ClassWithMethods("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
@@ -500,15 +500,15 @@ namespace Amazon.IonObjectMapper.Test
     {
         public ClassWithProperties() { }
 
-        public ClassWithProperties(string publicProperty, string protectedProperty, string protectedInternalProperty,
-            string internalProperty, string privateProperty, string privateProtectedProperty)
+        public ClassWithProperties(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
         {
-            this.PublicProperty = publicProperty;
-            this.ProtectedProperty = protectedProperty;
-            this.ProtectedInternalProperty = protectedInternalProperty;
-            this.InternalProperty = internalProperty;
-            this.PrivateProperty = privateProperty;
-            this.PrivateProtectedProperty = privateProtectedProperty;
+            this.PublicProperty = publicValue;
+            this.ProtectedProperty = protectedValue;
+            this.ProtectedInternalProperty = protectedInternalValue;
+            this.InternalProperty = internalValue;
+            this.PrivateProperty = privateValue;
+            this.PrivateProtectedProperty = privateProtectedValue;
         }
 
         public string PublicProperty { get; set; }
@@ -538,15 +538,15 @@ namespace Amazon.IonObjectMapper.Test
     {
         public ClassWithReadonlyProperties() { }
 
-        public ClassWithReadonlyProperties(string publicProperty, string protectedProperty, string protectedInternalProperty,
-            string internalProperty, string privateProperty, string privateProtectedProperty)
+        public ClassWithReadonlyProperties(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
         {
-            this.PublicProperty = publicProperty;
-            this.ProtectedProperty = protectedProperty;
-            this.ProtectedInternalProperty = protectedInternalProperty;
-            this.InternalProperty = internalProperty;
-            this.PrivateProperty = privateProperty;
-            this.PrivateProtectedProperty = privateProtectedProperty;
+            this.PublicProperty = publicValue;
+            this.ProtectedProperty = protectedValue;
+            this.ProtectedInternalProperty = protectedInternalValue;
+            this.InternalProperty = internalValue;
+            this.PrivateProperty = privateValue;
+            this.PrivateProtectedProperty = privateProtectedValue;
         }
 
         public string PublicProperty { get; }
@@ -577,15 +577,15 @@ namespace Amazon.IonObjectMapper.Test
     {
         public ClassWithIonPropertyNamesAttribute() { }
 
-        public ClassWithIonPropertyNamesAttribute(string publicProperty, string protectedProperty, string protectedInternalProperty,
-            string internalProperty, string privateProperty, string privateProtectedProperty)
+        public ClassWithIonPropertyNamesAttribute(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
         {
-            this.PublicProperty = publicProperty;
-            this.ProtectedProperty = protectedProperty;
-            this.ProtectedInternalProperty = protectedInternalProperty;
-            this.InternalProperty = internalProperty;
-            this.PrivateProperty = privateProperty;
-            this.PrivateProtectedProperty = PrivateProtectedProperty;
+            this.PublicProperty = publicValue;
+            this.ProtectedProperty = protectedValue;
+            this.ProtectedInternalProperty = protectedInternalValue;
+            this.InternalProperty = internalValue;
+            this.PrivateProperty = privateValue;
+            this.PrivateProtectedProperty = privateProtectedValue;
         }
 
         [IonPropertyName("Public Property")]
