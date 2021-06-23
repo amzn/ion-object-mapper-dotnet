@@ -101,7 +101,11 @@ namespace Amazon.IonObjectMapper
                 if (constructorArgIndexMap != null && constructorArgIndexMap.ContainsKey(reader.CurrentFieldName))
                 {
                     var index = constructorArgIndexMap[reader.CurrentFieldName];
+                    
+                    // Deserialize current Ion field only if it was not already
+                    // deserialized by the above method/property/field logic.
                     deserialized ??= ionSerializer.Deserialize(reader, parameters[index].ParameterType, ionType);
+                    
                     constructorArgs[index] = deserialized;
                 }
             }
