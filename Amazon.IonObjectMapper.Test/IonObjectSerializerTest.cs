@@ -180,6 +180,13 @@ namespace Amazon.IonObjectMapper.Test
             var stream = defaultSerializer.Serialize(new Tire("default", "MSW"));
             Assert.ThrowsException<InvalidOperationException>(() => defaultSerializer.Deserialize<Tire>(stream));
         }
+        
+        [TestMethod]
+        public void ExceptionOnDeserializingObjectWithUnannotatedIonConstructorParameter()
+        {
+            var stream = defaultSerializer.Serialize(new Windshield(59, 31.5));
+            Assert.ThrowsException<InvalidOperationException>(() => defaultSerializer.Deserialize<Windshield>(stream));
+        }
 
         [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
