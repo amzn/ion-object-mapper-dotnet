@@ -173,6 +173,17 @@ namespace Amazon.IonObjectMapper.Test
         {
             Check(new Wheel("default", "MSW"));
         }
+        
+        [TestMethod]
+        public void CanDeserializeToDifferentTypeUsingIonConstructor()
+        {
+            var cr = new CircleRadius(5);
+            
+            var stream = defaultSerializer.Serialize(cr);
+            var cc = defaultSerializer.Deserialize<CircleCircumference>(stream);
+            
+            Assert.AreEqual(2 * Math.PI * cr.Radius, cc.Circumference);
+        }
 
         [TestMethod]
         public void ExceptionOnDeserializingObjectWithMultipleIonConstructors()
