@@ -291,7 +291,7 @@ namespace Amazon.IonObjectMapper
                 var ionPropertyName = (IonPropertyName)parameters[i].GetCustomAttribute(typeof(IonPropertyName));
                 if (ionPropertyName == null)
                 {
-                    throw new NotSupportedException(
+                    throw new InvalidOperationException(
                         $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
                         $"for {targetType.Name}'s IonConstructor. All constructor arguments must be annotated " +
                         "so we know which parameters to set at construction time.");

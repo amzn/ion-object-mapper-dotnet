@@ -344,6 +344,20 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
+    // For testing unannotated constructor parameters.
+    public class Windshield
+    {
+        public double Length { get; init; }
+        public double Height { get; init; } 
+        
+        [IonConstructor]
+        public Windshield(double length, double height)
+        {
+            this.Length = length;
+            this.Height = height;
+        }
+    }
+
     public class School
     {
         private readonly string address;
