@@ -182,10 +182,13 @@ namespace Amazon.IonObjectMapper
         /// Create custom IonSerializer with customContext option.
         /// </summary>
         /// <param name="options">
-        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object.
+        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
+        /// and determined the way to customize the IonSerializer.
         /// </param>
         /// <param name="customContext">
-        /// The Dictionary<string, object> to use to create custom context. A Dictionary of Key Type string and Value Type object.
+        /// The Dictionary<string, object> customContext is one option to create IonSerializer with custom arbitrary data.
+        /// A Dictionary of Key Type string is to map to any customized objects
+        /// and Value Type object is to custom any serialize/deserialize logic.
         /// </param>
         /// <returns>
         /// Customized IonSerializer.
@@ -202,10 +205,13 @@ namespace Amazon.IonObjectMapper
         /// Create custom IonSerializer with customContext option.
         /// </summary>
         /// <param name="options">
-        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object.
+        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
+        /// and determined the way to customize the IonSerializer.
         /// </param>
         /// <param name="customContext">
-        /// The Dictionary<string, object> to use to create custom context. A Dictionary of Key Type string and Value Type object.
+        /// The Dictionary<string, object> customContext is one option to create IonSerializer with custom arbitrary data.
+        /// A Dictionary of Key Type string is to map to any customized objects
+        /// and Value Type object is to custom any serialize/deserialize logic.
         /// </param>
         /// <returns>
         /// Customized IonSerializer.
@@ -561,13 +567,13 @@ namespace Amazon.IonObjectMapper
         private IIonSerializer CreateCustomSerializer (Type targetType)
         {
             var customSerializerAttribute = targetType.GetCustomAttribute<IonSerializerAttribute>();
-            if (customSerializerAttribute.Factory != null) {
-                var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
-                var customSerializer = customSerializerFactory.Create(options, options.CustomContext);
-                return customSerializer;
-            } else if (customSerializerAttribute.Serializer != null) {
-                var customSerializer = (IIonSerializer)Activator.CreateInstance(customSerializerAttribute.Serializer);
-                return customSerializer;
+            if (customSerializerAttribute.Factory != null) 
+            {
+                return ((IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory)).Create(options, options.CustomContext);
+            } 
+            else if (customSerializerAttribute.Serializer != null) 
+            {
+                return (IIonSerializer)Activator.CreateInstance(customSerializerAttribute.Serializer);
             } 
 
             throw new InvalidOperationException($"[IonSerializer] annotated type {targetType} should have a valid IonSerializerAttribute Factory or Serializer");

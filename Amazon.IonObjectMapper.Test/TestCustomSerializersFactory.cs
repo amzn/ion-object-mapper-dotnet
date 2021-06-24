@@ -33,7 +33,7 @@ namespace Amazon.IonObjectMapper.Test {
             writer.SetFieldName("Sections");
             writer.WriteInt(updateCourseSections.RemoveSections(item.Sections));
             writer.SetFieldName("MeetingTime");
-            writer.WriteString(updateCourseSections.ShowCurrentTime());
+            writer.WriteString(updateCourseSections.ShowNewTime());
             writer.StepOut();
         }
     }
@@ -50,10 +50,9 @@ namespace Amazon.IonObjectMapper.Test {
             return sections + 1;
         }
 
-        public string ShowCurrentTime ()
+        public string ShowNewTime ()
         {
-            string newTime = "2021-10-10T13:15:21Z";
-            return newTime;
+            return "2021-10-10T13:15:21Z";
         }
     }
 }
