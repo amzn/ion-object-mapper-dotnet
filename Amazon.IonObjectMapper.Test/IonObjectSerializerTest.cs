@@ -717,7 +717,7 @@ namespace Amazon.IonObjectMapper.Test
         {
             var stream = defaultSerializer.Serialize(new ObjectWithPublicGetter { Property = "value" } );
             var deserializedObject = defaultSerializer.Deserialize<ObjectWithPrivateSetter>(stream);
-            Assert.IsNull(deserializedObject.field);
+            Assert.IsNull(deserializedObject.val);
         }
     }
 }

@@ -569,7 +569,6 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
-
     public class ClassWithIonPropertyNamesAttribute
     {
         public ClassWithIonPropertyNamesAttribute() { }
@@ -718,11 +717,11 @@ namespace Amazon.IonObjectMapper.Test
 
     public class ObjectWithPrivateSetter
     {
-        public string field;
+        public string val;
 
         private string Property
         {
-            set { field = value; }
+            set { val = value; }
         }
     }
 }
