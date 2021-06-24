@@ -72,8 +72,7 @@ namespace Amazon.IonObjectMapper.Test
 
         public static void Check<T>(string expectedString, T item)
         {
-            var serializer = new IonSerializer();
-            Assert.AreEqual(expectedString, Serde(serializer, item).ToString());
+            Assert.AreEqual(expectedString, Serde(item).ToString());
         }
 
         public static void AssertHasAnnotation(string annotation, Stream stream)
