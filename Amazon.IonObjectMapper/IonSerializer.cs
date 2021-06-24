@@ -569,7 +569,8 @@ namespace Amazon.IonObjectMapper
             var customSerializerAttribute = targetType.GetCustomAttribute<IonSerializerAttribute>();
             if (customSerializerAttribute.Factory != null) 
             {
-                return ((IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory)).Create(options, options.CustomContext);
+                var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
+                return customSerializerFactory.Create(options, options.CustomContext);
             } 
             else if (customSerializerAttribute.Serializer != null) 
             {
