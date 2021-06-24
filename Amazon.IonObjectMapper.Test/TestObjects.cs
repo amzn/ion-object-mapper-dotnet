@@ -346,6 +346,31 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
+    // For testing serializing and deserializing between different types using an annotated constructor.
+    public class CircleRadius
+    {
+        public double Radius { get; init; }
+        
+        public CircleRadius(double radius)
+        {
+            this.Radius = radius;
+        }
+    }
+
+    // For testing serializing and deserializing between different types using an annotated constructor.
+    // We serialize a CircleRadius and then use the deserialized radius with the annotated constructor
+    // to create a CircleCircumference.
+    public class CircleCircumference
+    {
+        public double Circumference { get; init; }
+
+        [IonConstructor]
+        public CircleCircumference([IonPropertyName("radius")] double radius)
+        {
+            this.Circumference = 2 * Math.PI * radius;
+        }
+    }
+
     public class School
     {
         private readonly string address;
