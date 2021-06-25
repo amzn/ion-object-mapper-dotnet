@@ -197,6 +197,18 @@ namespace Amazon.IonObjectMapper.Test
             Weight = 52310,
             Capacity = 2230,
         };
+         
+        public static ClassWithProperties objectWithProperties = new ClassWithProperties("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
+
+        public static ClassWithReadonlyProperties objectWithReadonlyProperties = new ClassWithReadonlyProperties("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
+
+        public static ClassWithIonPropertyNamesAttribute objectWithIonPropertyNameAttributes = new ClassWithIonPropertyNamesAttribute("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
+
+        public static ClassWithMethods objectWithMethods = new ClassWithMethods("Public Value", "Protected Value",
+            "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
     }
 
     public class Person
@@ -322,10 +334,82 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Wheel
     {
-        [IonConstructor]
-        public Wheel([IonPropertyName("specification")] string specification)
-        {
+        public string Brand { get; init; }
+        public string Specification { get; init; }
 
+        [IonConstructor]
+        public Wheel(
+            [IonPropertyName("specification")] string specification,
+            [IonPropertyName("brand")] string brand)
+        {
+            this.Specification = specification;
+            this.Brand = brand;
+        }
+
+        public override string ToString()
+        {
+            return $"<Wheel>{{ Specification: {Specification}, Brand: {Brand} }}";
+        }
+    }
+
+    // For testing multiple annotated constructors.
+    public class Tire
+    {
+        public string Brand { get; init; }
+        public string Specification { get; init; }
+
+        [IonConstructor]
+        public Tire(
+            [IonPropertyName("specification")] string specification,
+            [IonPropertyName("brand")] string brand)
+        {
+            this.Specification = specification;
+            this.Brand = brand;
+        }
+
+        [IonConstructor]
+        private Tire([IonPropertyName("specification")] string specification)
+        {
+            this.Specification = specification;
+        }
+    }
+
+    // For testing unannotated constructor parameters.
+    public class Windshield
+    {
+        public double Length { get; init; }
+        public double Height { get; init; } 
+        
+        [IonConstructor]
+        public Windshield(double length, double height)
+        {
+            this.Length = length;
+            this.Height = height;
+        }
+    }
+
+    // For testing serializing and deserializing between different types using an annotated constructor.
+    public class CircleRadius
+    {
+        public double Radius { get; init; }
+        
+        public CircleRadius(double radius)
+        {
+            this.Radius = radius;
+        }
+    }
+
+    // For testing serializing and deserializing between different types using an annotated constructor.
+    // We serialize a CircleRadius and then use the deserialized radius with the annotated constructor
+    // to create a CircleCircumference.
+    public class CircleCircumference
+    {
+        public double Circumference { get; init; }
+
+        [IonConstructor]
+        public CircleCircumference([IonPropertyName("radius")] double radius)
+        {
+            this.Circumference = 2 * Math.PI * radius;
         }
     }
 
@@ -511,6 +595,235 @@ namespace Amazon.IonObjectMapper.Test
         public static string PrettyString(IDictionary<string, int> dictionary)
         {
             return string.Join(Environment.NewLine, dictionary);
+        }
+    }
+
+    public class ClassWithOnlySetProperty
+    {
+        private string val;
+
+        public ClassWithOnlySetProperty(string input)
+        {
+            val = input;
+        }
+
+        public string SetOnlyProperty
+        {
+            set { val = value; }
+        }
+    }
+
+    public class ClassWithProperties
+    {
+        public ClassWithProperties() { }
+
+        public ClassWithProperties(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
+        {
+            this.PublicProperty = publicValue;
+            this.ProtectedProperty = protectedValue;
+            this.ProtectedInternalProperty = protectedInternalValue;
+            this.InternalProperty = internalValue;
+            this.PrivateProperty = privateValue;
+            this.PrivateProtectedProperty = privateProtectedValue;
+        }
+
+        public string PublicProperty { get; set; }
+        protected string ProtectedProperty { get; set; }
+        protected internal string ProtectedInternalProperty { get; set; }
+        internal string InternalProperty { get; set; }
+        private string PrivateProperty { get; set; }
+        private protected string PrivateProtectedProperty { get; set; }
+
+        public override string ToString()
+        {
+            return $"<ClassWithProperties>{{ PublicProperty: {PublicProperty}, ProtectedProperty: {ProtectedProperty}, ProtectedInternalProperty: {ProtectedInternalProperty}, " +
+                   $"InternalProperty: {InternalProperty}, PrivateProperty: {PrivateProperty}, PrivateProtectedProperty: {PrivateProtectedProperty} }}";
+        }
+    }
+
+    public class ClassWithReadonlyProperties
+    {
+        public ClassWithReadonlyProperties() { }
+
+        public ClassWithReadonlyProperties(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
+        {
+            this.PublicProperty = publicValue;
+            this.ProtectedProperty = protectedValue;
+            this.ProtectedInternalProperty = protectedInternalValue;
+            this.InternalProperty = internalValue;
+            this.PrivateProperty = privateValue;
+            this.PrivateProtectedProperty = privateProtectedValue;
+        }
+
+        public string PublicProperty { get; }
+        protected string ProtectedProperty { get; }
+        protected internal string ProtectedInternalProperty { get; }
+        internal string InternalProperty { get; }
+        private string PrivateProperty { get; }
+        private protected string PrivateProtectedProperty { get; }
+
+        public override string ToString()
+        {
+            return $"<ClassWithReadonlyProperties>{{ PublicProperty: {PublicProperty}, ProtectedProperty: {ProtectedProperty}, ProtectedInternalProperty: {ProtectedInternalProperty}, " +
+                   $"InternalProperty: {InternalProperty}, PrivateProperty: {PrivateProperty}, PrivateProtectedProperty: {PrivateProtectedProperty} }}";
+        }
+    }
+
+    public class ClassWithIonPropertyNamesAttribute
+    {
+        public ClassWithIonPropertyNamesAttribute() { }
+
+        public ClassWithIonPropertyNamesAttribute(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
+        {
+            this.PublicProperty = publicValue;
+            this.ProtectedProperty = protectedValue;
+            this.ProtectedInternalProperty = protectedInternalValue;
+            this.InternalProperty = internalValue;
+            this.PrivateProperty = privateValue;
+            this.PrivateProtectedProperty = privateProtectedValue;
+        }
+
+        [IonPropertyName("Public Property")]
+        public string PublicProperty { get; set; }
+
+        [IonPropertyName("Protected Property")]
+        protected string ProtectedProperty { get; set; }
+
+        [IonPropertyName("Protected Internal Property")]
+        protected internal string ProtectedInternalProperty { get; set; }
+
+        [IonPropertyName("Internal Property")]
+        internal string InternalProperty { get; set; }
+
+        [IonPropertyName("Private Property")]
+        private string PrivateProperty { get; set; }
+
+        [IonPropertyName("Private Protected Property")]
+        private protected string PrivateProtectedProperty { get; set; }
+
+        public override string ToString()
+        {
+            return $"<ClassWithIonPropertyNamesAttribute>{{ PublicProperty: {PublicProperty}, ProtectedProperty: {ProtectedProperty}, ProtectedInternalProperty: {ProtectedInternalProperty}, " +
+                   $"InternalProperty: {InternalProperty}, PrivateProperty: {PrivateProperty}, PrivateProtectedProperty: {PrivateProtectedProperty} }}";
+        }
+    }
+
+    public class ClassWithMethods
+    {
+        public string publicValue;
+        public string protectedValue;
+        public string protectedInternalValue;
+        public string internalValue;
+        public string privateValue;
+        public string privateProtectedValue;
+
+        public ClassWithMethods() { }
+
+        public ClassWithMethods(string publicValue, string protectedValue, string protectedInternalValue,
+            string internalValue, string privateValue, string privateProtectedValue)
+        {
+            this.publicValue = publicValue;
+            this.protectedValue = protectedValue;
+            this.protectedInternalValue = protectedInternalValue;
+            this.internalValue = internalValue;
+            this.privateValue = privateValue;
+            this.privateProtectedValue = privateProtectedValue;
+        }
+
+        [IonPropertyGetter("public value")]
+        public string GetPublicValue()
+        {
+            return this.publicValue;
+        }
+
+        [IonPropertySetter("public value")]
+        public void SetPublicValue(string value)
+        {
+            this.publicValue = value;
+        }
+
+        [IonPropertyGetter("protected value")]
+        protected string GetProtectedValue()
+        { 
+            return this.protectedValue;
+        }
+
+        [IonPropertySetter("protected value")]
+        protected void SetProtectedValue(string value)
+        {
+            this.protectedValue = value;
+        }
+
+        [IonPropertyGetter("protected internal value")]
+        protected internal string GetProtectedInternalValue()
+        {
+            return this.protectedInternalValue;
+        }
+
+        [IonPropertySetter("protected internal value")]
+        protected internal void SetProtectedInternalValue(string value)
+        {
+            this.protectedInternalValue = value;
+        }
+
+        [IonPropertyGetter("internal value")]
+        internal string GetInternalValue()
+        {
+            return this.internalValue;
+        }
+
+        [IonPropertySetter("internal value")]
+        internal void SetInternalValue(string value)
+        {
+            this.internalValue = value;
+        }
+
+        [IonPropertyGetter("private value")]
+        private string GetPrivateValue()
+        {
+            return this.privateValue;
+        }
+
+        [IonPropertySetter("private value")]
+        private void SetPrivateValue(string value)
+        {
+            this.privateValue = value;
+        }
+
+        [IonPropertyGetter("private protected value")]
+        private protected string GetPrivateProtectedValue()
+        {
+            return this.privateProtectedValue;
+        }
+
+        [IonPropertySetter("private protected value")]
+        private protected void SetPrivateProtectedValue(string value)
+        {
+            this.privateProtectedValue = value;
+        }
+
+        public override string ToString()
+        {
+            return $"<ClassWithMethods>{{ PublicValue: {publicValue}, ProtectedValue: {protectedValue}, ProtectedInternalValue: {protectedInternalValue}, " +
+                   $"InternalValue: {internalValue}, PrivateValue: {privateValue}, PrivateProtectedValue: {privateProtectedValue} }}";
+        }
+    }
+
+    public class ObjectWithPublicGetter
+    {
+        public string Property { init; get; }
+    }
+
+    public class ObjectWithPrivateSetter
+    {
+        public string val;
+
+        private string Property
+        {
+            set { val = value; }
         }
     }
 }

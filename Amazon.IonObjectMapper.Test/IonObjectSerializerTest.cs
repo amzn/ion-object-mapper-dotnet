@@ -169,6 +169,37 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
+        public void DeserializesObjectsWithIonConstructor()
+        {
+            Check(new Wheel("default", "MSW"));
+        }
+        
+        [TestMethod]
+        public void CanDeserializeToDifferentTypeUsingIonConstructor()
+        {
+            var cr = new CircleRadius(5);
+            
+            var stream = defaultSerializer.Serialize(cr);
+            var cc = defaultSerializer.Deserialize<CircleCircumference>(stream);
+            
+            Assert.AreEqual(2 * Math.PI * cr.Radius, cc.Circumference);
+        }
+
+        [TestMethod]
+        public void ExceptionOnDeserializingObjectWithMultipleIonConstructors()
+        {
+            var stream = defaultSerializer.Serialize(new Tire("default", "MSW"));
+            Assert.ThrowsException<InvalidOperationException>(() => defaultSerializer.Deserialize<Tire>(stream));
+        }
+        
+        [TestMethod]
+        public void ExceptionOnDeserializingObjectWithUnannotatedIonConstructorParameter()
+        {
+            var stream = defaultSerializer.Serialize(new Windshield(59, 31.5));
+            Assert.ThrowsException<InvalidOperationException>(() => defaultSerializer.Deserialize<Windshield>(stream));
+        }
+
+        [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
             Check(
@@ -618,6 +649,106 @@ namespace Amazon.IonObjectMapper.Test
         private void AssertIsTruck(object actual)
         {
             Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
+        }
+
+        [TestMethod]
+        public void SerializePropertiesWithOnlySetter()
+        {
+            IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(new ClassWithOnlySetProperty("test")));
+
+            Assert.IsFalse(serialized.ContainsField("setOnlyProperty"));
+        }
+
+        [TestMethod]
+        public void SerializePropertiesWithAccessModifiers()
+        {
+            IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithProperties));
+
+            Assert.AreEqual("Public Value", serialized.GetField("publicProperty").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("protectedInternalProperty").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("internalProperty").StringValue);
+            Assert.IsFalse(serialized.ContainsField("protectedProperty"));
+            Assert.IsFalse(serialized.ContainsField("privateProperty"));
+            Assert.IsFalse(serialized.ContainsField("protectedPrivateProperty"));
+        }
+
+        [TestMethod]
+        public void SerializeReadOnlyPropertiesWithAccessModifiers()
+        {
+            IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithReadonlyProperties));
+
+            Assert.AreEqual("Public Value", serialized.GetField("<PublicProperty>k__BackingField").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("<ProtectedInternalProperty>k__BackingField").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("<InternalProperty>k__BackingField").StringValue);
+            Assert.IsFalse(serialized.ContainsField("<ProtectedProperty>k__BackingField"));
+            Assert.IsFalse(serialized.ContainsField("<PrivateProperty>k__BackingField"));
+            Assert.IsFalse(serialized.ContainsField("<ProtectedPrivateProperty>k__BackingField"));
+        }
+
+        [TestMethod]
+        public void SerializeIonPropertyNamesWithAccessModifiers()
+        {
+            IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithIonPropertyNameAttributes));
+
+            Assert.AreEqual("Public Value", serialized.GetField("Public Property").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("Protected Internal Property").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("Internal Property").StringValue);
+            Assert.AreEqual("Protected Value", serialized.GetField("Protected Property").StringValue);
+            Assert.AreEqual("Private Value", serialized.GetField("Private Property").StringValue);
+            Assert.AreEqual("Private Protected Value", serialized.GetField("Private Protected Property").StringValue);
+        }
+
+        [TestMethod]
+        public void SerializeMethodsWithAccessModifiers()
+        {
+            IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithMethods));
+
+            Assert.AreEqual("Public Value", serialized.GetField("public value").StringValue);
+            Assert.AreEqual("Protected Value", serialized.GetField("protected value").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("protected internal value").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("internal value").StringValue);
+            Assert.AreEqual("Private Value", serialized.GetField("private value").StringValue);
+            Assert.AreEqual("Private Protected Value", serialized.GetField("private protected value").StringValue);
+        }
+
+        [TestMethod]
+        public void SerializeAndDeserializePropertiesWithAccessModifiers()
+        {
+            Check("<ClassWithProperties>{ PublicProperty: Public Value, ProtectedProperty: , " +
+                "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
+                "PrivateProperty: , PrivateProtectedProperty:  }", TestObjects.objectWithProperties);
+        }
+
+        [TestMethod]
+        public void SerializeAndDeserializeReadOnlyPropertiesWithAccessModifiers()
+        {
+            Check("<ClassWithReadonlyProperties>{ PublicProperty: Public Value, ProtectedProperty: , " +
+                "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
+                "PrivateProperty: , PrivateProtectedProperty:  }", TestObjects.objectWithReadonlyProperties);
+        }
+
+        [TestMethod]
+        public void SerializeAndDeserializeIonPropertyNamesWithAccessModifiers()
+        {
+            Check("<ClassWithIonPropertyNamesAttribute>{ PublicProperty: Public Value, ProtectedProperty: Protected Value, " +
+                "ProtectedInternalProperty: Protected Internal Value, InternalProperty: Internal Value, " +
+                "PrivateProperty: Private Value, PrivateProtectedProperty: Private Protected Value }", TestObjects.objectWithIonPropertyNameAttributes);
+        }
+
+        [TestMethod]
+        public void SerializeAndDeserializeMethodsWithAccessModifiers()
+        {
+            Check("<ClassWithMethods>{ PublicValue: Public Value, ProtectedValue: Protected Value, " +
+                "ProtectedInternalValue: Protected Internal Value, InternalValue: Internal Value, " +
+                "PrivateValue: Private Value, PrivateProtectedValue: Private Protected Value }", TestObjects.objectWithMethods);
+        }
+
+        [TestMethod]
+        public void DeserializeToPrivateProperty()
+        {
+            var stream = defaultSerializer.Serialize(new ObjectWithPublicGetter { Property = "value" } );
+            var deserializedObject = defaultSerializer.Deserialize<ObjectWithPrivateSetter>(stream);
+            Assert.IsNull(deserializedObject.val);
         }
     }
 }

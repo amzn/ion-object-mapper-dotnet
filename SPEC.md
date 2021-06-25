@@ -153,7 +153,7 @@ public class Engine
 }
 ```
 
-the `init` keyword is a C# modifier which indicates that the property is only settable at construction time. In reality the Intermediate Language (IL) code just contains a regular setter and so long as properties in general have a getter and setter, the library will be able to use them. By default, all gettable properties will be serialized and all settable properties will be deserialized, but this can be configured as specified later in this document.
+the `init` keyword is a C# modifier which indicates that the property is only settable at construction time. In reality the Intermediate Language (IL) code just contains a regular setter and so long as properties in general have a getter and setter, the library will be able to use them. By default, all gettable properties will be serialized and all settable properties will be deserialized, but this can be configured as specified later in this document. The properties must have public, internal, or protected internal access modifiers.
 
 ### Default behavior when deserializing annotated Ion
 
@@ -278,11 +278,11 @@ public class Car
 }
 ```
 
-If the specified property name conflicts with a field name of the same class, the property will get precedence over the field during serialiation and/or deserialization.
+If the specified property name conflicts with a field name of the same class, the property will get precedence over the field during serialization and/or deserialization. The annotated property can have any access modifier.
 
 ### Methods
 
-By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name. In the event of a naming conflict between the specified annotated Ion property name and a property or field name of the class (such as the below example), the annotated Ion property name will get precedence over the class's property or field name during serialization and/or deserialization.
+By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name. In the event of a naming conflict between the specified annotated Ion property name and a property or field name of the class (such as the below example), the annotated Ion property name will get precedence over the class's property or field name during serialization and/or deserialization. The annotated method can have any access modifier.
 
 ```c#
 public class Car
@@ -306,7 +306,7 @@ public class Car
 
 ### Fields
 
-By default, C#fields are ignored. However, they can be annotated with an `Attribute` to be included or by an option specified later. Even private fields may be specified.
+By default, C# fields are ignored. However, they can be annotated with an `IonField` `Attribute` to be included or by an option specified later. The annotated field can have any access modifier.
 
 ```c#
 public class Car
