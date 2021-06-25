@@ -4,11 +4,11 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, release ]
 
 jobs:
   build:
-    name: Build
+    name: Build and test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,11 +26,15 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet }}
 
+      - name: Install dependencies
+        run: dotnet restore
       - name: Install Codecov tool
         run: dotnet tool install --global Codecov.Tool --version 1.13.0
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
 
-      - name: Build, unit test & generate coverage report
-        run: dotnet test --configuration Release --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      - name: Unit test & generate coverage report
+        run: dotnet test Amazon.IonObjectMapper.Test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v1
@@ -38,3 +42,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
 
+      - name: Performance test
+        if: github.base_ref == 'release'
+        run: dotnet test Amazon.IonObjectMapper.PerformanceTest
