@@ -382,10 +382,10 @@ namespace Amazon.IonObjectMapper
                 var propertyName = options.NamingConvention.ToProperty(name);
                 if (this.readOnlyProperties.Value.Any(p => p.Name == propertyName))
                 {
-                    exact = targetType.GetField($"<{propertyName}>k__BackingField", BINDINGS);
-                    if (exact != null)
+                    var backingField = targetType.GetField($"<{propertyName}>k__BackingField", BINDINGS);
+                    if (backingField != null)
                     {
-                        return exact;
+                        return backingField;
                     }
                 }
             }
