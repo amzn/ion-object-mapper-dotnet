@@ -32,11 +32,6 @@ namespace Amazon.IonObjectMapper
         }
     }
 
-    public interface IonSerializationContext
-    {
-
-    }
-
     public enum IonSerializationFormat 
     {
         BINARY,
@@ -174,11 +169,59 @@ namespace Amazon.IonObjectMapper
         public readonly bool PermissiveMode;
         
         public Dictionary<Type, IIonSerializer> IonSerializers { get; init; }
+        public Dictionary<string, object> CustomContext { get; init; }
     }
 
-    public interface IonSerializerFactory<T, TContext> where TContext : IonSerializationContext
+    /// <summary>
+    /// This interface is to create a custom IonSerializer to be used to serialize
+    /// and deserialize instances of the class annotated with Factory IonSerializerAttribute.
+    /// </summary>
+    public interface IIonSerializerFactory
     {
-        public IonSerializer<T> create(IonSerializationOptions options, TContext context);
+        /// <summary>
+        /// Create custom IonSerializer with customContext option.
+        /// </summary>
+        /// <param name="options">
+        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
+        /// and determined the way to customize the IonSerializer.
+        /// </param>
+        /// <param name="customContext">
+        /// The Dictionary<string, object> customContext is one option to create IonSerializer with custom arbitrary data.
+        /// A Dictionary of Key Type string is to map to any customized objects
+        /// and Value Type object is to custom any serialize/deserialize logic.
+        /// </param>
+        /// <returns>
+        /// Customized IonSerializer.
+        /// </returns>
+        IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> customContext);
+    }
+
+    /// <summary>
+    /// This abstract class is to implement IIonSerializerFactory interface.
+    /// </summary>
+    public abstract class IonSerializerFactory<T> : IIonSerializerFactory
+    {
+        /// <summary>
+        /// Create custom IonSerializer with customContext option.
+        /// </summary>
+        /// <param name="options">
+        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
+        /// and determined the way to customize the IonSerializer.
+        /// </param>
+        /// <param name="customContext">
+        /// The Dictionary<string, object> customContext is one option to create IonSerializer with custom arbitrary data.
+        /// A Dictionary of Key Type string is to map to any customized objects
+        /// and Value Type object is to custom any serialize/deserialize logic.
+        /// </param>
+        /// <returns>
+        /// Customized IonSerializer.
+        /// </returns>
+        public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> customContext);
+
+        IIonSerializer IIonSerializerFactory.Create(IonSerializationOptions options, Dictionary<string, object> customContext)
+        {
+            return Create(options, customContext);
+        }
     }
 
     public class IonSerializer
@@ -327,6 +370,13 @@ namespace Amazon.IonObjectMapper
 
             if (item is object)
             {
+                var customSerializerAttribute = item.GetType().GetCustomAttribute<IonSerializerAttribute>();
+                if (customSerializerAttribute != null) {
+                    var customSerializer = CreateCustomSerializer(item.GetType());
+                    customSerializer.Serialize(writer, item);
+                    return;
+                }
+
                 new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
                 return;
             }
@@ -369,6 +419,15 @@ namespace Amazon.IonObjectMapper
             if (reader.CurrentDepth > this.options.MaxDepth)
             {
                 return null;
+            }
+
+            if (type != null) 
+            {
+                var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
+                if (customSerializerAttribute != null) {
+                    var customSerializer = CreateCustomSerializer(type);
+                    return customSerializer.Deserialize(reader);
+                }
             }
 
             if (ionType == IonType.None || ionType == IonType.Null)
@@ -503,6 +562,22 @@ namespace Amazon.IonObjectMapper
             }
 
             return defaultSerializer;
+        }
+
+        private IIonSerializer CreateCustomSerializer (Type targetType)
+        {
+            var customSerializerAttribute = targetType.GetCustomAttribute<IonSerializerAttribute>();
+            if (customSerializerAttribute.Factory != null) 
+            {
+                var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
+                return customSerializerFactory.Create(options, options.CustomContext);
+            } 
+            else if (customSerializerAttribute.Serializer != null) 
+            {
+                return (IIonSerializer)Activator.CreateInstance(customSerializerAttribute.Serializer);
+            } 
+
+            throw new InvalidOperationException($"[IonSerializer] annotated type {targetType} should have a valid IonSerializerAttribute Factory or Serializer");
         }
     }
 }

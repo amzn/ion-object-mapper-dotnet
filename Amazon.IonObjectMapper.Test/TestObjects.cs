@@ -136,13 +136,20 @@ namespace Amazon.IonObjectMapper.Test
     }
 
     public static class TestObjects {
-        public static Car honda = new Car 
+        public static Car honda = new Car
         { 
             Make = "Honda", 
             Model = "Civic", 
             YearOfManufacture = 2010, 
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
+        };
+
+        public static Person bob = new Person
+        { 
+            Name = "Bob", 
+            Id = 123455, 
+            Course = new Course { Sections = 10, MeetingTime = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
         public static Truck nativeTruck = new Truck();
@@ -202,6 +209,29 @@ namespace Amazon.IonObjectMapper.Test
 
         public static ClassWithMethods objectWithMethods = new ClassWithMethods("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
+    }
+
+    public class Person
+    {
+        public string Name { get; init; }
+        public int Id { get; init; }
+        public Course Course { get; init; }
+
+        public override string ToString()
+        {
+            return "<Person>{ Name: " + Name + ", Id: " + Id + " }";
+        }
+    }
+
+    [IonSerializer(Factory = typeof(CourseSerializerFactory))]  
+    public class Course
+    {
+        public int Sections { get; init; }
+        public DateTime MeetingTime { get; init; }
+        public override string ToString()
+        {
+            return "<Course>{ Sections: " + Sections + ", MeetingTime: " + MeetingTime + "}";
+        }
     }
 
     public class Car
