@@ -12,15 +12,12 @@ namespace Amazon.IonObjectMapper
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
-        private readonly Lazy<IEnumerable<PropertyInfo>> readOnlyProperties;
 
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
             this.options = options;
             this.targetType = targetType;
-            this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
-                () => GetValidProperties(true).Where(IsReadOnlyProperty));
         }
 
         public override object Deserialize(IIonReader reader)
@@ -362,7 +359,7 @@ namespace Amazon.IonObjectMapper
             return GetValidProperties(false).FirstOrDefault(p => String.Equals(p.Name, name));
         }
 
-        private bool IsReadOnlyProperty(PropertyInfo property)
+        private static bool IsReadOnlyProperty(PropertyInfo property)
         {
             return property.SetMethod == null;
         }
@@ -380,7 +377,8 @@ namespace Amazon.IonObjectMapper
             else if (!options.IgnoreReadOnlyProperties)
             {
                 var propertyName = options.NamingConvention.ToProperty(name);
-                if (this.readOnlyProperties.Value.Any(p => p.Name == propertyName))
+                var readonlyProperties = this.GetValidProperties(true).Where(IsReadOnlyProperty);
+                if (readonlyProperties.Any(p => p.Name == propertyName))
                 {
                     var backingField = targetType.GetField($"<{propertyName}>k__BackingField", BINDINGS);
                     if (backingField != null)
