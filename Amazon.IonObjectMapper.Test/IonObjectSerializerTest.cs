@@ -76,7 +76,7 @@ namespace Amazon.IonObjectMapper.Test
             
             Assert.IsTrue(serialized.ContainsField("firstName"));
             Assert.IsTrue(serialized.ContainsField("lastName"));
-            Assert.IsFalse(serialized.ContainsField("<Major>k__BackingField"));
+            Assert.IsFalse(serialized.ContainsField("major"));
         }
         
         [TestMethod]
@@ -677,12 +677,12 @@ namespace Amazon.IonObjectMapper.Test
         {
             IIonStruct serialized = StreamToIonValue(defaultSerializer.Serialize(TestObjects.objectWithReadonlyProperties));
 
-            Assert.AreEqual("Public Value", serialized.GetField("<PublicProperty>k__BackingField").StringValue);
-            Assert.AreEqual("Protected Internal Value", serialized.GetField("<ProtectedInternalProperty>k__BackingField").StringValue);
-            Assert.AreEqual("Internal Value", serialized.GetField("<InternalProperty>k__BackingField").StringValue);
-            Assert.IsFalse(serialized.ContainsField("<ProtectedProperty>k__BackingField"));
-            Assert.IsFalse(serialized.ContainsField("<PrivateProperty>k__BackingField"));
-            Assert.IsFalse(serialized.ContainsField("<ProtectedPrivateProperty>k__BackingField"));
+            Assert.AreEqual("Public Value", serialized.GetField("publicProperty").StringValue);
+            Assert.AreEqual("Protected Internal Value", serialized.GetField("protectedInternalProperty").StringValue);
+            Assert.AreEqual("Internal Value", serialized.GetField("internalProperty").StringValue);
+            Assert.IsFalse(serialized.ContainsField("protectedProperty"));
+            Assert.IsFalse(serialized.ContainsField("privateProperty"));
+            Assert.IsFalse(serialized.ContainsField("protectedPrivateProperty"));
         }
 
         [TestMethod]
