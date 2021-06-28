@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Amazon.IonDotnet;
 
 namespace Amazon.IonObjectMapper
@@ -255,7 +256,7 @@ namespace Amazon.IonObjectMapper
                 return false;
             }
 
-            return !options.IgnoreDefaults || deserialized != default;
+            return !IgnoreDeserializedProperty(deserialized);
         }
         
         // Deserialize the given field and return bool to indicate whether the deserialized result should be used.
@@ -265,12 +266,30 @@ namespace Amazon.IonObjectMapper
             // for some Ion types need to be consumed in order to advance the reader.
             deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
             
-            if (options.IgnoreReadOnlyFields && field.IsInitOnly)
-            {
-                return false;
-            }
+            return !IgnoreDeserializedField(field, deserialized);
+        }
 
-            return !options.IgnoreDefaults || deserialized != default;
+        private bool IgnoreDeserializedProperty(object deserialized)
+        {
+            return options.IgnoreDefaults && deserialized == default;
+        }
+        
+        private bool IgnoreDeserializedField(FieldInfo field, object deserialized)
+        {
+            // Check if this field is really a backing field for a readonly property and
+            // if so, apply the ignore property logic instead of the ignore field logic.
+            if (IsBackingField(field))
+            {
+                return IgnoreDeserializedProperty(deserialized);
+            }
+            
+            return (options.IgnoreReadOnlyFields && field.IsInitOnly) || 
+                   (options.IgnoreDefaults && deserialized == default);
+        }
+
+        private static bool IsBackingField(FieldInfo field)
+        {
+            return Regex.Match(field.Name, "<[0-9_A-z]+>k__BackingField").Success;
         }
 
         // Compute mapping between parameter names and index in parameter array so we can figure out the
