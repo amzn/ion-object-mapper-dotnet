@@ -23,6 +23,12 @@ namespace Amazon.IonObjectMapper.Test
         }
         
         [TestMethod]
+        public void SerializesAndDeserializesObjectsWithReadOnlyProperties()
+        {
+            Check(TestObjects.JohnGreenwood);
+        }
+        
+        [TestMethod]
         public void SerializesAndDeserializesObjectsWithIncludeFields()
         {
             Check(TestObjects.fieldAcademy, new IonSerializationOptions { IncludeFields = true });
