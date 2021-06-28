@@ -251,8 +251,7 @@ namespace Amazon.IonObjectMapper
             if (IsReadOnlyProperty(property))
             {
                 // property.SetValue() does not work with a readonly property.
-                // logic for handling deserializing readonly properties happens during field processing
-                // when we detect backing fields for the property.
+                // To get around this we process the readonly property's backing field instead.
                 return false;
             }
 
@@ -395,6 +394,7 @@ namespace Amazon.IonObjectMapper
             }
             else if (!options.IgnoreReadOnlyProperties)
             {
+                // Check if this field is a backing field for a readonly property.
                 var propertyName = options.NamingConvention.ToProperty(name);
                 var readonlyProperties = this.GetValidProperties(true).Where(IsReadOnlyProperty);
                 if (readonlyProperties.Any(p => p.Name == propertyName))
