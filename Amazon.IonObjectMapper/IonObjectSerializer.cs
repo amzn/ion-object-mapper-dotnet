@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Amazon.IonDotnet;
 
 namespace Amazon.IonObjectMapper
@@ -277,7 +276,7 @@ namespace Amazon.IonObjectMapper
         {
             // Check if this field is really a backing field for a readonly property and
             // if so, apply the ignore property logic instead of the ignore field logic.
-            if (IsBackingField(field))
+            if (!options.IgnoreReadOnlyProperties && IsBackingFieldForReadonlyProperty(field))
             {
                 return IgnoreDeserializedProperty(deserialized);
             }
@@ -286,9 +285,10 @@ namespace Amazon.IonObjectMapper
                    (options.IgnoreDefaults && deserialized == default);
         }
 
-        private static bool IsBackingField(FieldInfo field)
+        private bool IsBackingFieldForReadonlyProperty(FieldInfo field)
         {
-            return Regex.Match(field.Name, "<[0-9_A-z]+>k__BackingField").Success;
+            var readonlyProperties = this.GetValidProperties(true).Where(IsReadOnlyProperty);
+            return readonlyProperties.Any(p => field.Name == $"<{p.Name}>k__BackingField");
         }
 
         // Compute mapping between parameter names and index in parameter array so we can figure out the
