@@ -246,13 +246,6 @@ namespace Amazon.IonObjectMapper
             // We deserialize whether or not we ultimately use the result because values
             // for some Ion types need to be consumed in order to advance the reader.
             deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-            
-            if (IsReadOnlyProperty(property))
-            {
-                // property.SetValue() does not work with a readonly property.
-                // To get around this we process the readonly property's backing field instead.
-                return false;
-            }
 
             return !IgnoreDeserializedProperty(deserialized);
         }
