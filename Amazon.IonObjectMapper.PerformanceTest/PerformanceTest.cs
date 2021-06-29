@@ -23,24 +23,24 @@ namespace Amazon.IonObjectMapper.PerformanceTest
     public class PerformanceTest
     {
         /// <summary>
-        /// Size of dictionary to use as the baseline for determining how much runtime and 
+        /// Size of dictionary to use as the baseline for determining how much runtime and
         /// memory is required for one entry.
-        /// 
-        /// Setting this to be too low will cause overhead runtime and memory to dominate 
+        ///
+        /// Setting this to be too low will cause overhead runtime and memory to dominate
         /// the per-entry baseline.
         /// </summary>
         private const long BaseCount = 100000;
 
         /// <summary>
-        /// The orders of magnitude to test over the BaseCount amount. 
-        /// 
-        /// For example, a BaseCount of 100,000 with a Magnitude of 2 will test 
-        /// 1,000,000 and 10,000,000 entries.
+        /// The orders of magnitude to test over the BaseCount amount.
+        ///
+        /// For example, a BaseCount of 100,000 with a Magnitude of 2 will test
+        /// 100,000, 1,000,000 and 10,000,000 entries.
         /// </summary>
         private const int Magnitude = 2;
 
         /// <summary>
-        /// Margin of error in percentage to allow over the per-entry baseline. 
+        /// Percentage margin of error to allow over the per-entry baseline.
         /// </summary>
         private const int ErrorMargin = 15;
 

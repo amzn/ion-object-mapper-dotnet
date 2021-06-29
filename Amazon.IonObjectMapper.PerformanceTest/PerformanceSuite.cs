@@ -34,7 +34,7 @@ namespace Amazon.IonObjectMapper.PerformanceTest
             this.metrics.Add(key, new Metric { RuntimeTicks = runtime, MemoryUsedBytes = memoryUsed });
         }
 
-        public bool IsLinearRuntime() 
+        public bool IsLinearRuntime()
         {
             long baseRuntime = this.metrics[this.baselineKey].RuntimeTicks / this.baselineKey;
             Console.WriteLine($"Runtime baseline : {baseRuntime} ticks per entry");
@@ -42,9 +42,10 @@ namespace Amazon.IonObjectMapper.PerformanceTest
             long threshold = Convert.ToInt64(baseRuntime * (1 + (this.errorMargin / 100m)));
             foreach (var kvp in this.metrics)
             {
-                if (kvp.Value.RuntimeTicks / kvp.Key > threshold)
+                long entryCount = kvp.Key;
+                if (kvp.Value.RuntimeTicks / entryCount > threshold)
                 {
-                    Console.WriteLine($"Acceptable runtime threshold of {threshold} ticks exceeded for {kvp.Key} entries : {kvp.Value.RuntimeTicks / kvp.Key} ticks used per entry");
+                    Console.WriteLine($"Acceptable runtime threshold of {threshold} ticks exceeded for {entryCount} entries : {kvp.Value.RuntimeTicks / entryCount} ticks used per entry");
                     return false;
                 }
             }
@@ -52,7 +53,7 @@ namespace Amazon.IonObjectMapper.PerformanceTest
             return true;
         }
 
-        public bool IsLinearMemoryUsed() 
+        public bool IsLinearMemoryUsed()
         {
             long baseMemoryUsed = this.metrics[this.baselineKey].MemoryUsedBytes / this.baselineKey;
             Console.WriteLine($"Memory baseline : {baseMemoryUsed} bytes per entry");
@@ -60,9 +61,10 @@ namespace Amazon.IonObjectMapper.PerformanceTest
             long threshold = Convert.ToInt64(baseMemoryUsed * (1 + (this.errorMargin / 100m)));
             foreach (var kvp in this.metrics)
             {
-                if (kvp.Value.MemoryUsedBytes / kvp.Key > threshold)
+                long entryCount = kvp.Key;
+                if (kvp.Value.MemoryUsedBytes / entryCount > threshold)
                 {
-                    Console.WriteLine($"Acceptable memory threshold of {threshold} bytes exceeded for {kvp.Key} entries : {kvp.Value.MemoryUsedBytes / kvp.Key} bytes used per entry");
+                    Console.WriteLine($"Acceptable memory threshold of {threshold} bytes exceeded for {entryCount} entries : {kvp.Value.MemoryUsedBytes / entryCount} bytes used per entry");
                     return false;
                 }
             }
