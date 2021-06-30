@@ -12,15 +12,12 @@ namespace Amazon.IonObjectMapper
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
-        private readonly Lazy<IEnumerable<PropertyInfo>> readOnlyProperties;
 
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
             this.options = options;
             this.targetType = targetType;
-            this.readOnlyProperties = new Lazy<IEnumerable<PropertyInfo>>(
-                () => GetValidProperties(true).Where(IsReadOnlyProperty));
         }
 
         public override object Deserialize(IIonReader reader)
@@ -173,11 +170,6 @@ namespace Amazon.IonObjectMapper
                     // This Ion property name was already serialized.
                     continue;
                 }
-                
-                if (property.GetCustomAttributes(true).Any(it => it is IonIgnore))
-                {
-                    continue;
-                }
 
                 if (this.options.IgnoreReadOnlyProperties && IsReadOnlyProperty(property))
                 {
@@ -254,16 +246,8 @@ namespace Amazon.IonObjectMapper
             // We deserialize whether or not we ultimately use the result because values
             // for some Ion types need to be consumed in order to advance the reader.
             deserialized = ionSerializer.Deserialize(reader, property.PropertyType, ionType);
-            
-            if (IsReadOnlyProperty(property))
-            {
-                // property.SetValue() does not work with a readonly property.
-                // logic for handling deserializing readonly properties happens during field processing
-                // when we detect backing fields for the property.
-                return false;
-            }
 
-            return !options.IgnoreDefaults || deserialized != default;
+            return !IgnoreDeserializedProperty(deserialized);
         }
         
         // Deserialize the given field and return bool to indicate whether the deserialized result should be used.
@@ -273,12 +257,31 @@ namespace Amazon.IonObjectMapper
             // for some Ion types need to be consumed in order to advance the reader.
             deserialized = ionSerializer.Deserialize(reader, field.FieldType, ionType);
             
-            if (options.IgnoreReadOnlyFields && field.IsInitOnly)
-            {
-                return false;
-            }
+            return !IgnoreDeserializedField(field, deserialized);
+        }
 
-            return !options.IgnoreDefaults || deserialized != default;
+        private bool IgnoreDeserializedProperty(object deserialized)
+        {
+            return options.IgnoreDefaults && deserialized == default;
+        }
+        
+        private bool IgnoreDeserializedField(FieldInfo field, object deserialized)
+        {
+            // Check if this field is really a backing field for a readonly property and
+            // if so, apply the ignore property logic instead of the ignore field logic.
+            if (!options.IgnoreReadOnlyProperties && IsBackingFieldForReadonlyProperty(field))
+            {
+                return IgnoreDeserializedProperty(deserialized);
+            }
+            
+            return (options.IgnoreReadOnlyFields && field.IsInitOnly) || 
+                   (options.IgnoreDefaults && deserialized == default);
+        }
+
+        private bool IsBackingFieldForReadonlyProperty(FieldInfo field)
+        {
+            var readonlyProperties = this.GetValidProperties(true).Where(IsReadOnlyProperty);
+            return readonlyProperties.Any(p => field.Name == $"<{p.Name}>k__BackingField");
         }
 
         // Compute mapping between parameter names and index in parameter array so we can figure out the
@@ -367,7 +370,7 @@ namespace Amazon.IonObjectMapper
             return GetValidProperties(false).FirstOrDefault(p => String.Equals(p.Name, name));
         }
 
-        private bool IsReadOnlyProperty(PropertyInfo property)
+        private static bool IsReadOnlyProperty(PropertyInfo property)
         {
             return property.SetMethod == null;
         }
@@ -375,9 +378,26 @@ namespace Amazon.IonObjectMapper
         private FieldInfo FindField(string name)
         {
             var exact = targetType.GetField(name, BINDINGS);
-            if (exact != null && IsField(exact))
+            if (exact != null)
             {
-                return exact;
+                if (IsField(exact))
+                {
+                    return exact;
+                }
+            }
+            else if (!options.IgnoreReadOnlyProperties)
+            {
+                // Check if this field is a backing field for a readonly property.
+                var propertyName = options.NamingConvention.ToProperty(name);
+                var readonlyProperties = this.GetValidProperties(true).Where(IsReadOnlyProperty);
+                if (readonlyProperties.Any(p => p.Name == propertyName))
+                {
+                    var backingField = targetType.GetField($"<{propertyName}>k__BackingField", BINDINGS);
+                    if (backingField != null)
+                    {
+                        return backingField;
+                    }
+                }
             }
 
             return Fields().FirstOrDefault(f => 
@@ -405,6 +425,11 @@ namespace Amazon.IonObjectMapper
         {
             return property.GetCustomAttribute(typeof(IonPropertyName)) != null;
         }
+        
+        private static bool IsIonIgnore(PropertyInfo property)
+        {
+            return property.GetCustomAttribute(typeof(IonIgnore)) != null;
+        }
 
         /// <summary>
         /// We only serialize public, internal, and protected internal properties or properties with IonPropertyName annotation.
@@ -420,18 +445,7 @@ namespace Amazon.IonObjectMapper
 
         private bool IsField(FieldInfo field)
         {
-            if (options.IncludeFields)
-            {
-                return true;
-            }
-
-            if (!this.options.IgnoreReadOnlyProperties &&
-                this.readOnlyProperties.Value.Any(p => field.Name == $"<{p.Name}>k__BackingField"))
-            {
-                return true;
-            }
-
-            return IsIonField(field);
+            return options.IncludeFields || IsIonField(field);
         }
 
         private IEnumerable<FieldInfo> Fields()
@@ -451,7 +465,7 @@ namespace Amazon.IonObjectMapper
 
         private IEnumerable<PropertyInfo> GetValidProperties(bool isGetter)
         {
-            return targetType.GetRuntimeProperties().Where(x => HasValidAccessModifier(x, isGetter));
+            return targetType.GetRuntimeProperties().Where(p => !IsIonIgnore(p) && HasValidAccessModifier(p, isGetter));
         }
     }
 }
