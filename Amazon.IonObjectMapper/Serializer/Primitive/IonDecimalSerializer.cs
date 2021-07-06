@@ -16,15 +16,31 @@ namespace Amazon.IonObjectMapper
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing decimal values.
+    /// </summary>
     public class IonDecimalSerializer : IonSerializer<decimal>
     {
         internal static readonly string ANNOTATION = "numeric.decimal128";
 
+        /// <summary>
+        /// Deserialize decimal value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized decimal value.</returns>
         public override decimal Deserialize(IIonReader reader)
         {
             return reader.DecimalValue().ToDecimal();
         }
 
+        /// <summary>
+        /// Serialize decimal value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The decimal value to serialize.</param>
         public override void Serialize(IIonWriter writer, decimal item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });

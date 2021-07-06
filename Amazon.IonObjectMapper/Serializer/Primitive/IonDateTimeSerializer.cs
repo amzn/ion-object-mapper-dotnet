@@ -16,13 +16,29 @@ namespace Amazon.IonObjectMapper
     using System;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing date time values.
+    /// </summary>
     public class IonDateTimeSerializer : IonSerializer<DateTime>
     {
+        /// <summary>
+        /// Deserialize date time value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized date time value.</returns>
         public override DateTime Deserialize(IIonReader reader)
         {
             return reader.TimestampValue().DateTimeValue;
         }
 
+        /// <summary>
+        /// Serialize date time value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The date time value to serialize.</param>
         public override void Serialize(IIonWriter writer, DateTime item)
         {
             writer.WriteTimestamp(new Timestamp(item));

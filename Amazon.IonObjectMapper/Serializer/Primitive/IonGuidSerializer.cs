@@ -17,16 +17,31 @@ namespace Amazon.IonObjectMapper
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing Guid values.
+    /// </summary>
     public class IonGuidSerializer : IonSerializer<Guid>
     {
         internal static readonly string ANNOTATION = "guid128";
         private readonly IonSerializationOptions options;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonGuidSerializer"/> class.
+        /// </summary>
+        ///
+        /// <param name="options">Serialization options.</param>
         public IonGuidSerializer(IonSerializationOptions options)
         {
             this.options = options;
         }
 
+        /// <summary>
+        /// Deserialize Guid value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized Guid value.</returns>
         public override Guid Deserialize(IIonReader reader)
         {
             byte[] blob = new byte[reader.GetLobByteSize()];
@@ -34,6 +49,12 @@ namespace Amazon.IonObjectMapper
             return new Guid(blob);
         }
 
+        /// <summary>
+        /// Serialize Guid value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The Guid value to serialize.</param>
         public override void Serialize(IIonWriter writer, Guid item)
         {
             if (this.options.AnnotateGuids)

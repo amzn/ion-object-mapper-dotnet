@@ -15,13 +15,29 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing big decimal values.
+    /// </summary>
     public class IonBigDecimalSerializer : IonSerializer<BigDecimal>
     {
+        /// <summary>
+        /// Deserialize big decimal value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized big decimal value.</returns>
         public override BigDecimal Deserialize(IIonReader reader)
         {
             return reader.DecimalValue();
         }
 
+        /// <summary>
+        /// Serialize big decimal value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The big decimal value to serialize.</param>
         public override void Serialize(IIonWriter writer, BigDecimal item)
         {
             writer.WriteDecimal(item);

@@ -15,13 +15,29 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing boolean values.
+    /// </summary>
     public class IonBooleanSerializer : IonSerializer<bool>
     {
+        /// <summary>
+        /// Deserialize boolean value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized boolean value.</returns>
         public override bool Deserialize(IIonReader reader)
         {
             return reader.BoolValue();
         }
 
+        /// <summary>
+        /// Serialize boolean value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The boolean value to serialize.</param>
         public override void Serialize(IIonWriter writer, bool item)
         {
             writer.WriteBool(item);

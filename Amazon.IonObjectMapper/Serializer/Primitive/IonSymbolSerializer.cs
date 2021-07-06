@@ -15,13 +15,29 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing Symbol Token values.
+    /// </summary>
     public class IonSymbolSerializer : IonSerializer<SymbolToken>
     {
+        /// <summary>
+        /// Deserialize Symbol Token value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized Symbol Token value.</returns>
         public override SymbolToken Deserialize(IIonReader reader)
         {
             return reader.SymbolValue();
         }
 
+        /// <summary>
+        /// Serialize Symbol Token value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The Symbol Token value to serialize.</param>
         public override void Serialize(IIonWriter writer, SymbolToken item)
         {
             writer.WriteSymbolToken(item);

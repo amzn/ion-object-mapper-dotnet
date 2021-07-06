@@ -15,13 +15,29 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing null values.
+    /// </summary>
     public class IonNullSerializer : IonSerializer<object>
     {
+        /// <summary>
+        /// Deserialize null value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized null value.</returns>
         public override object Deserialize(IIonReader reader)
         {
             return null;
         }
 
+        /// <summary>
+        /// Serialize null value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The null object to serialize.</param>
         public override void Serialize(IIonWriter writer, object item)
         {
             writer.WriteNull();
