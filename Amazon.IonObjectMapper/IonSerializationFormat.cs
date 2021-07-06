@@ -13,6 +13,9 @@
 
 namespace Amazon.IonObjectMapper
 {
+    /// <summary>
+    /// Format for serializing/deserializing Ion.
+    /// </summary>
     public enum IonSerializationFormat
     {
         BINARY,

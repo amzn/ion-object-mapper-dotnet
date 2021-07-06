@@ -15,10 +15,26 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Interface for Ion Serializer.
+    /// </summary>
     public interface IIonSerializer
     {
+        /// <summary>
+        /// Serialize value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="item">The value to serialize.</param>
         void Serialize(IIonWriter writer, object item);
 
+        /// <summary>
+        /// Deserialize value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader used during deserialization.</param>
+        ///
+        /// <returns>The deserialized value.</returns>
         object Deserialize(IIonReader reader);
     }
 }
