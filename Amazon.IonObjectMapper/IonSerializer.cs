@@ -351,7 +351,7 @@ namespace Amazon.IonObjectMapper
                 return new IonListSerializer(this, listType);
             }
 
-            throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
+            throw new NotSupportedException($"Encountered an Ion list but the desired deserialized type was not an IList, it was: {listType}");
         }
 
         private IIonSerializer GetPrimitiveSerializer<T>(IIonSerializer defaultSerializer)

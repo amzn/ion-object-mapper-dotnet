@@ -665,11 +665,6 @@ namespace Amazon.IonObjectMapper.Test
             Assert.AreNotEqual(TestObjects.nativeTruck.ToString(), truck.ToString());
         }
 
-        private static void AssertIsTruck(object actual)
-        {
-            Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
-        }
-
         [TestMethod]
         public void SerializePropertiesWithOnlySetter()
         {

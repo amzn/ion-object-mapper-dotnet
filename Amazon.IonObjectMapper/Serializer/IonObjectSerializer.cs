@@ -48,8 +48,7 @@ namespace Amazon.IonObjectMapper
                 if (ionConstructors.Count() > 1)
                 {
                     throw new InvalidOperationException(
-                        $"Only one constructor in class {this.targetType.Name} may be annotated " +
-                        "with the [IonConstructor] attribute and more than one was detected");
+                        $"Only one constructor in class {this.targetType.Name} may be annotated with the [IonConstructor] attribute and more than one was detected");
                 }
 
                 ionConstructor = ionConstructors.First();
@@ -281,10 +280,10 @@ namespace Amazon.IonObjectMapper
 
         private static string GetFieldName(FieldInfo field)
         {
-            var propertyName = field.GetCustomAttribute(typeof(IonPropertyNameAttribute));
+            var propertyName = (IonPropertyNameAttribute)field.GetCustomAttribute(typeof(IonPropertyNameAttribute));
             if (propertyName != null)
             {
-                return ((IonPropertyNameAttribute)propertyName).Name;
+                return propertyName.Name;
             }
 
             return field.Name;
@@ -298,8 +297,7 @@ namespace Amazon.IonObjectMapper
             if (parameters.Length != 1)
             {
                 throw new InvalidOperationException(
-                    "An [IonPropertySetter] annotated method should have exactly one argument " +
-                    $"but {method.Name} has {parameters.Length} arguments");
+                    $"An [IonPropertySetter] annotated method should have exactly one argument but {method.Name} has {parameters.Length} arguments");
             }
 
             deserialized = this.ionSerializer.Deserialize(reader, parameters[0].ParameterType, ionType);
@@ -363,9 +361,7 @@ namespace Amazon.IonObjectMapper
                 if (ionPropertyName == null)
                 {
                     throw new InvalidOperationException(
-                        $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute " +
-                        $"for {this.targetType.Name}'s IonConstructor. All constructor arguments must be annotated " +
-                        "so we know which parameters to set at construction time.");
+                        $"Parameter '{parameters[i].Name}' is not specified with the [IonPropertyName] attribute for {this.targetType.Name}'s IonConstructor. All constructor arguments must be annotated so we know which parameters to set at construction time.");
                 }
 
                 constructorArgIndexMap.Add(ionPropertyName.Name, i);
@@ -404,10 +400,10 @@ namespace Amazon.IonObjectMapper
 
         private string IonFieldNameFromProperty(PropertyInfo property)
         {
-            var ionPropertyName = property.GetCustomAttribute(typeof(IonPropertyNameAttribute));
+            var ionPropertyName = (IonPropertyNameAttribute)property.GetCustomAttribute(typeof(IonPropertyNameAttribute));
             if (ionPropertyName != null)
             {
-                return ((IonPropertyNameAttribute)ionPropertyName).Name;
+                return ionPropertyName.Name;
             }
 
             return this.options.NamingConvention.FromProperty(property.Name);
@@ -466,10 +462,10 @@ namespace Amazon.IonObjectMapper
 
             return this.Fields().FirstOrDefault(f =>
             {
-                var propertyName = f.GetCustomAttribute(typeof(IonPropertyNameAttribute));
+                var propertyName = (IonPropertyNameAttribute)f.GetCustomAttribute(typeof(IonPropertyNameAttribute));
                 if (propertyName != null)
                 {
-                    return name == ((IonPropertyNameAttribute)propertyName).Name;
+                    return name == propertyName.Name;
                 }
 
                 return false;

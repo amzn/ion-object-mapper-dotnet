@@ -145,5 +145,10 @@ namespace Amazon.IonObjectMapper.Test
             var stream = new IonSerializer().Serialize(item);
             return serializer.Deserialize<T>(stream);
         }
+
+        public static void AssertIsTruck(object actual)
+        {
+            Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
+        }
     }
 }

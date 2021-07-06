@@ -14,10 +14,11 @@
 namespace Amazon.IonObjectMapper
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
-    public class IonListSerializer : IonSerializer<System.Collections.IList>
+    public class IonListSerializer : IonSerializer<IList>
     {
         private readonly IonSerializer serializer;
         private readonly Type listType;
@@ -36,10 +37,10 @@ namespace Amazon.IonObjectMapper
             this.listType = listType;
         }
 
-        public override System.Collections.IList Deserialize(IIonReader reader)
+        public override IList Deserialize(IIonReader reader)
         {
             reader.StepIn();
-            var list = new System.Collections.ArrayList();
+            var list = new ArrayList();
             IonType ionType;
             while ((ionType = reader.MoveNext()) != IonType.None)
             {
@@ -59,16 +60,16 @@ namespace Amazon.IonObjectMapper
                 return typedArray;
             }
 
-            if (this.listType is System.Collections.IEnumerable || this.listType is object)
+            if (this.listType is IEnumerable || this.listType is object)
             {
-                System.Collections.IList typedList;
+                IList typedList;
                 if (this.listType.IsGenericType)
                 {
-                    typedList = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(this.elementType));
+                    typedList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(this.elementType));
                 }
                 else
                 {
-                    typedList = new System.Collections.ArrayList();
+                    typedList = new ArrayList();
                 }
 
                 foreach (var element in list)
@@ -79,10 +80,10 @@ namespace Amazon.IonObjectMapper
                 return typedList;
             }
 
-            throw new NotSupportedException("Don't know how to make a list of type " + this.listType + " with element type " + this.elementType);
+            throw new NotSupportedException($"Don't know how to make a list of type {this.listType} with element type {this.elementType}");
         }
 
-        public override void Serialize(IIonWriter writer, System.Collections.IList item)
+        public override void Serialize(IIonWriter writer, IList item)
         {
             writer.StepIn(IonType.List);
             foreach (var i in item)
