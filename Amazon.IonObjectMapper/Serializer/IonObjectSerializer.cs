@@ -416,7 +416,7 @@ namespace Amazon.IonObjectMapper
                     var ionPropertyName = p.GetCustomAttribute<IonPropertyNameAttribute>();
                     if (ionPropertyName != null)
                     {
-                        return p.GetCustomAttribute<IonPropertyNameAttribute>().Name == readName;
+                        return ionPropertyName.Name == readName;
                     }
 
                     return false;
