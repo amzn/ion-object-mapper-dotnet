@@ -18,12 +18,22 @@ namespace Amazon.IonObjectMapper
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Ion Serializer for list types.
+    /// </summary>
     public class IonListSerializer : IonSerializer<IList>
     {
         private readonly IonSerializer serializer;
         private readonly Type listType;
         private readonly Type elementType;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonListSerializer"/> class.
+        /// </summary>
+        ///
+        /// <param name="serializer">Serializer used for serializing/deserializing items in list.</param>
+        /// <param name="listType">Type of list.</param>
+        /// <param name="elementType">Type of items in list.</param>
         public IonListSerializer(IonSerializer serializer, Type listType, Type elementType)
         {
             this.serializer = serializer;
@@ -31,12 +41,19 @@ namespace Amazon.IonObjectMapper
             this.elementType = elementType;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonListSerializer"/> class.
+        /// </summary>
+        ///
+        /// <param name="serializer">Serializer used for serializing/deserializing items in list.</param>
+        /// <param name="listType">Type of list.</param>
         public IonListSerializer(IonSerializer serializer, Type listType)
         {
             this.serializer = serializer;
             this.listType = listType;
         }
 
+        /// <inheritdoc/>
         public override IList Deserialize(IIonReader reader)
         {
             reader.StepIn();
@@ -83,6 +100,7 @@ namespace Amazon.IonObjectMapper
             throw new NotSupportedException($"Don't know how to make a list of type {this.listType} with element type {this.elementType}");
         }
 
+        /// <inheritdoc/>
         public override void Serialize(IIonWriter writer, IList item)
         {
             writer.StepIn(IonType.List);
