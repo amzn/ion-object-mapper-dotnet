@@ -15,12 +15,25 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Attribute to identify a .NET type to target during deserialization.
+    /// </summary>
     public class IonAnnotateTypeAttribute : Attribute
     {
+        /// <summary>
+        /// Gets a value indicating whether any classes descending from the annotated class
+        /// are excluded from the annotation.
+        /// </summary>
         public bool ExcludeDescendants { get; init; }
 
+        /// <summary>
+        /// Gets or sets the .NET namespace of the annotated type.
+        /// </summary>
         public string Prefix { get; set; }
 
+        /// <summary>
+        /// Gets or sets the .NET class name of the annotated type.
+        /// </summary>
         public string Name { get; set; }
     }
 }

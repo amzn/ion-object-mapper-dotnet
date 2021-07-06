@@ -15,8 +15,16 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Attribute to identify a .NET type that should not be annotated
+    /// even if a parent class is annotated.
+    /// </summary>
     public class IonDoNotAnnotateTypeAttribute : Attribute
     {
+        /// <summary>
+        /// Gets a value indicating whether any classes descending from the annotated class
+        /// are excluded from the IonAnnotateTypeAttribute annotation.
+        /// </summary>
         public bool ExcludeDescendants { get; init; }
     }
 }
