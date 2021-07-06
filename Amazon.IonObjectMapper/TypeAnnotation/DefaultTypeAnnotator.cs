@@ -16,8 +16,12 @@ namespace Amazon.IonObjectMapper
     using System;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Default type annotator.
+    /// </summary>
     public class DefaultTypeAnnotator : ITypeAnnotator
     {
+        /// <inheritdoc/>
         public void Apply(IonSerializationOptions options, IIonWriter writer, Type type)
         {
             IonAnnotateTypeAttribute annotateType = this.ShouldAnnotate(type, type);

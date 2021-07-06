@@ -16,8 +16,18 @@ namespace Amazon.IonObjectMapper
     using System;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Interface for Type Annotator.
+    /// </summary>
     public interface ITypeAnnotator
     {
+        /// <summary>
+        /// Apply type annotation.
+        /// </summary>
+        ///
+        /// <param name="options">Serialization options.</param>
+        /// <param name="writer">The Ion writer writing the annotations.</param>
+        /// <param name="type">.NET Type being annotated.</param>
         public void Apply(IonSerializationOptions options, IIonWriter writer, Type type);
     }
 }

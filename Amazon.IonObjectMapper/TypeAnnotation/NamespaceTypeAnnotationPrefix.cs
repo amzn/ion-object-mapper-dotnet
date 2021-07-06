@@ -15,8 +15,12 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Namespace type annotation prefix.
+    /// </summary>
     public class NamespaceTypeAnnotationPrefix : ITypeAnnotationPrefix
     {
+        /// <inheritdoc/>
         public string Apply(Type type)
         {
             return type.Namespace;
