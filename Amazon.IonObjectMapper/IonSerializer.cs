@@ -1,236 +1,33 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Amazon.IonDotnet;
-using Amazon.IonDotnet.Builders;
-using static Amazon.IonObjectMapper.IonSerializationFormat;
+﻿/*
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.IonObjectMapper
 {
-    public interface IIonSerializer
-    {
-        void Serialize(IIonWriter writer, object item);
-        object Deserialize(IIonReader reader);
-    }
-
-    public abstract class IonSerializer<T> : IIonSerializer
-    {
-        public abstract void Serialize(IIonWriter writer, T item);
-        public abstract T Deserialize(IIonReader reader);
-
-        void IIonSerializer.Serialize(IIonWriter writer, object item)
-        {
-            Serialize(writer, (T)item);
-        }
-
-        object IIonSerializer.Deserialize(IIonReader reader)
-        {
-            return Deserialize(reader);
-        }
-    }
-
-    public enum IonSerializationFormat 
-    {
-        BINARY,
-        TEXT, 
-        PRETTY_TEXT
-    }
-
-    public interface IonReaderFactory
-    {
-        IIonReader Create(Stream stream);
-    }
-
-    public class DefaultIonReaderFactory : IonReaderFactory
-    {
-        public IIonReader Create(Stream stream)
-        {
-            return IonReaderBuilder.Build(stream, new ReaderOptions {Format = ReaderFormat.Detect});
-        }
-    }
-    
-    public interface IonWriterFactory
-    {
-        IIonWriter Create(Stream stream);
-    }
-
-    public class DefaultIonWriterFactory : IonWriterFactory
-    {
-        private IonSerializationFormat format = TEXT;
-
-        public DefaultIonWriterFactory()
-        {
-        }
-
-        public DefaultIonWriterFactory(IonSerializationFormat format)
-        {
-            this.format = format;
-        }
-
-        public IIonWriter Create(Stream stream)
-        {
-            switch (format)
-            {
-                case BINARY:
-                    return IonBinaryWriterBuilder.Build(stream);
-                case TEXT:
-                    return IonTextWriterBuilder.Build(new StreamWriter(stream));
-                case PRETTY_TEXT:
-                    return IonTextWriterBuilder.Build(new StreamWriter(stream),
-                        new IonTextOptions {PrettyPrint = true});
-                default:
-                    throw new InvalidOperationException($"Format {format} not supported");
-            }
-        }
-    }
-
-    public interface ObjectFactory
-    {
-        object Create(IonSerializationOptions options, IIonReader reader, Type targetType);
-    }
-
-    public class DefaultObjectFactory : ObjectFactory
-    {
-        public object Create(IonSerializationOptions options, IIonReader reader, Type targetType)
-        {
-            var annotations = reader.GetTypeAnnotations();
-            if (annotations.Length > 0)
-            {
-                var typeName = annotations[0];
-                Type typeToCreate = null;
-
-                if (options.AnnotatedTypeAssemblies != null)
-                {
-                    foreach (string assemblyName in options.AnnotatedTypeAssemblies)
-                    {
-                        if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        typeToCreate = assembly.GetType(assembly.GetName().Name + "." + typeName);
-                        if (typeToCreate != null)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                if (typeToCreate != null && targetType.IsAssignableFrom(typeToCreate))
-                {
-                    return Activator.CreateInstance(typeToCreate);
-                }
-            }
-            return Activator.CreateInstance(targetType);
-        }
-
-        private string FullName(string typeName, string assemblyName)
-        {
-            return assemblyName + "." + typeName + "," + assemblyName;
-        }
-    }
-
-    public class IonSerializationOptions
-    {
-        public IonPropertyNamingConvention NamingConvention { get; init; } = new CamelCaseNamingConvention();
-        public IonSerializationFormat Format { get; init; } = TEXT;
-        public int MaxDepth { get; init; } = 64;
-        public bool AnnotateGuids { get; init; } = false;
-
-        public bool IncludeFields { get; init; } = false;
-        public bool IgnoreNulls { get; init; } = false;
-        public bool IgnoreReadOnlyFields { get; init; } = false;
-        public bool IgnoreReadOnlyProperties { get; init; } = false;
-        public bool PropertyNameCaseInsensitive { get; init; } = false;
-        public bool IgnoreDefaults { get; init; } = false;
-        public bool IncludeTypeInformation { get; init; } = false;
-        public TypeAnnotationPrefix TypeAnnotationPrefix { get; init; } = new NamespaceTypeAnnotationPrefix();
-
-        public TypeAnnotationName TypeAnnotationName { get; init; } = new ClassNameTypeAnnotationName();
-
-        public AnnotationConvention AnnotationConvention { get; init; } = new DefaultAnnotationConvention();
-
-        public TypeAnnotator TypeAnnotator { get; init; } = new DefaultTypeAnnotator();
-
-        public IonReaderFactory ReaderFactory { get; init; } = new DefaultIonReaderFactory();
-        public IonWriterFactory WriterFactory { get; init; } = new DefaultIonWriterFactory();
-
-        public ObjectFactory ObjectFactory { get; init; } = new DefaultObjectFactory();
-        public IEnumerable<string> AnnotatedTypeAssemblies { get; init; }
-
-        public readonly bool PermissiveMode;
-        
-        public Dictionary<Type, IIonSerializer> IonSerializers { get; init; }
-        public Dictionary<string, object> CustomContext { get; init; }
-    }
-
-    /// <summary>
-    /// This interface is to create a custom IonSerializer to be used to serialize
-    /// and deserialize instances of the class annotated with Factory IonSerializerAttribute.
-    /// </summary>
-    public interface IIonSerializerFactory
-    {
-        /// <summary>
-        /// Create custom IonSerializer with customContext option.
-        /// </summary>
-        /// <param name="options">
-        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
-        /// and determined the way to customize the IonSerializer.
-        /// </param>
-        /// <param name="customContext">
-        /// The Dictionary<string, object> customContext is one option to create IonSerializer with custom arbitrary data.
-        /// A Dictionary of Key Type string is to map to any customized objects
-        /// and Value Type object is to custom any serialize/deserialize logic.
-        /// </param>
-        /// <returns>
-        /// Customized IonSerializer.
-        /// </returns>
-        IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> customContext);
-    }
-
-    /// <summary>
-    /// This abstract class is to implement IIonSerializerFactory interface.
-    /// </summary>
-    public abstract class IonSerializerFactory<T> : IIonSerializerFactory
-    {
-        /// <summary>
-        /// Create custom IonSerializer with customContext option.
-        /// </summary>
-        /// <param name="options">
-        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
-        /// and determined the way to customize the IonSerializer.
-        /// </param>
-        /// <param name="customContext">
-        /// The Dictionary<string, object> customContext is one option to create IonSerializer with custom arbitrary data.
-        /// A Dictionary of Key Type string is to map to any customized objects
-        /// and Value Type object is to custom any serialize/deserialize logic.
-        /// </param>
-        /// <returns>
-        /// Customized IonSerializer.
-        /// </returns>
-        public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> customContext);
-
-        IIonSerializer IIonSerializerFactory.Create(IonSerializationOptions options, Dictionary<string, object> customContext)
-        {
-            return Create(options, customContext);
-        }
-    }
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using Amazon.IonDotnet;
 
     public class IonSerializer
     {
         private readonly IonSerializationOptions options;
 
-        public IonSerializer() : this(new IonSerializationOptions())
+        public IonSerializer()
+            : this(new IonSerializationOptions())
         {
-
         }
 
         public IonSerializer(IonSerializationOptions options)
@@ -241,15 +38,15 @@ namespace Amazon.IonObjectMapper
         public Stream Serialize<T>(T item)
         {
             var stream = new MemoryStream();
-            Serialize(stream, item);
+            this.Serialize(stream, item);
             stream.Position = 0;
             return stream;
         }
 
         public void Serialize<T>(Stream stream, T item)
         {
-            IIonWriter writer = options.WriterFactory.Create(stream);
-            Serialize(writer, item);
+            IIonWriter writer = this.options.WriterFactory.Create(stream);
+            this.Serialize(writer, item);
             writer.Finish();
             writer.Flush();
         }
@@ -341,14 +138,14 @@ namespace Amazon.IonObjectMapper
 
             if (item is Guid)
             {
-                var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(options));
+                var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(this.options));
                 serializer.Serialize(writer, (Guid)(object)item);
                 return;
             }
 
-            if (item is System.Collections.IList)
+            if (item is IList list)
             {
-                NewIonListSerializer(item.GetType()).Serialize(writer, (System.Collections.IList)item);
+                this.NewIonListSerializer(item.GetType()).Serialize(writer, list);
                 return;
             }
 
@@ -371,47 +168,28 @@ namespace Amazon.IonObjectMapper
             if (item is object)
             {
                 var customSerializerAttribute = item.GetType().GetCustomAttribute<IonSerializerAttribute>();
-                if (customSerializerAttribute != null) {
-                    var customSerializer = CreateCustomSerializer(item.GetType());
+                if (customSerializerAttribute != null)
+                {
+                    var customSerializer = this.CreateCustomSerializer(item.GetType());
                     customSerializer.Serialize(writer, item);
                     return;
                 }
 
-                new IonObjectSerializer(this, options, item.GetType()).Serialize(writer, item);
+                new IonObjectSerializer(this, this.options, item.GetType()).Serialize(writer, item);
                 return;
             }
 
             throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
         }
 
-        private IonListSerializer NewIonListSerializer(Type listType) 
-        {
-            if (listType.IsArray)
-            {
-                return new IonListSerializer(this, listType, listType.GetElementType());
-            }
-            
-            if (listType.IsAssignableTo(typeof(System.Collections.IList)))
-            {
-                if (listType.IsGenericType)
-                {
-                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0]);
-                }
-                return new IonListSerializer(this, listType);
-            }
-            
-            throw new NotSupportedException("Encountered an Ion list but the desired deserialized type was not an IList, it was: " + listType);
-        }
-
-
         public T Deserialize<T>(Stream stream)
         {
-            return Deserialize<T>(options.ReaderFactory.Create(stream));
+            return this.Deserialize<T>(this.options.ReaderFactory.Create(stream));
         }
 
         public object Deserialize(IIonReader reader, Type type)
         {
-            return Deserialize(reader, type, reader.MoveNext());
+            return this.Deserialize(reader, type, reader.MoveNext());
         }
 
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
@@ -421,11 +199,12 @@ namespace Amazon.IonObjectMapper
                 return null;
             }
 
-            if (type != null) 
+            if (type != null)
             {
                 var customSerializerAttribute = type.GetCustomAttribute<IonSerializerAttribute>();
-                if (customSerializerAttribute != null) {
-                    var customSerializer = CreateCustomSerializer(type);
+                if (customSerializerAttribute != null)
+                {
+                    var customSerializer = this.CreateCustomSerializer(type);
                     return customSerializer.Deserialize(reader);
                 }
             }
@@ -483,12 +262,12 @@ namespace Amazon.IonObjectMapper
                 }
             }
 
-            if (ionType == IonType.Blob) 
+            if (ionType == IonType.Blob)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                     || type.IsAssignableTo(typeof(Guid)))
                 {
-                    var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(options));
+                    var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(this.options));
                     return serializer.Deserialize(reader);
                 }
                 else
@@ -504,29 +283,29 @@ namespace Amazon.IonObjectMapper
                 return serializer.Deserialize(reader);
             }
 
-            if (ionType == IonType.Symbol) 
+            if (ionType == IonType.Symbol)
             {
                 var serializer = this.GetPrimitiveSerializer<SymbolToken>(new IonSymbolSerializer());
                 return serializer.Deserialize(reader);
             }
 
-            if (ionType == IonType.Timestamp) 
+            if (ionType == IonType.Timestamp)
             {
                 var serializer = this.GetPrimitiveSerializer<DateTime>(new IonDateTimeSerializer());
                 return serializer.Deserialize(reader);
             }
 
-            if (ionType == IonType.Clob) 
+            if (ionType == IonType.Clob)
             {
                 return new IonClobSerializer().Deserialize(reader);
             }
 
-            if (ionType == IonType.List) 
+            if (ionType == IonType.List)
             {
-                return NewIonListSerializer(type).Deserialize(reader);
+                return this.NewIonListSerializer(type).Deserialize(reader);
             }
 
-            if (ionType == IonType.Struct) 
+            if (ionType == IonType.Struct)
             {
                 if (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>)))
                 {
@@ -543,7 +322,8 @@ namespace Amazon.IonObjectMapper
                         throw new NotSupportedException("Can not deserialize into Dictionary when key is not of type string");
                     }
                 }
-                return new IonObjectSerializer(this, options, type).Deserialize(reader);
+
+                return new IonObjectSerializer(this, this.options, type).Deserialize(reader);
             }
 
             throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
@@ -551,7 +331,27 @@ namespace Amazon.IonObjectMapper
 
         public T Deserialize<T>(IIonReader reader)
         {
-            return (T) Deserialize(reader, typeof(T));
+            return (T)this.Deserialize(reader, typeof(T));
+        }
+
+        private IonListSerializer NewIonListSerializer(Type listType)
+        {
+            if (listType.IsArray)
+            {
+                return new IonListSerializer(this, listType, listType.GetElementType());
+            }
+
+            if (listType.IsAssignableTo(typeof(System.Collections.IList)))
+            {
+                if (listType.IsGenericType)
+                {
+                    return new IonListSerializer(this, listType, listType.GetGenericArguments()[0]);
+                }
+
+                return new IonListSerializer(this, listType);
+            }
+
+            throw new NotSupportedException($"Encountered an Ion list but the desired deserialized type was not an IList, it was: {listType}");
         }
 
         private IIonSerializer GetPrimitiveSerializer<T>(IIonSerializer defaultSerializer)
@@ -564,18 +364,18 @@ namespace Amazon.IonObjectMapper
             return defaultSerializer;
         }
 
-        private IIonSerializer CreateCustomSerializer (Type targetType)
+        private IIonSerializer CreateCustomSerializer(Type targetType)
         {
             var customSerializerAttribute = targetType.GetCustomAttribute<IonSerializerAttribute>();
-            if (customSerializerAttribute.Factory != null) 
+            if (customSerializerAttribute.Factory != null)
             {
                 var customSerializerFactory = (IIonSerializerFactory)Activator.CreateInstance(customSerializerAttribute.Factory);
-                return customSerializerFactory.Create(options, options.CustomContext);
-            } 
-            else if (customSerializerAttribute.Serializer != null) 
+                return customSerializerFactory.Create(this.options, this.options.CustomContext);
+            }
+            else if (customSerializerAttribute.Serializer != null)
             {
                 return (IIonSerializer)Activator.CreateInstance(customSerializerAttribute.Serializer);
-            } 
+            }
 
             throw new InvalidOperationException($"[IonSerializer] annotated type {targetType} should have a valid IonSerializerAttribute Factory or Serializer");
         }

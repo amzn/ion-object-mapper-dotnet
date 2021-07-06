@@ -1,14 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Amazon.IonDotnet.Builders;
-using Amazon.IonDotnet.Tree;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/*
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.IonObjectMapper.Test
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using Amazon.IonDotnet.Builders;
+    using Amazon.IonDotnet.Tree;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     public static class Utils
     {
         public static Stream Copy(Stream source) {
@@ -33,18 +46,18 @@ namespace Amazon.IonObjectMapper.Test
         public static string PrettyPrint(Stream stream) {
             return IonLoader.Default.Load(Copy(stream)).ToPrettyString();
         }
-        public static T Serde<T>(T item) 
+        public static T Serde<T>(T item)
         {
             return Serde(new IonSerializer(), item);
         }
 
-        public static T Serde<T>(IonSerializer ionSerializer, T item) 
+        public static T Serde<T>(IonSerializer ionSerializer, T item)
         {
             var stream = ionSerializer.Serialize(item);
             return ionSerializer.Deserialize<T>(stream);
         }
 
-        public static IIonValue ToIonValue<T>(IonSerializer ionSerializer, T item) 
+        public static IIonValue ToIonValue<T>(IonSerializer ionSerializer, T item)
         {
             var stream = ionSerializer.Serialize(item);
             return StreamToIonValue(stream);
@@ -54,7 +67,7 @@ namespace Amazon.IonObjectMapper.Test
         {
             Check(new IonSerializer(), item);
         }
-        
+
         public static void Check<T>(T item, IonSerializationOptions options)
         {
             Check(new IonSerializer(options), item);
@@ -62,7 +75,7 @@ namespace Amazon.IonObjectMapper.Test
 
         public static void Check<T>(IonSerializer ionSerializer, T item)
         {
-            if (item == null) 
+            if (item == null)
             {
                 Assert.AreEqual(null, Serde(ionSerializer, (object) null));
                 return;
@@ -96,26 +109,26 @@ namespace Amazon.IonObjectMapper.Test
         {
             Assert.AreEqual(expected.ToString(), new IonSerializer().Deserialize<string>(actual));
         }
-        
+
         public static IIonValue StreamToIonValue(Stream stream)
         {
             return IonLoader.Default.Load(stream).GetElementAt(0);
         }
-        
+
         public static IIonValue SerializeToIonWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
         {
             return SerializeToIonWithCustomSerializers(
                 new Dictionary<Type, IIonSerializer>() {{typeof(T), customSerializer}},
                 item);
         }
-        
+
         public static T DeserializeWithCustomSerializer<T>(IonSerializer<T> customSerializer, T item)
         {
             return DeserializeWithCustomSerializers(
                 new Dictionary<Type, IIonSerializer>() {{typeof(T), customSerializer}},
                 item);
         }
-        
+
         public static IIonValue SerializeToIonWithCustomSerializers<T>(
             Dictionary<Type, IIonSerializer> ionSerializers, T item)
         {
@@ -124,13 +137,18 @@ namespace Amazon.IonObjectMapper.Test
             var stream = serializer.Serialize(item);
             return StreamToIonValue(stream);
         }
-        
+
         public static T DeserializeWithCustomSerializers<T>(Dictionary<Type, IIonSerializer> ionSerializers, T item)
         {
             var serializer = new IonSerializer(new IonSerializationOptions { IonSerializers = ionSerializers });
 
             var stream = new IonSerializer().Serialize(item);
             return serializer.Deserialize<T>(stream);
+        }
+
+        public static void AssertIsTruck(object actual)
+        {
+            Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
         }
     }
 }

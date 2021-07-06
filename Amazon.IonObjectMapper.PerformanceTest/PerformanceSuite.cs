@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is located at
@@ -18,9 +18,9 @@ namespace Amazon.IonObjectMapper.PerformanceTest
 
     public class PerformanceSuite
     {
-        private long baselineKey;
-        private int errorMargin;
-        private IDictionary<long, Metric> metrics;
+        private readonly long baselineKey;
+        private readonly int errorMargin;
+        private readonly IDictionary<long, Metric> metrics;
 
         public PerformanceSuite(long baselineKey, int errorMargin)
         {
