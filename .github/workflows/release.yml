@@ -82,7 +82,7 @@ jobs:
       - name: Wait for signing job to complete
         run: |
           pip install boto3
-          python signing_job_waiter.py ${{ steps.get-job-id.outputs.job-id }}
+          python .github/workflows/signing_job_waiter.py ${{ steps.get-job-id.outputs.job-id }}
       
       - name: Get signed DLL from S3
         run: |
