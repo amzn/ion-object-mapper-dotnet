@@ -1,10 +1,22 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Amazon.IonObjectMapper.Test.Utils;
+/*
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.IonObjectMapper.Test
 {
+    using System.Collections.Generic;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using static Amazon.IonObjectMapper.Test.Utils;
+
     [TestClass]
     public class CustomIonSerializerTest
     {
@@ -12,7 +24,7 @@ namespace Amazon.IonObjectMapper.Test
         public void SerializeObjectsWithCustomContextFactoryAttribute()
         {
             var customContext = new Dictionary<string, object>()
-            { 
+            {
                 { "customCourseSerializer", new UpdateCourseSections() }
             };
             var customSerializer = new IonSerializer(new IonSerializationOptions { CustomContext = customContext });
@@ -30,7 +42,7 @@ namespace Amazon.IonObjectMapper.Test
         public void DeserializeObjectsWithCustomContextFactoryAttribute()
         {
             var customContext = new Dictionary<string, object>()
-            { 
+            {
                 { "customCourseSerializer", new UpdateCourseSections() }
             };
             Check(TestObjects.bob, new IonSerializationOptions { CustomContext = customContext });

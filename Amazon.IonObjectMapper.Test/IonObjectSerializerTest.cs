@@ -1,33 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Amazon.IonDotnet;
-using Amazon.IonDotnet.Builders;
-using Amazon.IonDotnet.Tree;
-using Amazon.IonDotnet.Tree.Impl;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Amazon.IonObjectMapper.Test.Utils;
+﻿/*
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.IonObjectMapper.Test
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Amazon.IonDotnet;
+    using Amazon.IonDotnet.Builders;
+    using Amazon.IonDotnet.Tree;
+    using Amazon.IonDotnet.Tree.Impl;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using static Amazon.IonObjectMapper.Test.Utils;
+
     [TestClass]
     public class IonObjectSerializerTest
     {
-        IonSerializer defaultSerializer = new IonSerializer();
-        private IValueFactory valueFactory = new ValueFactory();
+        private readonly IonSerializer defaultSerializer = new();
+        private readonly IValueFactory valueFactory = new ValueFactory();
 
         [TestMethod]
         public void SerializesAndDeserializesObjects()
         {
             Check(TestObjects.honda);
         }
-        
+
         [TestMethod]
         public void SerializesAndDeserializesObjectsWithReadOnlyProperties()
         {
             Check(TestObjects.JohnGreenwood);
         }
-        
+
         [TestMethod]
         public void SerializesAndDeserializesObjectsWithIncludeFields()
         {
@@ -46,20 +59,20 @@ namespace Amazon.IonObjectMapper.Test
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
-        
+
         [TestMethod]
         public void SerializesObjectsWithIgnoreReadOnlyFields()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyFields = true, IncludeFields = true});
 
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.drKyler));
-            
+
             Assert.IsFalse(serialized.ContainsField("firstName"));
             Assert.IsFalse(serialized.ContainsField("lastName"));
             Assert.IsTrue(serialized.ContainsField("department"));
             Assert.IsFalse(serialized.ContainsField("birthDate"));
         }
-        
+
         [TestMethod]
         public void DeserializesObjectsWithIgnoreReadOnlyFields()
         {
@@ -67,24 +80,24 @@ namespace Amazon.IonObjectMapper.Test
 
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyFields = true, IncludeFields = true});
             var deserialized = serializer.Deserialize<Teacher>(stream);
-            
+
             Assert.IsNull(deserialized.firstName);
             Assert.IsNull(deserialized.lastName);
             Assert.IsNotNull(deserialized.department);
             Assert.IsNull(deserialized.birthDate);
         }
-        
+
         [TestMethod]
         public void SerializesObjectsWithIgnoreReadOnlyProperties()
         {
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
             IIonStruct serialized = StreamToIonValue(serializer.Serialize(TestObjects.JohnGreenwood));
-            
+
             Assert.IsTrue(serialized.ContainsField("firstName"));
             Assert.IsTrue(serialized.ContainsField("lastName"));
             Assert.IsFalse(serialized.ContainsField("major"));
         }
-        
+
         [TestMethod]
         public void DeserializesObjectsWithIgnoreReadOnlyProperties()
         {
@@ -92,7 +105,7 @@ namespace Amazon.IonObjectMapper.Test
 
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreReadOnlyProperties = true});
             var deserialized = serializer.Deserialize<Student>(stream);
-            
+
             Assert.AreEqual(TestObjects.JohnGreenwood.FirstName, deserialized.FirstName);
             Assert.AreEqual(TestObjects.JohnGreenwood.LastName, deserialized.LastName);
             Assert.AreNotEqual(TestObjects.JohnGreenwood.Major, deserialized.Major);
@@ -108,7 +121,7 @@ namespace Amazon.IonObjectMapper.Test
             Assert.IsFalse(serialized.ContainsField("color"));
             Assert.IsTrue(serialized.ContainsField("canOffroad"));
         }
-        
+
         [TestMethod]
         public void DeserializesObjectsWithIgnoreDefaults()
         {
@@ -116,7 +129,7 @@ namespace Amazon.IonObjectMapper.Test
 
             var serializer = new IonSerializer(new IonSerializationOptions {IgnoreDefaults = true});
             var deserialized = serializer.Deserialize<Motorcycle>(stream);
-            
+
             Assert.IsNull(deserialized.Brand);
             Assert.IsNull(deserialized.color);
             Assert.IsNotNull(deserialized.canOffroad);
@@ -126,10 +139,10 @@ namespace Amazon.IonObjectMapper.Test
         public void SerializesAndDeserializesObjectsWithCaseInsensitiveProperties()
         {
             var serializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });
-            
+
             var stream = serializer.Serialize(TestObjects.Titanic);
             var deserialized = serializer.Deserialize<ShipWithVariedCasing>(stream);
-            
+
             Assert.AreEqual(TestObjects.Titanic.Name, deserialized.name);
             Assert.AreEqual(TestObjects.Titanic.Weight, deserialized.WEIGHT);
             Assert.AreEqual(TestObjects.Titanic.Capacity, deserialized.CaPaCiTy);
@@ -179,15 +192,15 @@ namespace Amazon.IonObjectMapper.Test
         {
             Check(new Wheel("default", "MSW"));
         }
-        
+
         [TestMethod]
         public void CanDeserializeToDifferentTypeUsingIonConstructor()
         {
             var cr = new CircleRadius(5);
-            
+
             var stream = defaultSerializer.Serialize(cr);
             var cc = defaultSerializer.Deserialize<CircleCircumference>(stream);
-            
+
             Assert.AreEqual(2 * Math.PI * cr.Radius, cc.Circumference);
         }
 
@@ -197,7 +210,7 @@ namespace Amazon.IonObjectMapper.Test
             var stream = defaultSerializer.Serialize(new Tire("default", "MSW"));
             Assert.ThrowsException<InvalidOperationException>(() => defaultSerializer.Deserialize<Tire>(stream));
         }
-        
+
         [TestMethod]
         public void ExceptionOnDeserializingObjectWithUnannotatedIonConstructorParameter()
         {
@@ -212,7 +225,7 @@ namespace Amazon.IonObjectMapper.Test
                 new List<Vehicle>()
                 {
                     new Plane(), new Boat(), new Helicopter()
-                }, 
+                },
                 new IonSerializationOptions
                 {
                     AnnotatedTypeAssemblies = new string[]
@@ -227,7 +240,7 @@ namespace Amazon.IonObjectMapper.Test
         public void DeserializesObjectsThatExceedMaxDepth()
         {
             var stream = new IonSerializer().Serialize(TestObjects.UnitedStates);
-            
+
             var serializer = new IonSerializer(new IonSerializationOptions {MaxDepth = 4});
             var deserialized = serializer.Deserialize<Country>(stream);
 
@@ -250,10 +263,10 @@ namespace Amazon.IonObjectMapper.Test
         public void RespectAnnotationPrefixes()
         {
             AssertHasAnnotation(
-                "my.prefix.Truck", 
+                "my.prefix.Truck",
                 new IonSerializer(new IonSerializationOptions { IncludeTypeInformation = true, TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("my.prefix") }).Serialize(new Truck()));
             AssertHasAnnotation(
-                "my.universal.namespace.BussyMcBusface", 
+                "my.universal.namespace.BussyMcBusface",
                 new IonSerializer().Serialize(new Bus()));
         }
 
@@ -263,14 +276,14 @@ namespace Amazon.IonObjectMapper.Test
             var serialized = SerializeToIonWithCustomSerializer(new NegationBoolIonSerializer(), true);
             Assert.AreEqual(false, serialized.BoolValue);
         }
-        
+
         [TestMethod]
         public void DeserializesWithCustomBoolSerializer()
         {
             var deserialized = DeserializeWithCustomSerializer(new NegationBoolIonSerializer(), true);
             Assert.AreEqual(false, deserialized);
         }
-        
+
         [TestMethod]
         public void SerializesWithCustomStringSerializer()
         {
@@ -379,7 +392,7 @@ namespace Amazon.IonObjectMapper.Test
         public void SerializesWithCustomBigDecimalSerializer()
         {
             var testBigDecimal = BigDecimal.Parse("3.14159265359");
-            
+
             var serialized = SerializeToIonWithCustomSerializer(new NegativeBigDecimalIonSerializer(), testBigDecimal);
             Assert.AreEqual(-testBigDecimal, serialized.BigDecimalValue);
         }
@@ -388,7 +401,7 @@ namespace Amazon.IonObjectMapper.Test
         public void DeserializesWithCustomBigDecimalSerializer()
         {
             var testBigDecimal = BigDecimal.Parse("3.14159265359");
-            
+
             var deserialized = DeserializeWithCustomSerializer(new NegativeBigDecimalIonSerializer(), testBigDecimal);
             Assert.AreEqual(-testBigDecimal, deserialized);
         }
@@ -397,7 +410,7 @@ namespace Amazon.IonObjectMapper.Test
         public void SerializesWithCustomSymbolSerializer()
         {
             var serialized = SerializeToIonWithCustomSerializer(
-                new UpperCaseSymbolIonSerializer(), 
+                new UpperCaseSymbolIonSerializer(),
                 new SymbolToken("test symbol", 10));
             Assert.AreEqual("TEST SYMBOL", serialized.SymbolValue.Text);
         }
@@ -406,7 +419,7 @@ namespace Amazon.IonObjectMapper.Test
         public void DeserializesWithCustomSymbolSerializer()
         {
             var deserialized = DeserializeWithCustomSerializer(
-                new UpperCaseSymbolIonSerializer(), 
+                new UpperCaseSymbolIonSerializer(),
                 new SymbolToken("test symbol", 10));
             Assert.AreEqual("TEST SYMBOL", deserialized.Text);
         }
@@ -434,8 +447,8 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void SerializesWithCustomGuidSerializer()
         {
-            var testGuid = new Guid(new byte[] 
-            { 
+            var testGuid = new Guid(new byte[]
+            {
                 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
                 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F
             });
@@ -452,8 +465,8 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void DeserializesWithCustomGuidSerializer()
         {
-            var testGuid = new Guid(new byte[] 
-            { 
+            var testGuid = new Guid(new byte[]
+            {
                 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
                 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F
             });
@@ -466,7 +479,7 @@ namespace Amazon.IonObjectMapper.Test
             var deserialized = DeserializeWithCustomSerializer(new ZeroGuidIonSerializer(), testGuid);
             Assert.IsTrue(expectedGuid.SequenceEqual(deserialized.ToByteArray()));
         }
-        
+
         [TestMethod]
         public void SerializesListsWithCustomSerializers()
         {
@@ -477,8 +490,8 @@ namespace Amazon.IonObjectMapper.Test
                 {typeof(float), new NegativeFloatIonSerializer()},
             };
 
-            List<object> testList = new List<object>(new object[] { "test", 5, 3.14f });
-            
+            List<object> testList = new(new object[] { "test", 5, 3.14f });
+
             var serialized = (IIonList)SerializeToIonWithCustomSerializers(customSerializers, testList);
 
             Assert.AreEqual(3, serialized.Count);
@@ -486,7 +499,7 @@ namespace Amazon.IonObjectMapper.Test
             Assert.AreEqual(-5, serialized.GetElementAt(1).IntValue);
             Assert.AreEqual(-3.14f, serialized.GetElementAt(2).DoubleValue);
         }
-        
+
         [TestMethod]
         public void DeserializesListsWithCustomSerializers()
         {
@@ -497,8 +510,8 @@ namespace Amazon.IonObjectMapper.Test
                 {typeof(float), new NegativeFloatIonSerializer()},
             };
 
-            List<object> testList = new List<object>(new object[] { "test", 5, 3.14f });
-            
+            List<object> testList = new(new object[] { "test", 5, 3.14f });
+
             var deserialized = DeserializeWithCustomSerializers(customSerializers, testList);
 
             Assert.AreEqual(3, deserialized.Count);
@@ -533,7 +546,7 @@ namespace Amazon.IonObjectMapper.Test
             var engine = serialized.GetField("engine");
             Assert.IsTrue(engine.ContainsField("manufactureDate"));
             Assert.AreEqual(
-                TestObjects.honda.Engine.ManufactureDate.AddDays(1), 
+                TestObjects.honda.Engine.ManufactureDate.AddDays(1),
                 engine.GetField("manufactureDate").TimestampValue.DateTimeValue);
         }
 
@@ -591,7 +604,7 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void DeserializeAnnotatedIonToClassNameWithAnnotatedTypeAssemblies()
         {
-            IonSerializationOptions options = new IonSerializationOptions
+            IonSerializationOptions options = new()
             {
                 AnnotatedTypeAssemblies = new string[]
                 {
@@ -601,7 +614,7 @@ namespace Amazon.IonObjectMapper.Test
 
             IIonReader reader = IonReaderBuilder.Build(TestObjects.truckIonText);
 
-            IonSerializer ionSerializer = new IonSerializer(options);
+            IonSerializer ionSerializer = new(options);
             Vehicle truck = ionSerializer.Deserialize<Vehicle>(reader);
 
             AssertIsTruck(truck);
@@ -652,7 +665,7 @@ namespace Amazon.IonObjectMapper.Test
             Assert.AreNotEqual(TestObjects.nativeTruck.ToString(), truck.ToString());
         }
 
-        private void AssertIsTruck(object actual)
+        private static void AssertIsTruck(object actual)
         {
             Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
         }

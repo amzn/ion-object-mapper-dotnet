@@ -1,5 +1,5 @@
 /*
- * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is located at
@@ -44,7 +44,7 @@ namespace Amazon.IonObjectMapper.PerformanceTest
         /// </summary>
         private const int ErrorMargin = 15;
 
-        private static readonly PerformanceSuite suite = new PerformanceSuite(BaseCount, ErrorMargin);
+        private static readonly PerformanceSuite suite = new(BaseCount, ErrorMargin);
 
         [TestMethod]
         public void AssertLinearRuntime()
@@ -83,13 +83,13 @@ namespace Amazon.IonObjectMapper.PerformanceTest
 
         private static void RecordMetrics(IDictionary<string, PerformanceTestObject> dictionary)
         {
-            IonSerializer serializer = new IonSerializer();
+            IonSerializer serializer = new();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
             long baseMemoryUsed = GC.GetTotalMemory(true);
 
-            Stopwatch timer = new Stopwatch();
+            Stopwatch timer = new();
 
             timer.Start();
             Stream serialized = serializer.Serialize(dictionary);

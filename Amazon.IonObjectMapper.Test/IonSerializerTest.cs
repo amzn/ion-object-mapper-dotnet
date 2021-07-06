@@ -1,12 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Amazon.IonDotnet;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Amazon.IonObjectMapper.Test.Utils;
+﻿/*
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.IonObjectMapper.Test
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Amazon.IonDotnet;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using static Amazon.IonObjectMapper.Test.Utils;
+
     [TestClass]
     public class IonSerializerTest
     {
@@ -40,10 +53,12 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesDictionaries()
         {
-            var dictionary = new TestDictionary();
-            dictionary.Add("one", 1);
-            dictionary.Add("two", 2);
-            dictionary.Add("three", 3);
+            var dictionary = new TestDictionary
+            {
+                { "one", 1 },
+                { "two", 2 },
+                { "three", 3 }
+            };
             Assert.AreEqual(TestDictionary.PrettyString(dictionary), 
                 TestDictionary.PrettyString(Serde<Dictionary<string, int>>(dictionary)));
         }

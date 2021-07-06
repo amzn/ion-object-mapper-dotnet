@@ -1,9 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿/*
+ * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+ * the License. A copy of the License is located at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
 
 namespace Amazon.IonObjectMapper.Test
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
 
     [IonAnnotateType]
     public class Vehicle
@@ -14,7 +26,7 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
-    [IonAnnotateType(Prefix = "my.universal.namespace", Name="BussyMcBusface")] 
+    [IonAnnotateType(Prefix = "my.universal.namespace", Name="BussyMcBusface")]
     public class Bus : Vehicle
     {
         public override string ToString()
@@ -49,7 +61,7 @@ namespace Amazon.IonObjectMapper.Test
             return "<Boat>";
         }
     }
-    
+
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Motorcycle : Vehicle
     {
@@ -59,14 +71,14 @@ namespace Amazon.IonObjectMapper.Test
         public string color;
 
         [IonField]
-        public bool canOffroad; 
-        
+        public bool canOffroad;
+
         public override string ToString()
         {
             return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
-    
+
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
     {
@@ -82,26 +94,26 @@ namespace Amazon.IonObjectMapper.Test
         public string Name { get; init; }
         public int Weight { get; init; }
         public int Capacity { get; init; }
-        
+
         public override string ToString()
         {
             return $"<Ship>{{ Name: {this.Name}, Weight: {this.Weight}, Capacity: {this.Capacity} }}";
         }
     }
-    
+
     // For testing case insensitive deserialization.
     public class ShipWithVariedCasing : Boat
     {
         public string name { get; init; }
         public double WEIGHT { get; init; }
         public int CaPaCiTy { get; init; }
-        
+
         public override string ToString()
         {
             return $"<Ship>{{ name: {this.name}, WEIGHT: {this.WEIGHT}, CaPaCiTy: {this.CaPaCiTy} }}";
         }
     }
-    
+
     public class Catamaran : Yacht
     {
         public override string ToString()
@@ -118,7 +130,7 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
-    [IonAnnotateType(ExcludeDescendants = true)] 
+    [IonAnnotateType(ExcludeDescendants = true)]
     public class Jet : Plane
     {
         public override string ToString()
@@ -137,18 +149,18 @@ namespace Amazon.IonObjectMapper.Test
 
     public static class TestObjects {
         public static Car honda = new Car
-        { 
-            Make = "Honda", 
-            Model = "Civic", 
-            YearOfManufacture = 2010, 
+        {
+            Make = "Honda",
+            Model = "Civic",
+            YearOfManufacture = 2010,
             Weight = new Random().NextDouble(),
             Engine = new Engine { Cylinders = 4, ManufactureDate = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
         public static Person bob = new Person
-        { 
-            Name = "Bob", 
-            Id = 123455, 
+        {
+            Name = "Bob",
+            Id = 123455,
             Course = new Course { Sections = 10, MeetingTime = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
@@ -164,9 +176,9 @@ namespace Amazon.IonObjectMapper.Test
         public static Teacher drFord = new Teacher("Rachel", "Ford", "Chemistry", DateTime.ParseExact("29/04/1985", "dd/MM/yyyy", CultureInfo.InvariantCulture));
         private static Teacher[] faculty = { drKyler, drFord };
         public static School fieldAcademy = new School("1234 Fictional Ave", 150, new List<Teacher>(faculty));
-        
+
         public static Student JohnGreenwood = new Student("John", "Greenwood", "Physics");
-        
+
         public static Desk SchoolDesk = new Desk {width = 48, Depth = 24, Height = 30};
         public static Ruler Ruler = new Ruler {length = 30, unit = "cm"};
         public static Chalkboard Chalkboard = new Chalkboard {width = 48, height = 36};
@@ -197,7 +209,7 @@ namespace Amazon.IonObjectMapper.Test
             Weight = 52310,
             Capacity = 2230,
         };
-         
+
         public static ClassWithProperties objectWithProperties = new ClassWithProperties("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
 
@@ -223,7 +235,7 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
-    [IonSerializer(Factory = typeof(CourseSerializerFactory))]  
+    [IonSerializer(Factory = typeof(CourseSerializerFactory))]
     public class Course
     {
         public int Sections { get; init; }
@@ -242,19 +254,19 @@ namespace Amazon.IonObjectMapper.Test
         public string Model { get; init; }
         public int YearOfManufacture { get; init; }
         public Engine Engine { get; init; }
-        
+
         [IonIgnore]
         public double Speed { get { return new Random().NextDouble(); } }
 
         [IonPropertyName("weightInKg")]
         public double Weight { get; init; }
 
-        public string GetColor() 
+        public string GetColor()
         {
             return "#FF0000";
         }
 
-        public void SetColor(string input) 
+        public void SetColor(string input)
         {
             this.color = input;
         }
@@ -378,8 +390,8 @@ namespace Amazon.IonObjectMapper.Test
     public class Windshield
     {
         public double Length { get; init; }
-        public double Height { get; init; } 
-        
+        public double Height { get; init; }
+
         [IonConstructor]
         public Windshield(double length, double height)
         {
@@ -392,7 +404,7 @@ namespace Amazon.IonObjectMapper.Test
     public class CircleRadius
     {
         public double Radius { get; init; }
-        
+
         public CircleRadius(double radius)
         {
             this.Radius = radius;
@@ -425,14 +437,14 @@ namespace Amazon.IonObjectMapper.Test
             this.studentCount = 0;
             this.faculty = new List<Teacher>();
         }
-        
+
         public School(string address, int studentCount, List<Teacher> faculty)
         {
             this.address = address;
             this.studentCount = studentCount;
             this.faculty = faculty;
         }
-        
+
         public override string ToString()
         {
             return "<School>{ address: " + address + ", studentCount: " + studentCount + ", faculty: " + faculty + " }";
@@ -453,7 +465,7 @@ namespace Amazon.IonObjectMapper.Test
             this.department = null;
             this.birthDate = null;
         }
-        
+
         public Teacher(string firstName, string lastName, string department, DateTime birthDate)
         {
             this.firstName = firstName;
@@ -461,7 +473,7 @@ namespace Amazon.IonObjectMapper.Test
             this.department = department;
             this.birthDate = birthDate;
         }
-        
+
         public override string ToString()
         {
             return "<Teacher>{ firstName: " + firstName + ", lastName: " + lastName + ", department: " + department + ", birthDate: " + birthDate + " }";
@@ -480,14 +492,14 @@ namespace Amazon.IonObjectMapper.Test
             this.LastName = default;
             this.Major = default;
         }
-        
+
         public Student(string firstName, string lastName, string major)
         {
             this.FirstName = firstName;
             this.LastName = lastName;
             this.Major = major;
         }
-        
+
         public override string ToString()
         {
             return $"<Student>{{ FirstName: {FirstName}, LastName: {LastName}, Major: {Major} }}";
@@ -501,13 +513,13 @@ namespace Amazon.IonObjectMapper.Test
         public int Height { get; init; }
 
         [IonPropertyGetter("desk width")]
-        public int GetWidth() 
+        public int GetWidth()
         {
             return this.width;
         }
-        
+
         [IonPropertySetter("desk width")]
-        public void SetWidth(int width) 
+        public void SetWidth(int width)
         {
             this.width = width;
         }
@@ -521,22 +533,22 @@ namespace Amazon.IonObjectMapper.Test
     public class Ruler
     {
         public int length { get; set; }
-        
+
         [IonField]
         internal string unit;
 
         [IonPropertyGetter("length")]
-        public int GetLength() 
+        public int GetLength()
         {
             return this.length;
         }
 
         [IonPropertySetter("length")]
-        public void SetLength(int length) 
+        public void SetLength(int length)
         {
             this.length = length;
         }
-        
+
         [IonPropertyGetter("unit")]
         public string GetUnit()
         {
@@ -747,7 +759,7 @@ namespace Amazon.IonObjectMapper.Test
 
         [IonPropertyGetter("protected value")]
         protected string GetProtectedValue()
-        { 
+        {
             return this.protectedValue;
         }
 
