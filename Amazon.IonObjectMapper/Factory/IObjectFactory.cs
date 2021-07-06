@@ -16,8 +16,20 @@ namespace Amazon.IonObjectMapper
     using System;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Interface for Object Factory.
+    /// </summary>
     public interface IObjectFactory
     {
+        /// <summary>
+        /// Create new instance of an object.
+        /// </summary>
+        ///
+        /// <param name="options">Serialization options.</param>
+        /// <param name="reader">The Ion reader used for object creation.</param>
+        /// <param name="targetType">The type of the created object.</param>
+        ///
+        /// <returns>A new instance of a specified type.</returns>
         object Create(IonSerializationOptions options, IIonReader reader, Type targetType);
     }
 }

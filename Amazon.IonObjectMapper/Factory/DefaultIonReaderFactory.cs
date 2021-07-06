@@ -17,8 +17,12 @@ namespace Amazon.IonObjectMapper
     using Amazon.IonDotnet;
     using Amazon.IonDotnet.Builders;
 
+    /// <summary>
+    /// Default Ion Reader Factory.
+    /// </summary>
     public class DefaultIonReaderFactory : IIonReaderFactory
     {
+        /// <inheritdoc/>
         public IIonReader Create(Stream stream)
         {
             return IonReaderBuilder.Build(stream, new ReaderOptions { Format = ReaderFormat.Detect });
