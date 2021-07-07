@@ -40,7 +40,7 @@ namespace Amazon.IonObjectMapper
         /// Initializes a new instance of the <see cref="IonSerializer"/> class.
         /// </summary>
         ///
-        /// <param name="options">Serialization options.</param>
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         public IonSerializer(IonSerializationOptions options)
         {
             this.options = options;
@@ -50,8 +50,8 @@ namespace Amazon.IonObjectMapper
         /// Serialize value to Ion.
         /// </summary>
         ///
-        /// <param name="item">Value to be serialized.</param>
-        /// <typeparam name="T">The data type being serialized.</typeparam>
+        /// <param name="item">The value to serialize.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
         ///
         /// <returns>The serialized stream.</returns>
         public Stream Serialize<T>(T item)
@@ -67,8 +67,8 @@ namespace Amazon.IonObjectMapper
         /// </summary>
         ///
         /// <param name="stream">The stream to be written with serialized Ion.</param>
-        /// <param name="item"> Value to be serialized.</param>
-        /// <typeparam name="T">The data type being serialized.</typeparam>
+        /// <param name="item">The value to serialize.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
         public void Serialize<T>(Stream stream, T item)
         {
             IIonWriter writer = this.options.WriterFactory.Create(stream);
@@ -81,9 +81,9 @@ namespace Amazon.IonObjectMapper
         /// Serialize value to Ion.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used for serialization.</param>
-        /// <param name="item">Value to be serialized.</param>
-        /// <typeparam name="T">The data type being serialized.</typeparam>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The value to serialize.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
         public void Serialize<T>(IIonWriter writer, T item)
         {
             if (item == null)
@@ -219,8 +219,8 @@ namespace Amazon.IonObjectMapper
         /// Deserialize value from Ion.
         /// </summary>
         ///
-        /// <param name="stream">The Ion stream to be read during deserialization.</param>
-        /// <typeparam name="T">The data type being serialized.</typeparam>
+        /// <param name="stream">The stream to be read during deserialization.</param>
+        /// <typeparam name="T">The type of data to deserialize.</typeparam>
         ///
         /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(Stream stream)
@@ -232,7 +232,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize value from Ion.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         /// <param name="type">The target .NET type for deserialization.</param>
         ///
         /// <returns>The deserialized value.</returns>
@@ -245,7 +245,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize value from Ion.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         /// <param name="type">The target .NET type for deserialization.</param>
         /// <param name="ionType">The Ion type of the current Ion field.</param>
         ///
@@ -391,10 +391,10 @@ namespace Amazon.IonObjectMapper
         /// Deserialize value from Ion.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
-        /// <typeparam name="T">The data type being serialized.</typeparam>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        /// <typeparam name="T">The type of data to deserialize.</typeparam>
         ///
-        /// <returns>The deserialized value of type T.</returns>
+        /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(IIonReader reader)
         {
             return (T)this.Deserialize(reader, typeof(T));

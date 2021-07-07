@@ -33,8 +33,8 @@ namespace Amazon.IonObjectMapper
         /// Initializes a new instance of the <see cref="IonObjectSerializer"/> class.
         /// </summary>
         ///
-        /// <param name="ionSerializer">Serializer used for serializing/deserializing class members.</param>
-        /// <param name="options">Serialization options.</param>
+        /// <param name="ionSerializer">Serializer to be used for serializing/deserializing non-primitive objects.</param>
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         /// <param name="targetType">The type of data being serialized/deserialized.</param>
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {

@@ -24,7 +24,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize Symbol Token value.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized Symbol Token value.</returns>
         public override SymbolToken Deserialize(IIonReader reader)
@@ -36,7 +36,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize Symbol Token value.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The Symbol Token value to serialize.</param>
         public override void Serialize(IIonWriter writer, SymbolToken item)
         {

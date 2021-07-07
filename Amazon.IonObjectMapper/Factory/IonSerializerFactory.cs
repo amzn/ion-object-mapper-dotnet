@@ -27,9 +27,7 @@ namespace Amazon.IonObjectMapper
         /// Arbitrary data that can be used to customize serialization/deserialization logic.
         /// </param>
         ///
-        /// <returns>
-        /// Customized IonSerializer.
-        /// </returns>
+        /// <returns>The customized IonSerializer.</returns>
         public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> customContext);
 
         /// <inheritdoc/>

@@ -27,7 +27,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize decimal value.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized decimal value.</returns>
         public override decimal Deserialize(IIonReader reader)
@@ -39,7 +39,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize decimal value.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The decimal value to serialize.</param>
         public override void Serialize(IIonWriter writer, decimal item)
         {

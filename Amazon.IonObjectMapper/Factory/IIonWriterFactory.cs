@@ -25,7 +25,7 @@ namespace Amazon.IonObjectMapper
         /// Create an Ion Writer.
         /// </summary>
         ///
-        /// <param name="stream">The stream to be written by the Ion Reader.</param>
+        /// <param name="stream">The stream to be written by the Ion writer.</param>
         ///
         /// <returns>The created Ion reader.</returns>
         IIonWriter Create(Stream stream);

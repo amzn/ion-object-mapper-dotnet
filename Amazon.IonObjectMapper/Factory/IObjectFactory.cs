@@ -25,8 +25,8 @@ namespace Amazon.IonObjectMapper
         /// Create new instance of an object.
         /// </summary>
         ///
-        /// <param name="options">Serialization options.</param>
-        /// <param name="reader">The Ion reader used for object creation.</param>
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
+        /// <param name="reader">The Ion reader to be used for object creation.</param>
         /// <param name="targetType">The type of the created object.</param>
         ///
         /// <returns>A new instance of a specified type.</returns>

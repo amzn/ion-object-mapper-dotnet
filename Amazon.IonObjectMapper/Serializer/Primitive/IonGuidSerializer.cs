@@ -29,7 +29,7 @@ namespace Amazon.IonObjectMapper
         /// Initializes a new instance of the <see cref="IonGuidSerializer"/> class.
         /// </summary>
         ///
-        /// <param name="options">Serialization options.</param>
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         public IonGuidSerializer(IonSerializationOptions options)
         {
             this.options = options;
@@ -39,7 +39,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize Guid value.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized Guid value.</returns>
         public override Guid Deserialize(IIonReader reader)
@@ -53,7 +53,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize Guid value.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The Guid value to serialize.</param>
         public override void Serialize(IIonWriter writer, Guid item)
         {

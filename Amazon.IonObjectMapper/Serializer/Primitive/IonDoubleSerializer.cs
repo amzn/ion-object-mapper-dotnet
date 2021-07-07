@@ -24,7 +24,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize double value.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized double value.</returns>
         public override double Deserialize(IIonReader reader)
@@ -36,7 +36,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize double value.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The double value to serialize.</param>
         public override void Serialize(IIonWriter writer, double item)
         {

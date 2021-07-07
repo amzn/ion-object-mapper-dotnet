@@ -25,7 +25,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize CLOB value.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized CLOB value.</returns>
         public override string Deserialize(IIonReader reader)
@@ -39,7 +39,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize CLOB value.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The CLOB value to serialize.</param>
         public override void Serialize(IIonWriter writer, string item)
         {

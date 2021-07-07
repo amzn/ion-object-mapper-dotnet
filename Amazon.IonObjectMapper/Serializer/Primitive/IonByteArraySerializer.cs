@@ -24,7 +24,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize byte array.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized byte array.</returns>
         public override byte[] Deserialize(IIonReader reader)
@@ -38,7 +38,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize byte array.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The byte array to serialize.</param>
         public override void Serialize(IIonWriter writer, byte[] item)
         {

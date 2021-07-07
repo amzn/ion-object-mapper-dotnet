@@ -24,7 +24,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize boolean value.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>The deserialized boolean value.</returns>
         public override bool Deserialize(IIonReader reader)
@@ -36,7 +36,7 @@ namespace Amazon.IonObjectMapper
         /// Serialize boolean value.
         /// </summary>
         ///
-        /// <param name="writer">The Ion writer used during serialization.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The boolean value to serialize.</param>
         public override void Serialize(IIonWriter writer, bool item)
         {

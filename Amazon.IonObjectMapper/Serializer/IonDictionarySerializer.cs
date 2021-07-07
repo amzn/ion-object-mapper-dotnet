@@ -44,7 +44,7 @@ namespace Amazon.IonObjectMapper
         /// Deserialize an Ion Struct into an IDictionary.
         /// </summary>
         ///
-        /// <param name="reader">The Ion reader to be used during deserialization.</param>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
         /// <returns>A Dictionary of Key Type string and Value Type valueType.</returns>
         public override IDictionary Deserialize(IIonReader reader)
@@ -68,8 +68,8 @@ namespace Amazon.IonObjectMapper
         /// and the Value is the struct field value.
         /// </summary>
         ///
-        /// <param name="writer">The IIonWriter to use to write the Ion Struct.</param>
-        /// <param name="item">The IDictionary to serialize into an Ion Struct.</param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The dictionary value to serialize.</param>
         public override void Serialize(IIonWriter writer, IDictionary item)
         {
             writer.StepIn(IonType.Struct);

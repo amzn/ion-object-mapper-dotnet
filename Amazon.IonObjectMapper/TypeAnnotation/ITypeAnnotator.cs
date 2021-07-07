@@ -25,7 +25,7 @@ namespace Amazon.IonObjectMapper
         /// Apply type annotation.
         /// </summary>
         ///
-        /// <param name="options">Serialization options.</param>
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         /// <param name="writer">The Ion writer writing the annotations.</param>
         /// <param name="type">.NET Type being annotated.</param>
         public void Apply(IonSerializationOptions options, IIonWriter writer, Type type);

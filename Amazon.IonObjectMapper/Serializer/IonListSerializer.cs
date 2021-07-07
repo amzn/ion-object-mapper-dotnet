@@ -31,7 +31,7 @@ namespace Amazon.IonObjectMapper
         /// Initializes a new instance of the <see cref="IonListSerializer"/> class.
         /// </summary>
         ///
-        /// <param name="serializer">Serializer used for serializing/deserializing items in list.</param>
+        /// <param name="serializer">Serializer to be used for serializing/deserializing items in list.</param>
         /// <param name="listType">Type of list.</param>
         /// <param name="elementType">Type of items in list.</param>
         public IonListSerializer(IonSerializer serializer, Type listType, Type elementType)
@@ -45,7 +45,7 @@ namespace Amazon.IonObjectMapper
         /// Initializes a new instance of the <see cref="IonListSerializer"/> class.
         /// </summary>
         ///
-        /// <param name="serializer">Serializer used for serializing/deserializing items in list.</param>
+        /// <param name="serializer">Serializer to be used for serializing/deserializing items in list.</param>
         /// <param name="listType">Type of list.</param>
         public IonListSerializer(IonSerializer serializer, Type listType)
         {
