@@ -28,7 +28,6 @@ namespace Amazon.IonObjectMapper
         ///
         /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The value to serialize.</param>
-        /// <typeparam name="T">The type of data to serialize.</typeparam>
         public abstract void Serialize(IIonWriter writer, T item);
 
         /// <summary>
@@ -36,7 +35,6 @@ namespace Amazon.IonObjectMapper
         /// </summary>
         ///
         /// <param name="reader">The Ion reader to be used for deserialization.</param>
-        /// <typeparam name="T">The type of data to deserialize.</typeparam>
         ///
         /// <returns>The deserialized value.</returns>
         public abstract T Deserialize(IIonReader reader);

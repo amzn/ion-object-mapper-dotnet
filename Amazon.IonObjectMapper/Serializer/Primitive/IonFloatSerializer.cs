@@ -22,6 +22,9 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public class IonFloatSerializer : IonSerializer<float>
     {
+        /// <summary>
+        /// Ion annotation to distinguish floats from doubles.
+        /// </summary>
         internal static readonly string ANNOTATION = "numeric.float32";
 
         /// <summary>

@@ -21,6 +21,9 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public class IonLongSerializer : IonSerializer<long>
     {
+        /// <summary>
+        /// Ion annotation to distinguish longs from ints.
+        /// </summary>
         internal static readonly string ANNOTATION = "numeric.int32";
 
         /// <summary>

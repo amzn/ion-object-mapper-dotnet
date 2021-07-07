@@ -21,6 +21,9 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public class IonDecimalSerializer : IonSerializer<decimal>
     {
+        /// <summary>
+        /// Ion annotation to distinguish decimals from big decimals.
+        /// </summary>
         internal static readonly string ANNOTATION = "numeric.decimal128";
 
         /// <summary>

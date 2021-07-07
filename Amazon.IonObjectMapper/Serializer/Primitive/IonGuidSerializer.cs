@@ -22,6 +22,9 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public class IonGuidSerializer : IonSerializer<Guid>
     {
+        /// <summary>
+        /// Ion annotation to distinguish Guids from byte arrays.
+        /// </summary>
         internal static readonly string ANNOTATION = "guid128";
         private readonly IonSerializationOptions options;
 
