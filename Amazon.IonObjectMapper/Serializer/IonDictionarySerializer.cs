@@ -44,6 +44,8 @@ namespace Amazon.IonObjectMapper
         /// Deserialize an Ion Struct into an IDictionary.
         /// </summary>
         ///
+        /// <param name="reader">The Ion reader to be used during deserialization.</param>
+        ///
         /// <returns>A Dictionary of Key Type string and Value Type valueType.</returns>
         public override IDictionary Deserialize(IIonReader reader)
         {

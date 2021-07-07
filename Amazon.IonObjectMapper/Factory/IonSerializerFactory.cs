@@ -15,28 +15,24 @@ namespace Amazon.IonObjectMapper
 {
     using System.Collections.Generic;
 
-    /// <summary>
-    /// This abstract class is to implement IIonSerializerFactory interface.
-    /// </summary>
+    /// <inheritdoc />
     public abstract class IonSerializerFactory<T> : IIonSerializerFactory
     {
         /// <summary>
         /// Create custom IonSerializer with customContext option.
         /// </summary>
-        /// <param name="options">
-        /// The IonSerializationOptions is an object that can be passed to the IonSerializer object
-        /// and determined the way to customize the IonSerializer.
-        /// </param>
+        ///
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         /// <param name="customContext">
-        /// The customContext is one option to create IonSerializer with custom arbitrary data.
-        /// A Dictionary of Key Type string is to map to any customized objects
-        /// and Value Type object is to custom any serialize/deserialize logic.
+        /// Arbitrary data that can be used to customize serialization/deserialization logic.
         /// </param>
+        ///
         /// <returns>
         /// Customized IonSerializer.
         /// </returns>
         public abstract IonSerializer<T> Create(IonSerializationOptions options, Dictionary<string, object> customContext);
 
+        /// <inheritdoc/>
         IIonSerializer IIonSerializerFactory.Create(IonSerializationOptions options, Dictionary<string, object> customContext)
         {
             return this.Create(options, customContext);
