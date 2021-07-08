@@ -9,3 +9,14 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 ## License
 
 This project is licensed under the Apache-2.0 License.
+
+## Development
+
+### Documentation 
+
+DocFX is used for documentation. Please see the link below for more detail to install DocFX
+* [DocFX installation](https://dotnet.github.io/docfx/tutorial/docfx_getting_started.html#2-use-docfx-as-a-command-line-tool)
+
+You can generate the docstring HTML locally by running the following in the root directory of this repository:
+
+```docfx docs/docfx.json --serve```
