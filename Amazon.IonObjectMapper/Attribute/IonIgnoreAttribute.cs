@@ -16,8 +16,7 @@ namespace Amazon.IonObjectMapper
     using System;
 
     /// <summary>
-    /// Attribute to identify a .NET property that should be ignored
-    /// by the serializer.
+    /// Attribute to identify a .NET property that should be ignored during serialization and deserialization.
     /// </summary>
     public class IonIgnoreAttribute : Attribute
     {
