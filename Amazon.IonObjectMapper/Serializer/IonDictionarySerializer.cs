@@ -18,6 +18,9 @@ namespace Amazon.IonObjectMapper
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Ion Serializer for dictionary types.
+    /// </summary>
     public class IonDictionarySerializer : IonSerializer<IDictionary>
     {
         private readonly IonSerializer serializer;
@@ -30,9 +33,7 @@ namespace Amazon.IonObjectMapper
         /// <param name="ionSerializer">
         /// The Ion serializer to use for serializing and deserializing the values of the IDictionary.
         /// </param>
-        /// <param name="valueType">
-        /// The Type of the Value of the IDictionary.
-        /// </param>
+        /// <param name="valueType">The type of values in the IDictionary.</param>
         public IonDictionarySerializer(IonSerializer ionSerializer, Type valueType)
         {
             this.serializer = ionSerializer;
@@ -43,9 +44,9 @@ namespace Amazon.IonObjectMapper
         /// Deserialize an Ion Struct into an IDictionary.
         /// </summary>
         ///
-        /// <returns>
-        /// A Dictionary of Key Type string and Value Type valueType.
-        /// </returns>
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        ///
+        /// <returns>A Dictionary of Key type string and Value type valueType.</returns>
         public override IDictionary Deserialize(IIonReader reader)
         {
             reader.StepIn();
@@ -67,12 +68,8 @@ namespace Amazon.IonObjectMapper
         /// and the Value is the struct field value.
         /// </summary>
         ///
-        /// <param name="writer">
-        /// The IIonWriter to use to write the Ion Struct.
-        /// </param>
-        /// <param name="item">
-        /// The IDictionary to serialize into an Ion Struct.
-        /// </param>
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The dictionary value to serialize.</param>
         public override void Serialize(IIonWriter writer, IDictionary item)
         {
             writer.StepIn(IonType.Struct);

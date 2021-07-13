@@ -16,8 +16,18 @@ namespace Amazon.IonObjectMapper
     using System.Text;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing CLOB values.
+    /// </summary>
     public class IonClobSerializer : IonSerializer<string>
     {
+        /// <summary>
+        /// Deserialize CLOB value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        ///
+        /// <returns>The deserialized CLOB value.</returns>
         public override string Deserialize(IIonReader reader)
         {
             byte[] clob = new byte[reader.GetLobByteSize()];
@@ -25,6 +35,12 @@ namespace Amazon.IonObjectMapper
             return Encoding.UTF8.GetString(clob);
         }
 
+        /// <summary>
+        /// Serialize CLOB value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The CLOB value to serialize.</param>
         public override void Serialize(IIonWriter writer, string item)
         {
             writer.WriteClob(Encoding.UTF8.GetBytes(item));

@@ -15,17 +15,37 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Generic abstract class for an Ion Serializer.
+    /// </summary>
+    ///
+    /// <typeparam name="T">The type of data to serialize/deserialize.</typeparam>
     public abstract class IonSerializer<T> : IIonSerializer
     {
+        /// <summary>
+        /// Serialize value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The value to serialize.</param>
         public abstract void Serialize(IIonWriter writer, T item);
 
+        /// <summary>
+        /// Deserialize value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        ///
+        /// <returns>The deserialized value.</returns>
         public abstract T Deserialize(IIonReader reader);
 
+        /// <inheritdoc/>
         void IIonSerializer.Serialize(IIonWriter writer, object item)
         {
             this.Serialize(writer, (T)item);
         }
 
+        /// <inheritdoc/>
         object IIonSerializer.Deserialize(IIonReader reader)
         {
             return this.Deserialize(reader);

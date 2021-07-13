@@ -21,20 +21,39 @@ namespace Amazon.IonObjectMapper
     using System.Reflection;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Ion Serializer.
+    /// </summary>
     public class IonSerializer
     {
         private readonly IonSerializationOptions options;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonSerializer"/> class.
+        /// </summary>
         public IonSerializer()
             : this(new IonSerializationOptions())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonSerializer"/> class.
+        /// </summary>
+        ///
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         public IonSerializer(IonSerializationOptions options)
         {
             this.options = options;
         }
 
+        /// <summary>
+        /// Serialize value to Ion.
+        /// </summary>
+        ///
+        /// <param name="item">The value to serialize.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
+        ///
+        /// <returns>The serialized stream.</returns>
         public Stream Serialize<T>(T item)
         {
             var stream = new MemoryStream();
@@ -43,6 +62,13 @@ namespace Amazon.IonObjectMapper
             return stream;
         }
 
+        /// <summary>
+        /// Serialize value to Ion.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to be written with serialized Ion.</param>
+        /// <param name="item">The value to serialize.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
         public void Serialize<T>(Stream stream, T item)
         {
             IIonWriter writer = this.options.WriterFactory.Create(stream);
@@ -51,6 +77,13 @@ namespace Amazon.IonObjectMapper
             writer.Flush();
         }
 
+        /// <summary>
+        /// Serialize value to Ion.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The value to serialize.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
         public void Serialize<T>(IIonWriter writer, T item)
         {
             if (item == null)
@@ -182,16 +215,41 @@ namespace Amazon.IonObjectMapper
             throw new NotSupportedException($"Do not know how to serialize type {typeof(T)}");
         }
 
+        /// <summary>
+        /// Deserialize value from Ion.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to be read during deserialization.</param>
+        /// <typeparam name="T">The type of data to deserialize to.</typeparam>
+        ///
+        /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(Stream stream)
         {
             return this.Deserialize<T>(this.options.ReaderFactory.Create(stream));
         }
 
+        /// <summary>
+        /// Deserialize value from Ion.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        /// <param name="type">The target .NET type for deserialization.</param>
+        ///
+        /// <returns>The deserialized value.</returns>
         public object Deserialize(IIonReader reader, Type type)
         {
             return this.Deserialize(reader, type, reader.MoveNext());
         }
 
+        /// <summary>
+        /// Deserialize value from Ion.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        /// <param name="type">The target .NET type for deserialization.</param>
+        /// <param name="ionType">The Ion type of the current Ion field.</param>
+        ///
+        /// <returns>The deserialized value.</returns>
         public object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
             if (reader.CurrentDepth > this.options.MaxDepth)
@@ -329,6 +387,14 @@ namespace Amazon.IonObjectMapper
             throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
         }
 
+        /// <summary>
+        /// Deserialize value from Ion.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        /// <typeparam name="T">The type of data to deserialize to.</typeparam>
+        ///
+        /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(IIonReader reader)
         {
             return (T)this.Deserialize(reader, typeof(T));

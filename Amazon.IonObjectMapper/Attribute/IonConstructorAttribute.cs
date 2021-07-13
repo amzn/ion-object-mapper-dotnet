@@ -17,7 +17,7 @@ namespace Amazon.IonObjectMapper
 
     /// <summary>
     /// Attribute to identify a custom constructor to be used to instantiate instances
-    /// of the class annotated with this attribute during deserialization.
+    /// of classes annotated with this attribute during deserialization.
     /// </summary>
     public class IonConstructorAttribute : Attribute
     {

@@ -17,8 +17,12 @@ namespace Amazon.IonObjectMapper
     using System.Reflection;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Default Object Factory.
+    /// </summary>
     public class DefaultObjectFactory : IObjectFactory
     {
+        /// <inheritdoc/>
         public object Create(IonSerializationOptions options, IIonReader reader, Type targetType)
         {
             var annotations = reader.GetTypeAnnotations();

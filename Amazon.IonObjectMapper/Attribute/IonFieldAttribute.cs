@@ -15,6 +15,10 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Attribute to identify a .NET field to be included during
+    /// serialization and deserialization.
+    /// </summary>
     public class IonFieldAttribute : Attribute
     {
     }

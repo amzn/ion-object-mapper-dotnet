@@ -15,8 +15,12 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Default annotation convention.
+    /// </summary>
     public class DefaultAnnotationConvention : IAnnotationConvention
     {
+        /// <inheritdoc/>
         public string Apply(IonAnnotateTypeAttribute annotateType, Type type)
         {
             return annotateType.Prefix + "." + annotateType.Name;

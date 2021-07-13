@@ -22,15 +22,17 @@ namespace Amazon.IonObjectMapper
     public class IonPropertySetterAttribute : Attribute
     {
         /// <summary>
-        /// IonPropertySetter constructor.
+        /// Initializes a new instance of the <see cref="IonPropertySetterAttribute"/> class.
         /// </summary>
+        ///
+        /// <param name="ionPropertyName">The name of the Ion property.</param>
         public IonPropertySetterAttribute(string ionPropertyName)
         {
             this.IonPropertyName = ionPropertyName;
         }
 
         /// <summary>
-        /// The name of the Ion property to be deserialized with the setter method.
+        /// Gets the name of the Ion property to be deserialized with the setter method.
         /// </summary>
         public string IonPropertyName { get; }
     }

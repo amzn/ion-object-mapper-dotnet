@@ -15,13 +15,25 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Attribute to identify the Ion field name to be used during serialization and/or
+    /// deserialization of a .NET property annotated with this attribute.
+    /// </summary>
     public class IonPropertyNameAttribute : Attribute
     {
-        public IonPropertyNameAttribute(string name)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonPropertyNameAttribute"/> class.
+        /// </summary>
+        ///
+        /// <param name="ionPropertyName">The name of the Ion property.</param>
+        public IonPropertyNameAttribute(string ionPropertyName)
         {
-            this.Name = name;
+            this.Name = ionPropertyName;
         }
 
+        /// <summary>
+        /// Gets the Ion field name to be used instead of the .NET property's name.
+        /// </summary>
         public string Name { get; }
     }
 }

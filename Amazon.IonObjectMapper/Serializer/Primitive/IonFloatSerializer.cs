@@ -17,15 +17,34 @@ namespace Amazon.IonObjectMapper
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing float values.
+    /// </summary>
     public class IonFloatSerializer : IonSerializer<float>
     {
+        /// <summary>
+        /// Ion annotation to distinguish floats from doubles.
+        /// </summary>
         internal static readonly string ANNOTATION = "numeric.float32";
 
+        /// <summary>
+        /// Deserialize float value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        ///
+        /// <returns>The deserialized float value.</returns>
         public override float Deserialize(IIonReader reader)
         {
             return Convert.ToSingle(reader.DoubleValue());
         }
 
+        /// <summary>
+        /// Serialize float value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The float value to serialize.</param>
         public override void Serialize(IIonWriter writer, float item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });

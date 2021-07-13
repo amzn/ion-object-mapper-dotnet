@@ -15,8 +15,18 @@ namespace Amazon.IonObjectMapper
 {
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing byte arrays.
+    /// </summary>
     public class IonByteArraySerializer : IonSerializer<byte[]>
     {
+        /// <summary>
+        /// Deserialize byte array.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        ///
+        /// <returns>The deserialized byte array.</returns>
         public override byte[] Deserialize(IIonReader reader)
         {
             byte[] blob = new byte[reader.GetLobByteSize()];
@@ -24,6 +34,12 @@ namespace Amazon.IonObjectMapper
             return blob;
         }
 
+        /// <summary>
+        /// Serialize byte array.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The byte array to serialize.</param>
         public override void Serialize(IIonWriter writer, byte[] item)
         {
             writer.WriteBlob(item);

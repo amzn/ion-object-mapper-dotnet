@@ -19,19 +19,31 @@ namespace Amazon.IonObjectMapper
     using Amazon.IonDotnet.Builders;
     using static Amazon.IonObjectMapper.IonSerializationFormat;
 
+    /// <summary>
+    /// Default Ion Writer Factory.
+    /// </summary>
     public class DefaultIonWriterFactory : IIonWriterFactory
     {
         private readonly IonSerializationFormat format = TEXT;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultIonWriterFactory"/> class.
+        /// </summary>
         public DefaultIonWriterFactory()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultIonWriterFactory"/> class.
+        /// </summary>
+        ///
+        /// <param name="format">Serialization format.</param>
         public DefaultIonWriterFactory(IonSerializationFormat format)
         {
             this.format = format;
         }
 
+        /// <inheritdoc/>
         public IIonWriter Create(Stream stream)
         {
             return this.format switch

@@ -13,10 +13,27 @@
 
 namespace Amazon.IonObjectMapper
 {
+    /// <summary>
+    /// Interface for property naming convention.
+    /// </summary>
     public interface IIonPropertyNamingConvention
     {
+        /// <summary>
+        /// Convert name back to original .NET property name.
+        /// </summary>
+        ///
+        /// <param name="s">The specified naming convention version of the .NET property name.</param>
+        ///
+        /// <returns>The original .NET property name.</returns>
         public string ToProperty(string s);
 
+        /// <summary>
+        /// Convert .NET property name to some naming convention.
+        /// </summary>
+        ///
+        /// <param name="s">The original .NET property name.</param>
+        ///
+        /// <returns>The specified naming convention version of the .NET property name.</returns>
         public string FromProperty(string s);
     }
 }

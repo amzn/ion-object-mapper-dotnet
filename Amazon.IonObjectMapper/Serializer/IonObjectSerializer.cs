@@ -19,6 +19,9 @@ namespace Amazon.IonObjectMapper
     using System.Reflection;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Ion Serializer for non-primitive object types.
+    /// </summary>
     public class IonObjectSerializer : IonSerializer<object>
     {
         private const BindingFlags BINDINGS = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
@@ -26,6 +29,13 @@ namespace Amazon.IonObjectMapper
         private readonly IonSerializationOptions options;
         private readonly Type targetType;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonObjectSerializer"/> class.
+        /// </summary>
+        ///
+        /// <param name="ionSerializer">Serializer to be used for serializing/deserializing non-primitive objects.</param>
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
+        /// <param name="targetType">The type of data being serialized/deserialized.</param>
         public IonObjectSerializer(IonSerializer ionSerializer, IonSerializationOptions options, Type targetType)
         {
             this.ionSerializer = ionSerializer;
@@ -33,6 +43,7 @@ namespace Amazon.IonObjectMapper
             this.targetType = targetType;
         }
 
+        /// <inheritdoc/>
         public override object Deserialize(IIonReader reader)
         {
             object targetObject = null;
@@ -160,6 +171,7 @@ namespace Amazon.IonObjectMapper
             return targetObject;
         }
 
+        /// <inheritdoc/>
         public override void Serialize(IIonWriter writer, object item)
         {
             this.options.TypeAnnotator.Apply(this.options, writer, this.targetType);
@@ -264,6 +276,7 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// We only serialize public, internal, and protected internal properties or properties with IonPropertyName annotation.
         /// </summary>
+        /// <param name="propertyInfo">The .NET property to check the access modifier.</param>
         /// <param name="isGetter">Specify if we are looking for getters or setters in the property.</param>
         private static bool HasValidAccessModifier(PropertyInfo propertyInfo, bool isGetter)
         {

@@ -13,13 +13,30 @@
 
 namespace Amazon.IonObjectMapper
 {
+    /// <summary>
+    /// Title Case naming convention for property names.
+    /// </summary>
     public class TitleCaseNamingConvention : IIonPropertyNamingConvention
     {
+        /// <summary>
+        /// Convert title case name back to original .NET property name.
+        /// </summary>
+        ///
+        /// <param name="s">Title case version of the .NET property name.</param>
+        ///
+        /// <returns>The original .NET property name.</returns>
         public string ToProperty(string s)
         {
             return s.Substring(0, 1).ToUpperInvariant() + s[1..];
         }
 
+        /// <summary>
+        /// Convert .NET property name to title case.
+        /// </summary>
+        ///
+        /// <param name="s">The original .NET property name.</param>
+        ///
+        /// <returns>Title case version of the .NET property name.</returns>
         public string FromProperty(string s)
         {
             return s.Substring(0, 1).ToUpperInvariant() + s[1..];

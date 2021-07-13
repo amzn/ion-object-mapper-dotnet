@@ -15,8 +15,18 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Interface for Type Annotation Prefix.
+    /// </summary>
     public interface ITypeAnnotationPrefix
     {
+        /// <summary>
+        /// Apply prefix annotation.
+        /// </summary>
+        ///
+        /// <param name="type">.NET Type being annotated.</param>
+        ///
+        /// <returns>Annotated prefix.</returns>
         public string Apply(Type type);
     }
 }

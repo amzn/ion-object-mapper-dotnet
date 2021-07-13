@@ -15,15 +15,24 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Fixed type annotation prefix.
+    /// </summary>
     public class FixedTypeAnnotationPrefix : ITypeAnnotationPrefix
     {
         private readonly string prefix;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FixedTypeAnnotationPrefix"/> class.
+        /// </summary>
+        ///
+        /// <param name="prefix">The prefix used for annotation.</param>
         public FixedTypeAnnotationPrefix(string prefix)
         {
             this.prefix = prefix;
         }
 
+        /// <inheritdoc/>
         public string Apply(Type type)
         {
             return this.prefix;

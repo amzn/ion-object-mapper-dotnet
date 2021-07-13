@@ -16,15 +16,34 @@ namespace Amazon.IonObjectMapper
     using System.Collections.Generic;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Serializer for serializing and deserializing long values.
+    /// </summary>
     public class IonLongSerializer : IonSerializer<long>
     {
+        /// <summary>
+        /// Ion annotation to distinguish longs from ints.
+        /// </summary>
         internal static readonly string ANNOTATION = "numeric.int32";
 
+        /// <summary>
+        /// Deserialize long value.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        ///
+        /// <returns>The deserialized long value.</returns>
         public override long Deserialize(IIonReader reader)
         {
             return reader.IntValue();
         }
 
+        /// <summary>
+        /// Serialize long value.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The long value to serialize.</param>
         public override void Serialize(IIonWriter writer, long item)
         {
             writer.SetTypeAnnotations(new List<string>() { ANNOTATION });

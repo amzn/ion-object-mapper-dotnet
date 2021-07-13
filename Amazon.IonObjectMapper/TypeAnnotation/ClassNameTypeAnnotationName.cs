@@ -15,8 +15,12 @@ namespace Amazon.IonObjectMapper
 {
     using System;
 
+    /// <summary>
+    /// Class name annotation.
+    /// </summary>
     public class ClassNameTypeAnnotationName : ITypeAnnotationName
     {
+        /// <inheritdoc/>
         public string Apply(Type type)
         {
             return type.Name;

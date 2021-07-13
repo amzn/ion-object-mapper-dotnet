@@ -16,8 +16,18 @@ namespace Amazon.IonObjectMapper
     using System.IO;
     using Amazon.IonDotnet;
 
+    /// <summary>
+    /// Interface for Ion Reader Factory.
+    /// </summary>
     public interface IIonReaderFactory
     {
+        /// <summary>
+        /// Create an Ion Reader.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to be read by the Ion reader.</param>
+        ///
+        /// <returns>The created Ion reader.</returns>
         IIonReader Create(Stream stream);
     }
 }
