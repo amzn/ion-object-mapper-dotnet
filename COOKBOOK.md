@@ -6,7 +6,7 @@ The Ion Object Mapper is a convenience library built to assist developers when d
 
 #### Basic Serialization and Deserialization
 
-The mapper (IonSerializer) supports by default the types listed in the [spec](SPEC.MD) under the "Primitive type conversion" section. There are ways to customize the conversion but the default use case adheres to the spec.
+The mapper (IonSerializer) supports by default the types listed in the [spec](SPEC.MD#primitive-type-conversion) under the "Primitive type conversion" section. There are ways to customize the conversion but the default use case adheres to the spec.
 
 ```c#
 public class MyPOCO
@@ -50,7 +50,7 @@ private static void CreateSerializerWithOptions()
 {
     IonSerializationOptions myOptions = new IonSerializationOptions
     {
-        // Enable the serialization and deserialization of fields in classes
+        // Enable the serialization and deserialization of all fields in classes
         IncludeFields = true,
         // Do not serialize or deserialize both C# and Ion null values
         IgnoreNulls = true
@@ -83,7 +83,7 @@ public class Hybrid : Engine { }
 
 Car myCar = new Honda 
 	{ 
-    	Engine = new Hybrid();
+		Engine = new Hybrid();
 	};
 
 IonSerializer serializer = new IonSerializer();
@@ -151,7 +151,7 @@ Fields are ignored by default by the serializer, but this attribute specifies th
 ```c#
 public class Motorcycle
 {
-    public string Brand { get; init; }
+    public string Make { get; init; }
 
     [IonField]
     public string color;
