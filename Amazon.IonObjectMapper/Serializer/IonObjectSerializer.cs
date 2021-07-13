@@ -276,7 +276,7 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// We only serialize public, internal, and protected internal properties or properties with IonPropertyName annotation.
         /// </summary>
-        /// <param name="propertyInfo">The .NET property to process.</param>
+        /// <param name="propertyInfo">The .NET property to check the access modifier.</param>
         /// <param name="isGetter">Specify if we are looking for getters or setters in the property.</param>
         private static bool HasValidAccessModifier(PropertyInfo propertyInfo, bool isGetter)
         {

@@ -30,7 +30,28 @@ namespace Amazon.IonObjectMapper
 
         /// <summary>
         /// Pretty text format for serializing/deserializing Ion.
+        /// Pretty printing aids human readability.
         /// </summary>
+        ///
+        /// <example>
+        /// Consider the following un-formatted text Ion:
+        /// {level1: {level2: {level3: "foo"}, x: 2}, y: [a,b,c]}
+        ///
+        /// Pretty text would write that as the following:
+        /// {
+        ///     level1: {
+        ///         level2: {
+        ///             level3: "foo"
+        ///         },
+        ///         x: 2
+        ///     },
+        ///     y: [
+        ///         a,
+        ///         b,
+        ///         c
+        ///     ]
+        /// }
+        /// </example>
         PRETTY_TEXT,
     }
 }

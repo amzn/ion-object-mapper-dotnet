@@ -27,7 +27,8 @@ namespace Amazon.IonObjectMapper
         ///
         /// <param name="options">Serialization options for customizing serializer behavior.</param>
         /// <param name="customContext">
-        /// Arbitrary data that can be used to customize serialization/deserialization logic.
+        /// A mapping between strings and arbitrary data that can be used to
+        /// create a serializer with custom serialization/deserialization logic.
         /// </param>
         ///
         /// <returns>The customized IonSerializer.</returns>

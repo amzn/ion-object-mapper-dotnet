@@ -33,7 +33,7 @@ namespace Amazon.IonObjectMapper
         /// <param name="ionSerializer">
         /// The Ion serializer to use for serializing and deserializing the values of the IDictionary.
         /// </param>
-        /// <param name="valueType">The Type of the Value of the IDictionary.</param>
+        /// <param name="valueType">The type of values in the IDictionary.</param>
         public IonDictionarySerializer(IonSerializer ionSerializer, Type valueType)
         {
             this.serializer = ionSerializer;
@@ -46,7 +46,7 @@ namespace Amazon.IonObjectMapper
         ///
         /// <param name="reader">The Ion reader to be used for deserialization.</param>
         ///
-        /// <returns>A Dictionary of Key Type string and Value Type valueType.</returns>
+        /// <returns>A Dictionary of Key type string and Value type valueType.</returns>
         public override IDictionary Deserialize(IIonReader reader)
         {
             reader.StepIn();

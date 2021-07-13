@@ -14,17 +14,17 @@
 namespace Amazon.IonObjectMapper
 {
     /// <summary>
-    /// Snake Case naming convention for property names.
+    /// Snake case naming convention for property names.
     /// </summary>
     public class SnakeCaseNamingConvention : IIonPropertyNamingConvention
     {
         /// <summary>
-        /// Convert snake case name back to original .NET property name.
+        /// Convert .NET property name to snake case.
         /// </summary>
         ///
-        /// <param name="s">Snake case version of the .NET property name.</param>
+        /// <param name="s">The original .NET property name.</param>
         ///
-        /// <returns>The original .NET property name.</returns>
+        /// <returns>Snake case version of the .NET property name.</returns>
         public string FromProperty(string s)
         {
             var output = string.Empty;
@@ -50,12 +50,12 @@ namespace Amazon.IonObjectMapper
         }
 
         /// <summary>
-        /// Convert .NET property name to snake case.
+        /// Convert snake case name back to original .NET property name.
         /// </summary>
         ///
-        /// <param name="s">The original .NET property name.</param>
+        /// <param name="s">Snake case version of the .NET property name.</param>
         ///
-        /// <returns>Snake case version of the .NET property name.</returns>
+        /// <returns>The original .NET property name.</returns>
         public string ToProperty(string s)
         {
             if (s.Length == 0)

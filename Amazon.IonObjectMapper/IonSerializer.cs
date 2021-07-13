@@ -220,7 +220,7 @@ namespace Amazon.IonObjectMapper
         /// </summary>
         ///
         /// <param name="stream">The stream to be read during deserialization.</param>
-        /// <typeparam name="T">The type of data to deserialize.</typeparam>
+        /// <typeparam name="T">The type of data to deserialize to.</typeparam>
         ///
         /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(Stream stream)
@@ -392,7 +392,7 @@ namespace Amazon.IonObjectMapper
         /// </summary>
         ///
         /// <param name="reader">The Ion reader to be used for deserialization.</param>
-        /// <typeparam name="T">The type of data to deserialize.</typeparam>
+        /// <typeparam name="T">The type of data to deserialize to.</typeparam>
         ///
         /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(IIonReader reader)

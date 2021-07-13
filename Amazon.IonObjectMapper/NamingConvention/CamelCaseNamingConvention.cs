@@ -14,7 +14,7 @@
 namespace Amazon.IonObjectMapper
 {
     /// <summary>
-    /// Camel Case naming convention for property names.
+    /// Camel case naming convention for property names.
     /// </summary>
     public class CamelCaseNamingConvention : IIonPropertyNamingConvention
     {
