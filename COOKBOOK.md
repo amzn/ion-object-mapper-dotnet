@@ -6,7 +6,7 @@ The Ion Object Mapper is a convenience library built to assist developers when d
 
 #### Basic Serialization and Deserialization
 
-The mapper (IonSerializer) supports by default the types listed in the [spec](SPEC.MD#primitive-type-conversion) under the "Primitive type conversion" section. There are ways to customize the conversion but the default use case adheres to the spec.
+The mapper (IonSerializer) supports by default the types listed in the [spec](SPEC.md#primitive-type-conversion) under the "Primitive type conversion" section. There are ways to customize the conversion but the default use case adheres to the spec.
 
 ```c#
 public class MyPOCO
@@ -26,8 +26,10 @@ private static void SerializationExample()
     };
 
     Stream serialized = serializer.Serialize(poco);
-    // Most AWS libraries will take in a Stream type.
-    // The Ion library can build an IIonReader from a Stream for using IIonValue.
+    // Most AWS libraries will take in a Stream type for using Ion with SDKs.
+    // 
+    // Alternatively, the Ion library can build an IIonReader from a Stream.
+    // An IIonReader can then be used to convert the Stream into IIonValue classes for use directly as a C# type.
 }
 
 private static void DeserializationExample(Stream serialized)
@@ -43,7 +45,7 @@ private static void DeserializationExample(Stream serialized)
 
 #### Serializer Configuration
 
-The full list of configurations available and what they do can be found in the [spec](SPEC.md) under Serialization options. In most scenarios, the default options (none passed into the constructor) are sufficient but various options can be helpful to reduce the need for transformation or mutation of objects after serialization or deserialization.
+The full list of configurations available and what they do can be found in the [spec](SPEC.md#serialization-options) under Serialization options. In most scenarios, the default options (none passed into the IonSerializer constructor) are sufficient but various options can be helpful to reduce the need for transformation or mutation of objects after serialization or deserialization.
 
 ```c#
 private static void CreateSerializerWithOptions()
@@ -119,7 +121,7 @@ Stream serialized = serializer.Serialize(myCar);
 
 #### IonConstructor
 
-This attributes specifies a Constructor method that will be invoked during deserialization. The `IonPropertyName` can also be used to pass parameters into the Constructor.
+This attributes specifies a Constructor method that will be invoked during deserialization. The `IonPropertyName` attribute must be used to pass parameters into the Constructor.
 
 ```c#
 public class Car
@@ -146,7 +148,7 @@ Car myCar = new IonSerializer().Deserialize<Car>(stream);
 
 #### IonField
 
-Fields are ignored by default by the serializer, but this attribute specifies that they should not be ignored.
+Fields are ignored by default by the serializer, but this attribute specifies that they should be included.
 
 ```c#
 public class Motorcycle
@@ -160,10 +162,10 @@ public class Motorcycle
 
 #### IonIgnore
 
-Any field, method, or property tagged with this attribute causes the serializer to ignore it.
+Any **property** tagged with this attribute causes the serializer to ignore it.
 
 ```c#
-public Document
+public class Document
 {
     public string Info { get; init; }
     
