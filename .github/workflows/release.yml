@@ -2,8 +2,6 @@ name: CI Release
 
 on:
   push:
-    branches:
-      - release
     tags:
       - "v*.*.*"
 
@@ -39,8 +37,6 @@ jobs:
       matrix:
         os: [ ubuntu-latest ] 
         dotnet: ['5.0.x']
-    env:
-      source-key: IonObjectMapperDLL
       
     steps:
       - uses: aws-actions/configure-aws-credentials@v1
@@ -48,43 +44,48 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-        
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+          role-duration-seconds: 900
+          
+      - name: Wait / Sleep
+        uses: jakejarvis/wait-action@v0.1.1
       - name: Git Checkout
         uses: actions/checkout@v2
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ matrix.dotnet }}
-
-      - name: Create publish ready DLL
-        run: dotnet publish
+        
+      - name: Create DLL
+        run: |
+          dotnet restore
+          dotnet build --configuration Release --no-restore
         
       - name: Push unsigned DLL to S3
         id: get-version
         run: |
-          version=$( aws s3api put-object --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ env.source-key }} --body Amazon.IonObjectMapper/bin/Debug/net5.0/Amazon.IonObjectMapper.dll | jq '.VersionId' )
-          echo "::set-output name=source-version::$version"
-          
-      - name: Trigger signing job
+          version=$( aws s3api put-object --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --body Amazon.IonObjectMapper/bin/Release/net5.0/Amazon.IonObjectMapper.dll  --acl bucket-owner-full-control | jq '.VersionId' )
+          echo "::set-output name=version-id::$version"
+      - name: Wait 5 seconds for job ID tag to be populated in S3 object
+        run: sleep 5s
+  
+      - name: Get job ID
         id: get-job-id
-        run: id=$( aws signer start-signing-job \
-          --source "s3={bucketName=${{ secrets.AWS_UNSIGNED_BUCKET }},key=${{ env.source-key }},version=${{ steps.get-version.outputs.source-version }}}" \
-          --destination "s3={bucketName=${{ secrets.AWS_SIGNED_BUCKET }},prefix=\"signed/\"}" \
-          --profile-name $PROFILE_NAME \
-          --profile-owner $PROFILE_OWNER | jq '.JobID' )
-          echo "::set-output name=job-id::$id"
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-        
-      - name: Wait for signing job to complete
         run: |
-          pip install boto3
-          python .github/workflows/signing_job_waiter.py ${{ steps.get-job-id.outputs.job-id }}
+          job=$( aws s3api get-object-tagging --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --version-id ${{ steps.get-version.outputs.version-id }} | jq '.TagSet[0].Value' )
+          echo "::set-output name=job-id::$job"
+        
+      - name: Poll signed S3 bucket to see if the signed artifact is there
+        run: |
+          echo ${{ steps.get-job-id.outputs.job-id }}
+          aws s3api wait object-exists --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${{ steps.get-job-id.outputs.job-id }}
       
       - name: Get signed DLL from S3
         run: |
-          aws s3api get-object --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key signed/${{ steps.get-job-id.outputs.job-id }} SignedIonObjectMapper.dll
- 
+          aws s3api get-object --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${{ steps.get-job-id.outputs.job-id }} Amazon.IonObjectMapper/bin/Release/net5.0/Amazon.IonObjectMapper.dll
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: signed-dll
+          path: Amazon.IonObjectMapper/bin/Release/net5.0/Amazon.IonObjectMapper.dll
