@@ -2,7 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Copyright>Amazon.com, Inc.</Copyright>
+    <Copyright>Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Version>0.1.0</Version>
+    <Authors>Amazon Web Services</Authors>
+    <Company>Amazon.com, Inc.</Company>
+    <Product>Amazon Ion Object Mapper</Product>
+    <Description>A configurable helper library used to serialize and deserialize between C# types and Ion.</Description>
+    <RepositoryUrl>https://github.com/amzn/ion-object-mapper-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>amazon api aws deserialize ion json serialize</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
