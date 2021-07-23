@@ -13,6 +13,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>amazon api aws deserialize ion json serialize</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIcon>amazon.png</PackageIcon>
+    <PackageIconUrl />
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\amazon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
