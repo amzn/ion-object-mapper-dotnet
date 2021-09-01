@@ -45,7 +45,7 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Plane : Vehicle
     {
-        public int MaxCapacity { get; init; }
+        public int MaxCapacity { get; set; }
 
         public override string ToString()
         {
@@ -65,7 +65,7 @@ namespace Amazon.IonObjectMapper.Test
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Motorcycle : Vehicle
     {
-        public string Brand { get; init; }
+        public string Brand { get; set; }
 
         [IonField]
         public string color;
@@ -91,9 +91,9 @@ namespace Amazon.IonObjectMapper.Test
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Ship : Boat
     {
-        public string Name { get; init; }
-        public int Weight { get; init; }
-        public int Capacity { get; init; }
+        public string Name { get; set; }
+        public int Weight { get; set; }
+        public int Capacity { get; set; }
 
         public override string ToString()
         {
@@ -104,9 +104,9 @@ namespace Amazon.IonObjectMapper.Test
     // For testing case insensitive deserialization.
     public class ShipWithVariedCasing : Boat
     {
-        public string name { get; init; }
-        public double WEIGHT { get; init; }
-        public int CaPaCiTy { get; init; }
+        public string name { get; set; }
+        public double WEIGHT { get; set; }
+        public int CaPaCiTy { get; set; }
 
         public override string ToString()
         {
@@ -225,9 +225,9 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Person
     {
-        public string Name { get; init; }
-        public int Id { get; init; }
-        public Course Course { get; init; }
+        public string Name { get; set; }
+        public int Id { get; set; }
+        public Course Course { get; set; }
 
         public override string ToString()
         {
@@ -238,8 +238,8 @@ namespace Amazon.IonObjectMapper.Test
     [IonSerializer(Factory = typeof(CourseSerializerFactory))]
     public class Course
     {
-        public int Sections { get; init; }
-        public DateTime MeetingTime { get; init; }
+        public int Sections { get; set; }
+        public DateTime MeetingTime { get; set; }
         public override string ToString()
         {
             return "<Course>{ Sections: " + Sections + ", MeetingTime: " + MeetingTime + "}";
@@ -250,16 +250,16 @@ namespace Amazon.IonObjectMapper.Test
     {
         private string color;
 
-        public string Make { get; init; }
-        public string Model { get; init; }
-        public int YearOfManufacture { get; init; }
-        public Engine Engine { get; init; }
+        public string Make { get; set; }
+        public string Model { get; set; }
+        public int YearOfManufacture { get; set; }
+        public Engine Engine { get; set; }
 
         [IonIgnore]
         public double Speed { get { return new Random().NextDouble(); } }
 
         [IonPropertyName("weightInKg")]
-        public double Weight { get; init; }
+        public double Weight { get; set; }
 
         public string GetColor()
         {
@@ -279,8 +279,8 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Engine
     {
-        public int Cylinders { get; init; }
-        public DateTime ManufactureDate { get; init; }
+        public int Cylinders { get; set; }
+        public DateTime ManufactureDate { get; set; }
 
         public override string ToString()
         {
@@ -336,7 +336,7 @@ namespace Amazon.IonObjectMapper.Test
     public class Radio
     {
         [IonPropertyName("broadcastMethod")]
-        public string Band { get; init; }
+        public string Band { get; set; }
 
         public override string ToString()
         {
@@ -346,8 +346,8 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Wheel
     {
-        public string Brand { get; init; }
-        public string Specification { get; init; }
+        public string Brand { get; set; }
+        public string Specification { get; set; }
 
         [IonConstructor]
         public Wheel(
@@ -367,8 +367,8 @@ namespace Amazon.IonObjectMapper.Test
     // For testing multiple annotated constructors.
     public class Tire
     {
-        public string Brand { get; init; }
-        public string Specification { get; init; }
+        public string Brand { get; set; }
+        public string Specification { get; set; }
 
         [IonConstructor]
         public Tire(
@@ -389,8 +389,8 @@ namespace Amazon.IonObjectMapper.Test
     // For testing unannotated constructor parameters.
     public class Windshield
     {
-        public double Length { get; init; }
-        public double Height { get; init; }
+        public double Length { get; set; }
+        public double Height { get; set; }
 
         [IonConstructor]
         public Windshield(double length, double height)
@@ -403,7 +403,7 @@ namespace Amazon.IonObjectMapper.Test
     // For testing serializing and deserializing between different types using an annotated constructor.
     public class CircleRadius
     {
-        public double Radius { get; init; }
+        public double Radius { get; set; }
 
         public CircleRadius(double radius)
         {
@@ -416,7 +416,7 @@ namespace Amazon.IonObjectMapper.Test
     // to create a CircleCircumference.
     public class CircleCircumference
     {
-        public double Circumference { get; init; }
+        public double Circumference { get; set; }
 
         [IonConstructor]
         public CircleCircumference([IonPropertyName("radius")] double radius)
@@ -482,8 +482,8 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Student
     {
-        public string FirstName { get; init; }
-        public string LastName { get; init; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Major { get; }
 
         public Student()
@@ -509,8 +509,8 @@ namespace Amazon.IonObjectMapper.Test
     public class Desk
     {
         internal int width;
-        public int Depth { get; init; }
-        public int Height { get; init; }
+        public int Depth { get; set; }
+        public int Height { get; set; }
 
         [IonPropertyGetter("desk width")]
         public int GetWidth()
@@ -577,29 +577,29 @@ namespace Amazon.IonObjectMapper.Test
 
     public class Country
     {
-        public string Name { get; init; }
-        public City Capital { get; init; }
-        public Politician President { get; init; }
-        public List<State> States { get; init; }
+        public string Name { get; set; }
+        public City Capital { get; set; }
+        public Politician President { get; set; }
+        public List<State> States { get; set; }
     }
 
     public class State
     {
-        public string Name { get; init; }
-        public City Capital { get; init; }
-        public Politician Governor { get; init; }
+        public string Name { get; set; }
+        public City Capital { get; set; }
+        public Politician Governor { get; set; }
     }
 
     public class City
     {
-        public string Name { get; init; }
-        public Politician Mayor { get; init; }
+        public string Name { get; set; }
+        public Politician Mayor { get; set; }
     }
 
     public class Politician
     {
-        public string FirstName { get; init; }
-        public string LastName { get; init; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 
     public class TestDictionary : Dictionary<string, int>
@@ -826,7 +826,7 @@ namespace Amazon.IonObjectMapper.Test
 
     public class ObjectWithPublicGetter
     {
-        public string Property { init; get; }
+        public string Property { set; get; }
     }
 
     public class ObjectWithPrivateSetter

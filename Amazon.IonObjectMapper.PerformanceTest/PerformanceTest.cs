@@ -44,7 +44,7 @@ namespace Amazon.IonObjectMapper.PerformanceTest
         /// </summary>
         private const int ErrorMargin = 15;
 
-        private static readonly PerformanceSuite suite = new(BaseCount, ErrorMargin);
+        private static readonly PerformanceSuite suite = new PerformanceSuite(BaseCount, ErrorMargin);
 
         [TestMethod]
         public void AssertLinearRuntime()
@@ -83,13 +83,13 @@ namespace Amazon.IonObjectMapper.PerformanceTest
 
         private static void RecordMetrics(IDictionary<string, PerformanceTestObject> dictionary)
         {
-            IonSerializer serializer = new();
+            IonSerializer serializer = new IonSerializer();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
             long baseMemoryUsed = GC.GetTotalMemory(true);
 
-            Stopwatch timer = new();
+            Stopwatch timer = new Stopwatch();
 
             timer.Start();
             Stream serialized = serializer.Serialize(dictionary);

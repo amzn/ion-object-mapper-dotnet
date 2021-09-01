@@ -75,8 +75,8 @@ namespace Amazon.IonObjectMapper.PerformanceTest
 
     public struct Metric
     {
-        public long RuntimeTicks { get; init; }
-        public long MemoryUsedBytes { get; init; }
+        public long RuntimeTicks { get; set; }
+        public long MemoryUsedBytes { get; set; }
     }
 
     public class PerformanceTestObject

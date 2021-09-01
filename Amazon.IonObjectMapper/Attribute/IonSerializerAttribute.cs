@@ -25,12 +25,12 @@ namespace Amazon.IonObjectMapper
         /// Gets the name of the IonSerializer Attribute to be used
         /// to create IonSerializerFactory with custom context.
         /// </summary>
-        public Type Factory { get; init; }
+        public Type Factory { get; set; }
 
         /// <summary>
         /// Gets the name of the IonSerializer Attribute to be used
         /// to create custom IonSerializer.
         /// </summary>
-        public Type Serializer { get; init; }
+        public Type Serializer { get; set; }
     }
 }
