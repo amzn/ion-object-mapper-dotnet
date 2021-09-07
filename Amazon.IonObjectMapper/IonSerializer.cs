@@ -182,12 +182,12 @@ namespace Amazon.IonObjectMapper
                 return;
             }
 
-            Type genericDictionaryType = item.GetType().GetInterfaces().FirstOrDefault(t => t.GetGenericTypeDefinition().IsAssignableTo(typeof(IDictionary<,>)));
+            Type genericDictionaryType = item.GetType().GetInterfaces().FirstOrDefault(t => typeof(IDictionary<,>).IsAssignableFrom(t.GetGenericTypeDefinition()));
             if (genericDictionaryType != null)
             {
                 var genericArguments = genericDictionaryType.GetGenericArguments();
 
-                if (genericArguments[0].IsAssignableTo(typeof(string)))
+                if (typeof(string).IsAssignableFrom(genericArguments[0]))
                 {
                     new IonDictionarySerializer(this, genericArguments[1]).Serialize(writer, (IDictionary)item);
                     return;
@@ -323,7 +323,7 @@ namespace Amazon.IonObjectMapper
             if (ionType == IonType.Blob)
             {
                 if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
-                    || type.IsAssignableTo(typeof(Guid)))
+                    || typeof(Guid).IsAssignableFrom(type))
                 {
                     var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(this.options));
                     return serializer.Deserialize(reader);
@@ -368,7 +368,7 @@ namespace Amazon.IonObjectMapper
                 if (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>)))
                 {
                     var genericArguments = type.GetGenericArguments();
-                    if (genericArguments[0].IsAssignableTo(typeof(string)))
+                    if (typeof(string).IsAssignableFrom(genericArguments[0]))
                     {
                         var dictionarySerializer = new IonDictionarySerializer(this, genericArguments[1]);
                         var deserialized = dictionarySerializer.Deserialize(reader);
@@ -407,7 +407,7 @@ namespace Amazon.IonObjectMapper
                 return new IonListSerializer(this, listType, listType.GetElementType());
             }
 
-            if (listType.IsAssignableTo(typeof(System.Collections.IList)))
+            if (typeof(System.Collections.IList).IsAssignableFrom(listType))
             {
                 if (listType.IsGenericType)
                 {

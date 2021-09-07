@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest ] 
-        dotnet: ['5.0.x']
+        dotnet: ['3.1.x']
 
     steps:
       - name: Git Checkout
@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ] 
-        dotnet: ['5.0.x']
+        dotnet: ['3.1.x']
       
     steps:
       - uses: aws-actions/configure-aws-credentials@v1
@@ -66,7 +66,7 @@ jobs:
           dotnet build --configuration Release
           
           # Push unsigned DLL to S3
-          version_id=$( aws s3api put-object --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --body Amazon.IonObjectMapper/bin/Release/net5.0/Amazon.IonObjectMapper.dll  --acl bucket-owner-full-control | jq '.VersionId' )
+          version_id=$( aws s3api put-object --bucket ${{ secrets.AWS_UNSIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }} --body Amazon.IonObjectMapper/bin/Release/netcoreapp3.1/Amazon.IonObjectMapper.dll  --acl bucket-owner-full-control | jq '.VersionId' )
 
           job_id=""
 
@@ -96,7 +96,7 @@ jobs:
           aws s3api wait object-exists --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id}
           
           # Get signed DLL from S3
-          aws s3api get-object --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id} Amazon.IonObjectMapper/bin/Release/net5.0/Amazon.IonObjectMapper.dll
+          aws s3api get-object --bucket ${{ secrets.AWS_SIGNED_BUCKET }} --key ${{ secrets.AWS_KEY }}-${job_id} Amazon.IonObjectMapper/bin/Release/netcoreapp3.1/Amazon.IonObjectMapper.dll
 
       - name: Publish to NuGet
         run: |

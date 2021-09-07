@@ -26,7 +26,7 @@ namespace Amazon.IonObjectMapper.Test
     [TestClass]
     public class IonObjectSerializerTest
     {
-        private readonly IonSerializer defaultSerializer = new();
+        private readonly IonSerializer defaultSerializer = new IonSerializer();
         private readonly IValueFactory valueFactory = new ValueFactory();
 
         [TestMethod]
@@ -490,7 +490,7 @@ namespace Amazon.IonObjectMapper.Test
                 {typeof(float), new NegativeFloatIonSerializer()},
             };
 
-            List<object> testList = new(new object[] { "test", 5, 3.14f });
+            List<object> testList = new List<object>(new object[] { "test", 5, 3.14f });
 
             var serialized = (IIonList)SerializeToIonWithCustomSerializers(customSerializers, testList);
 
@@ -510,7 +510,7 @@ namespace Amazon.IonObjectMapper.Test
                 {typeof(float), new NegativeFloatIonSerializer()},
             };
 
-            List<object> testList = new(new object[] { "test", 5, 3.14f });
+            List<object> testList = new List<object>(new object[] { "test", 5, 3.14f });
 
             var deserialized = DeserializeWithCustomSerializers(customSerializers, testList);
 
@@ -604,7 +604,7 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void DeserializeAnnotatedIonToClassNameWithAnnotatedTypeAssemblies()
         {
-            IonSerializationOptions options = new()
+            IonSerializationOptions options = new IonSerializationOptions()
             {
                 AnnotatedTypeAssemblies = new string[]
                 {
@@ -614,7 +614,7 @@ namespace Amazon.IonObjectMapper.Test
 
             IIonReader reader = IonReaderBuilder.Build(TestObjects.truckIonText);
 
-            IonSerializer ionSerializer = new(options);
+            IonSerializer ionSerializer = new IonSerializer(options);
             Vehicle truck = ionSerializer.Deserialize<Vehicle>(reader);
 
             AssertIsTruck(truck);

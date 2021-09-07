@@ -24,7 +24,7 @@ namespace Amazon.IonObjectMapper
         /// Gets a value indicating whether any classes descending from the annotated class
         /// are excluded from the annotation.
         /// </summary>
-        public bool ExcludeDescendants { get; init; }
+        public bool ExcludeDescendants { get; set; }
 
         /// <summary>
         /// Gets or sets the .NET namespace of the annotated type.
