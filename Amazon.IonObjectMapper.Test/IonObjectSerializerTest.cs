@@ -758,6 +758,13 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
+        public void SerializeAndDeserializeClassesImplementedInterfaces()
+        {
+            Check("<ClassWithInterfaces>{ StringProperty: test, IntProperty: 5, DoubleProperty: 3.14 }",
+                TestObjects.objectWithInterfaces);
+        }
+
+        [TestMethod]
         public void DeserializeToPrivateProperty()
         {
             var stream = defaultSerializer.Serialize(new ObjectWithPublicGetter { Property = "value" } );

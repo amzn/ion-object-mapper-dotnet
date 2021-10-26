@@ -182,7 +182,8 @@ namespace Amazon.IonObjectMapper
                 return;
             }
 
-            Type genericDictionaryType = item.GetType().GetInterfaces().FirstOrDefault(t => typeof(IDictionary<,>).IsAssignableFrom(t.GetGenericTypeDefinition()));
+            Type genericDictionaryType = item.GetType().GetInterfaces().FirstOrDefault(t =>
+                t.IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(t.GetGenericTypeDefinition()));
             if (genericDictionaryType != null)
             {
                 var genericArguments = genericDictionaryType.GetGenericArguments();
