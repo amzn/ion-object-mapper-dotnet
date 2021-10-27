@@ -84,9 +84,9 @@ public class Engine { }
 public class Hybrid : Engine { }
 
 Car myCar = new Honda 
-    { 
-        Engine = new Hybrid();
-    };
+{ 
+    Engine = new Hybrid();
+};
 
 IonSerializer serializer = new IonSerializer();
 
@@ -108,9 +108,9 @@ public class Car
 }
 
 Car myCar = new Car
-    {
-        Weight = 1400;
-    };
+{
+    Weight = 1400;
+};
 
 IonSerializer serializer = new IonSerializer();
 
