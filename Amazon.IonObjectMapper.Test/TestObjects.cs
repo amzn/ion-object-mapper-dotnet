@@ -221,6 +221,8 @@ namespace Amazon.IonObjectMapper.Test
 
         public static ClassWithMethods objectWithMethods = new ClassWithMethods("Public Value", "Protected Value",
             "Protected Internal Value", "Internal Value", "Private Value", "Private Protected Value");
+
+        public static ClassWithInterfaces objectWithInterfaces = new ClassWithInterfaces("test", 5, 3.14f);
     }
 
     public class Person
@@ -246,7 +248,11 @@ namespace Amazon.IonObjectMapper.Test
         }
     }
 
-    public class Car
+    interface IEmptyInterface
+    {
+    }
+
+    public class Car : IEmptyInterface
     {
         private string color;
 
@@ -821,6 +827,36 @@ namespace Amazon.IonObjectMapper.Test
         {
             return $"<ClassWithMethods>{{ PublicValue: {publicValue}, ProtectedValue: {protectedValue}, ProtectedInternalValue: {protectedInternalValue}, " +
                    $"InternalValue: {internalValue}, PrivateValue: {privateValue}, PrivateProtectedValue: {privateProtectedValue} }}";
+        }
+    }
+
+    interface ITestInterface
+    {
+        string StringProperty { get; set; }
+        int IntProperty { get; set; }
+    }
+
+    public class ClassWithInterfaces : ITestInterface
+    {
+        public ClassWithInterfaces()
+        {
+        }
+
+        public ClassWithInterfaces(string stringProperty, int intProperty, double doubleProperty)
+        {
+            this.StringProperty = stringProperty;
+            this.IntProperty = intProperty;
+            this.DoubleProperty = doubleProperty;
+        }
+
+        public string StringProperty { get; set; }
+        public int IntProperty { get; set; }
+        public double DoubleProperty { get; set; }
+
+        public override string ToString()
+        {
+            return
+                $"<ClassWithInterfaces>{{ StringProperty: {StringProperty}, IntProperty: {IntProperty}, DoubleProperty: {DoubleProperty:F2} }}";
         }
     }
 

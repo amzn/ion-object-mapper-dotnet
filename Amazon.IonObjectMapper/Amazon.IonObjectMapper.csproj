@@ -4,7 +4,7 @@
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <Copyright>Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Amazon Web Services</Authors>
     <Company>Amazon.com, Inc.</Company>
     <Product>Amazon Ion Object Mapper</Product>
