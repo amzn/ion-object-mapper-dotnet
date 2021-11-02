@@ -29,7 +29,7 @@ namespace Amazon.IonObjectMapper.PerformanceTest
         /// Setting this to be too low will cause overhead runtime and memory to dominate
         /// the per-entry baseline.
         /// </summary>
-        private const long BaseCount = 100000;
+        private const long BaseCount = 10000;
 
         /// <summary>
         /// The orders of magnitude to test over the BaseCount amount.
@@ -42,7 +42,7 @@ namespace Amazon.IonObjectMapper.PerformanceTest
         /// <summary>
         /// Percentage margin of error to allow over the per-entry baseline.
         /// </summary>
-        private const int ErrorMargin = 15;
+        private const int ErrorMargin = 30;
 
         private static readonly PerformanceSuite suite = new PerformanceSuite(BaseCount, ErrorMargin);
 
