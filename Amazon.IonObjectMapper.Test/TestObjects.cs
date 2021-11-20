@@ -164,6 +164,14 @@ namespace Amazon.IonObjectMapper.Test
             Course = new Course { Sections = 10, MeetingTime = DateTime.Parse("2009-10-10T13:15:21Z") }
         };
 
+        public static Person John = new Person
+        {
+            Name = "John",
+            Id = 13
+        };
+
+        public static string JohnIonText = "{name:\"John\",id:13,course:null}";
+
         public static Truck nativeTruck = new Truck();
 
         public static string truckIonText = "Truck:: { }";
