@@ -24,10 +24,10 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// Create an Ion Writer.
         /// </summary>
-        ///
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         /// <param name="stream">The stream to be written by the Ion writer.</param>
         ///
         /// <returns>The created Ion reader.</returns>
-        IIonWriter Create(Stream stream);
+        IIonWriter Create(IonSerializationOptions options, Stream stream);
     }
 }

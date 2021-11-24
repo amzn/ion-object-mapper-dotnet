@@ -2,6 +2,9 @@
 
 ## [0.1.3] - Unreleased
 
+### Fixed
+- The `Format` option will be valued by ObjectMapper now (#56)
+
 ## [0.1.2] - 2021-10-29
 
 ### Fixed

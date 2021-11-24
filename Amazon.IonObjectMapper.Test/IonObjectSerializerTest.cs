@@ -15,6 +15,7 @@ namespace Amazon.IonObjectMapper.Test
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using Amazon.IonDotnet;
     using Amazon.IonDotnet.Builders;
@@ -268,6 +269,63 @@ namespace Amazon.IonObjectMapper.Test
             AssertHasAnnotation(
                 "my.universal.namespace.BussyMcBusface",
                 new IonSerializer().Serialize(new Bus()));
+        }
+
+        [TestMethod]
+        public void RespectBinarySerializationFormat()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {Format = IonSerializationFormat.BINARY});
+            MemoryStream testStream = (MemoryStream) serializer.Serialize(TestObjects.John);
+
+            IIonValue ionValue = IonLoader.Default.Load(TestObjects.JohnIonText).GetElementAt(0);
+            MemoryStream expectedStream = new MemoryStream();
+            using (var writer = IonBinaryWriterBuilder.Build(expectedStream))
+            {
+                ionValue.WriteTo(writer);
+                writer.Finish();
+            }
+
+            Assert.IsTrue(expectedStream.ToArray().SequenceEqual(testStream.ToArray()));
+        }
+
+        [TestMethod]
+        public void RespectTextSerializationFormat()
+        {
+            var serializer = new IonSerializer(new IonSerializationOptions {Format = IonSerializationFormat.TEXT});
+            MemoryStream testStream = (MemoryStream) serializer.Serialize(TestObjects.John);
+            string testString = System.Text.Encoding.UTF8.GetString(testStream.ToArray());
+
+            IIonValue ionValue = IonLoader.Default.Load(TestObjects.JohnIonText).GetElementAt(0);
+            StringWriter expectedStringWriter = new StringWriter();
+            using (var writer = IonTextWriterBuilder.Build(expectedStringWriter))
+            {
+                ionValue.WriteTo(writer);
+                writer.Finish();
+            }
+
+            string expectedString = expectedStringWriter.ToString();
+            Assert.AreEqual(expectedString, testString);
+        }
+
+        [TestMethod]
+        public void RespectPrettyTextSerializationFormat()
+        {
+            var serializer =
+                new IonSerializer(new IonSerializationOptions {Format = IonSerializationFormat.PRETTY_TEXT});
+            MemoryStream testStream = (MemoryStream) serializer.Serialize(TestObjects.John);
+            string testString = System.Text.Encoding.UTF8.GetString(testStream.ToArray());
+
+            IIonValue ionValue = IonLoader.Default.Load(TestObjects.JohnIonText).GetElementAt(0);
+            StringWriter expectedStringWriter = new StringWriter();
+            using (var writer =
+                IonTextWriterBuilder.Build(expectedStringWriter, new IonTextOptions {PrettyPrint = true}))
+            {
+                ionValue.WriteTo(writer);
+                writer.Finish();
+            }
+
+            string expectedString = expectedStringWriter.ToString();
+            Assert.AreEqual(expectedString, testString);
         }
 
         [TestMethod]

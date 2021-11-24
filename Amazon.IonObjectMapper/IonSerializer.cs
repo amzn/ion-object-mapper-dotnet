@@ -71,10 +71,10 @@ namespace Amazon.IonObjectMapper
         /// <typeparam name="T">The type of data to serialize.</typeparam>
         public void Serialize<T>(Stream stream, T item)
         {
-            IIonWriter writer = this.options.WriterFactory.Create(stream);
+            IIonWriter writer = this.options.WriterFactory.Create(this.options, stream);
             this.Serialize(writer, item);
-            writer.Finish();
             writer.Flush();
+            writer.Finish();
         }
 
         /// <summary>

@@ -24,36 +24,17 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public class DefaultIonWriterFactory : IIonWriterFactory
     {
-        private readonly IonSerializationFormat format = TEXT;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultIonWriterFactory"/> class.
-        /// </summary>
-        public DefaultIonWriterFactory()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultIonWriterFactory"/> class.
-        /// </summary>
-        ///
-        /// <param name="format">Serialization format.</param>
-        public DefaultIonWriterFactory(IonSerializationFormat format)
-        {
-            this.format = format;
-        }
-
         /// <inheritdoc/>
-        public IIonWriter Create(Stream stream)
+        public IIonWriter Create(IonSerializationOptions options, Stream stream)
         {
-            return this.format switch
+            return options.Format switch
             {
                 BINARY => IonBinaryWriterBuilder.Build(stream),
                 TEXT => IonTextWriterBuilder.Build(new StreamWriter(stream)),
                 PRETTY_TEXT => IonTextWriterBuilder.Build(
                     new StreamWriter(stream),
                     new IonTextOptions { PrettyPrint = true }),
-                _ => throw new InvalidOperationException($"Format {this.format} not supported"),
+                _ => throw new InvalidOperationException($"Format {options.Format} not supported"),
             };
         }
     }
