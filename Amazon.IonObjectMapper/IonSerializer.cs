@@ -73,8 +73,12 @@ namespace Amazon.IonObjectMapper
         {
             IIonWriter writer = this.options.WriterFactory.Create(this.options, stream);
             this.Serialize(writer, item);
+
+            // We use `IIonWriter.Flush` instead of `IIonWriter.Finish` here. Although the `Finish` method
+            // documentation says "all written values will be flushed", that's only true for Ion binary writer.
+            // For Ion text writer, the `Finish` method is empty and only the `Flush` method calls the implemented
+            // `TextWriter.Flush` method that causes any buffered data to be written to the underlying device.
             writer.Flush();
-            writer.Finish();
         }
 
         /// <summary>

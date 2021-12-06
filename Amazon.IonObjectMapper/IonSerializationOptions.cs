@@ -30,7 +30,7 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// Gets option to specify the serialization format.
         /// </summary>
-        public IonSerializationFormat Format { get; set; } = TEXT;
+        public IonSerializationFormat Format { get; set; } = BINARY;
 
         /// <summary>
         /// Gets option to specify the maximum deserialization depth.

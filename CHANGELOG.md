@@ -5,6 +5,9 @@
 ### Fixed
 - The `Format` option will be valued by ObjectMapper now (#56)
 
+### Changed
+- Change the default serialization format to Ion binary
+
 ## [0.1.2] - 2021-10-29
 
 ### Fixed

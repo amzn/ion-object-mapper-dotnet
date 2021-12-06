@@ -18,6 +18,7 @@ namespace Amazon.IonObjectMapper.Test
     using System.IO;
     using System.Linq;
     using System.Text;
+    using Amazon.IonDotnet;
     using Amazon.IonDotnet.Builders;
     using Amazon.IonDotnet.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -80,6 +81,15 @@ namespace Amazon.IonObjectMapper.Test
                 Assert.AreEqual(null, Serde(ionSerializer, (object) null));
                 return;
             }
+            
+            // According to [Ion equivalence](https://amzn.github.io/ion-docs/guides/symbols-guide.html#symboltoken-equivalence),
+            // SymbolTokens with the same text are equivalent
+            if (item is SymbolToken symbolToken)
+            {
+                Assert.IsTrue(symbolToken.IsEquivalentTo(Serde(ionSerializer, symbolToken)));
+                return;
+            }
+
             Assert.AreEqual(item.ToString(), Serde(ionSerializer, item).ToString());
         }
 
