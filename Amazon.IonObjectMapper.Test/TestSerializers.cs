@@ -174,4 +174,30 @@ namespace Amazon.IonObjectMapper.Test
             writer.WriteBlob(new byte[item.ToByteArray().Length]);
         }
     }
+
+    public class SupraManufacturerDeserializer : IonSerializer<string>
+    {
+        public override string Deserialize(IIonReader reader)
+        {
+            return "BMW";
+        }
+
+        public override void Serialize(IIonWriter writer, string item)
+        {
+            writer.WriteString(item);
+        }
+    }
+
+    public class SupraManufacturerSerializer : IonSerializer<string>
+    {
+        public override string Deserialize(IIonReader reader)
+        {
+            return reader.StringValue();
+        }
+
+        public override void Serialize(IIonWriter writer, string item)
+        {
+            writer.WriteString("BMW");
+        }
+    }
 }

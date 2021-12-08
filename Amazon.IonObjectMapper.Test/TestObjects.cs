@@ -78,6 +78,11 @@ namespace Amazon.IonObjectMapper.Test
             return "<Motorcycle>{ Brand: " + Brand + ", color: " + color + ", canOffroad: " + canOffroad + " }";
         }
     }
+    public class Supra : Vehicle
+    {
+        [IonAnnotateType(Name = "Manufacturer", Prefix = "OEM")]
+        public string Brand { get; set; } = "Toyota";
+    }
 
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
     public class Yacht : Boat
@@ -171,6 +176,8 @@ namespace Amazon.IonObjectMapper.Test
         };
 
         public static string JohnIonText = "{name:\"John\",id:13,course:null}";
+        
+        public static Supra a90 = new Supra();
 
         public static Truck nativeTruck = new Truck();
 
