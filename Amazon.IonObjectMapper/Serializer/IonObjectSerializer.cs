@@ -217,6 +217,12 @@ namespace Amazon.IonObjectMapper
                 }
 
                 writer.SetFieldName(ionPropertyName);
+                var ionAnnotateTypes = (IEnumerable<IonAnnotateTypeAttribute>)property.GetCustomAttributes(typeof(IonAnnotateTypeAttribute));
+                if (this.ionSerializer.TryAnnotatedIonSerializer(writer, propertyValue, ionAnnotateTypes))
+                {
+                    continue;
+                }
+
                 this.ionSerializer.Serialize(writer, propertyValue);
             }
 
@@ -247,6 +253,12 @@ namespace Amazon.IonObjectMapper
                 }
 
                 writer.SetFieldName(ionFieldName);
+                var ionAnnotateTypes = (IEnumerable<IonAnnotateTypeAttribute>)field.GetCustomAttributes(typeof(IonAnnotateTypeAttribute));
+                if (this.ionSerializer.TryAnnotatedIonSerializer(writer, fieldValue, ionAnnotateTypes))
+                {
+                    continue;
+                }
+
                 this.ionSerializer.Serialize(writer, fieldValue);
             }
 

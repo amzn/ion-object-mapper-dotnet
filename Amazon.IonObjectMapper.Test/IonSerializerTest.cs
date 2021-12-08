@@ -35,9 +35,9 @@ namespace Amazon.IonObjectMapper.Test
             Check(6.02214076e23d); // double
             Check(567.9876543m); // decimal
             Check(BigDecimal.Parse("2.71828"));
-            Check(DateTime.Parse("2009-10-10T13:15:21Z")); 
-            Check("Civic"); 
-            Check(new SymbolToken("my symbol", SymbolToken.UnknownSid)); 
+            Check(DateTime.Parse("2009-10-10T13:15:21Z"));
+            Check("Civic");
+            Check(new SymbolToken("my symbol", SymbolToken.UnknownSid));
             Check(Encoding.UTF8.GetBytes("This is an Ion blob")); // blob
             Check(MakeIonClob("This is an Ion clob"), "This is an Ion clob"); // clob
             Check(Guid.NewGuid()); // guid
@@ -59,8 +59,30 @@ namespace Amazon.IonObjectMapper.Test
                 { "two", 2 },
                 { "three", 3 }
             };
-            Assert.AreEqual(TestDictionary.PrettyString(dictionary), 
+            Assert.AreEqual(TestDictionary.PrettyString(dictionary),
                 TestDictionary.PrettyString(Serde<Dictionary<string, int>>(dictionary)));
+        }
+
+        [TestMethod]
+        public void AnnotatedIonSerializerSerialization()
+        {
+            var annotatedIonSerializer = new Dictionary<string, IIonSerializer>();
+            annotatedIonSerializer.Add("OEM.Manufacturer", new SupraManufacturerSerializer());
+
+            var customizedSerializer = new IonSerializer(new IonSerializationOptions { AnnotatedIonSerializers = annotatedIonSerializer });
+
+            Assert.AreEqual("BMW", Serde(customizedSerializer, TestObjects.a90).Brand);
+        }
+
+        [TestMethod]
+        public void AnnotatedIonSerializerDeserialization()
+        {
+            var annotatedIonDeserializer = new Dictionary<string, IIonSerializer>();
+            annotatedIonDeserializer.Add("OEM.Manufacturer", new SupraManufacturerDeserializer());
+
+            var customizedDeserializer = new IonSerializer(new IonSerializationOptions { AnnotatedIonSerializers = annotatedIonDeserializer });
+
+            Assert.AreEqual("BMW", Serde(customizedDeserializer, TestObjects.a90).Brand);
         }
     }
 }

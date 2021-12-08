@@ -128,5 +128,10 @@ namespace Amazon.IonObjectMapper
         /// to further customize behavior.
         /// </summary>
         public Dictionary<string, object> CustomContext { get; set; }
+
+        /// <summary>
+        /// Gets option to specify custom serializers for any given Ion type annotation.
+        /// </summary>
+        public Dictionary<string, IIonSerializer> AnnotatedIonSerializers { get; set; }
     }
 }

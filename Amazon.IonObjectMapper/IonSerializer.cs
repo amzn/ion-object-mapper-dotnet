@@ -205,15 +205,24 @@ namespace Amazon.IonObjectMapper
 
             if (item is object)
             {
-                var customSerializerAttribute = item.GetType().GetCustomAttribute<IonSerializerAttribute>();
+                Type itemType = item.GetType();
+
+                // The AnnotatedIonSerializers takes precedence over IonSerializerAttribute
+                var ionAnnotateTypes = (IEnumerable<IonAnnotateTypeAttribute>)itemType.GetCustomAttributes(typeof(IonAnnotateTypeAttribute), false);
+                if (this.TryAnnotatedIonSerializer(writer, item, ionAnnotateTypes))
+                {
+                    return;
+                }
+
+                var customSerializerAttribute = itemType.GetCustomAttribute<IonSerializerAttribute>();
                 if (customSerializerAttribute != null)
                 {
-                    var customSerializer = this.CreateCustomSerializer(item.GetType());
+                    var customSerializer = this.CreateCustomSerializer(itemType);
                     customSerializer.Serialize(writer, item);
                     return;
                 }
 
-                new IonObjectSerializer(this, this.options, item.GetType()).Serialize(writer, item);
+                new IonObjectSerializer(this, this.options, itemType).Serialize(writer, item);
                 return;
             }
 
@@ -260,6 +269,20 @@ namespace Amazon.IonObjectMapper
             if (reader.CurrentDepth > this.options.MaxDepth)
             {
                 return null;
+            }
+
+            // The AnnotatedIonSerializers takes precedence over IonSerializerAttribute
+            if (this.options.AnnotatedIonSerializers != null)
+            {
+                var ionAnnotateTypes = reader.GetTypeAnnotations();
+                foreach (var ionAnnotateType in ionAnnotateTypes)
+                {
+                    if (this.options.AnnotatedIonSerializers.ContainsKey(ionAnnotateType))
+                    {
+                        var serializer = this.options.AnnotatedIonSerializers[ionAnnotateType];
+                        return serializer.Deserialize(reader);
+                    }
+                }
             }
 
             if (type != null)
@@ -403,6 +426,36 @@ namespace Amazon.IonObjectMapper
         public T Deserialize<T>(IIonReader reader)
         {
             return (T)this.Deserialize(reader, typeof(T));
+        }
+
+        /// <summary>
+        /// Serialize value to Ion using serializer identified by <see cref="IonAnnotateTypeAttribute"/>.
+        /// </summary>
+        ///
+        /// <param name="writer">The Ion writer to be used for serialization.</param>
+        /// <param name="item">The value to serialize.</param>
+        /// <param name="annotationAttributes">The <see cref="IonAnnotateTypeAttribute"/> to identify custom serializer for serialization.</param>
+        /// <typeparam name="T">The type of data to serialize.</typeparam>
+        ///
+        /// <returns>True if the value is serialized to Ion using AnnotatedIonSerializer. Otherwise return false.</returns>
+        internal bool TryAnnotatedIonSerializer<T>(IIonWriter writer, T item, IEnumerable<IonAnnotateTypeAttribute> annotationAttributes)
+        {
+            if (this.options.AnnotatedIonSerializers != null)
+            {
+                foreach (IonAnnotateTypeAttribute annotationAttribute in annotationAttributes)
+                {
+                    string standardizedAnnotation = this.options.AnnotationConvention.Apply(annotationAttribute, item.GetType());
+                    if (this.options.AnnotatedIonSerializers.ContainsKey(standardizedAnnotation))
+                    {
+                        var serializer = this.options.AnnotatedIonSerializers[standardizedAnnotation];
+                        writer.AddTypeAnnotation(standardizedAnnotation);
+                        serializer.Serialize(writer, item);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private IonListSerializer NewIonListSerializer(Type listType)
