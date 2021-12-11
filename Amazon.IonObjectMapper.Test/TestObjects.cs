@@ -49,7 +49,7 @@ namespace Amazon.IonObjectMapper.Test
 
         public override string ToString()
         {
-            return "<Plane>";
+            return "<Plane>{ " + MaxCapacity + " }";
         }
     }
 
@@ -181,7 +181,7 @@ namespace Amazon.IonObjectMapper.Test
 
         public static Truck nativeTruck = new Truck();
 
-        public static string truckIonText = "Truck:: { }";
+        public static string truckIonText = "'Amazon.IonObjectMapper.Test.Truck'::{}";
 
         public static Registration registration = new Registration(new LicensePlate("KM045F", DateTime.Parse("2020-04-01T12:12:12Z")));
 

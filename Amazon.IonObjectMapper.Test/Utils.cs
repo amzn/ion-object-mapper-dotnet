@@ -158,7 +158,7 @@ namespace Amazon.IonObjectMapper.Test
 
         public static void AssertIsTruck(object actual)
         {
-            Assert.AreEqual(actual.ToString(), TestObjects.nativeTruck.ToString());
+            Assert.AreEqual( TestObjects.nativeTruck.ToString(), actual.ToString());
         }
     }
 }

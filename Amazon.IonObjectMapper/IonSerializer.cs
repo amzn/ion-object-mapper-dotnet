@@ -271,11 +271,12 @@ namespace Amazon.IonObjectMapper
                 return null;
             }
 
+            var annotations = reader.GetTypeAnnotations();
+
             // The AnnotatedIonSerializers takes precedence over IonSerializerAttribute
             if (this.options.AnnotatedIonSerializers != null)
             {
-                var ionAnnotateTypes = reader.GetTypeAnnotations();
-                foreach (var ionAnnotateType in ionAnnotateTypes)
+                foreach (var ionAnnotateType in annotations)
                 {
                     if (this.options.AnnotatedIonSerializers.ContainsKey(ionAnnotateType))
                     {
@@ -308,7 +309,7 @@ namespace Amazon.IonObjectMapper
 
             if (ionType == IonType.Int)
             {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
+                if (annotations.Any(s => s.Equals(IonLongSerializer.ANNOTATION)))
                 {
                     var serializer = this.GetPrimitiveSerializer<long>(new IonLongSerializer());
                     return serializer.Deserialize(reader);
@@ -322,7 +323,7 @@ namespace Amazon.IonObjectMapper
 
             if (ionType == IonType.Float)
             {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
+                if (annotations.Any(s => s.Equals(IonFloatSerializer.ANNOTATION)))
                 {
                     var serializer = this.GetPrimitiveSerializer<float>(new IonFloatSerializer());
                     return serializer.Deserialize(reader);
@@ -336,7 +337,7 @@ namespace Amazon.IonObjectMapper
 
             if (ionType == IonType.Decimal)
             {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
+                if (annotations.Any(s => s.Equals(IonDecimalSerializer.ANNOTATION)))
                 {
                     var serializer = this.GetPrimitiveSerializer<decimal>(new IonDecimalSerializer());
                     return serializer.Deserialize(reader);
@@ -350,7 +351,7 @@ namespace Amazon.IonObjectMapper
 
             if (ionType == IonType.Blob)
             {
-                if (reader.GetTypeAnnotations().Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
+                if (annotations.Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                     || typeof(Guid).IsAssignableFrom(type))
                 {
                     var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(this.options));

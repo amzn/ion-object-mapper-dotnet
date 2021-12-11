@@ -222,19 +222,31 @@ namespace Amazon.IonObjectMapper.Test
         [TestMethod]
         public void SerializesAndDeserializesSubtypesBasedOnTypeAnnotations()
         {
-            Check(
-                new List<Vehicle>()
+            var item = new List<Vehicle>()
+            {
+                new Plane(), new Boat(), new Helicopter()
+            };
+            var serializer = new IonSerializer(new IonSerializationOptions
+            {
+                AnnotatedTypeAssemblies = new string[]
                 {
-                    new Plane(), new Boat(), new Helicopter()
-                },
-                new IonSerializationOptions
-                {
-                    AnnotatedTypeAssemblies = new string[]
-                    {
-                        typeof(Vehicle).Assembly.GetName().Name
-                    }
+                    typeof(Vehicle).Assembly.GetName().Name
                 }
-            );
+            });
+            var deserialized = serializer.Deserialize<List<Vehicle>>(serializer.Serialize(item));
+            Assert.AreEqual(string.Join(",", item), string.Join(",", deserialized));
+        }
+
+        [TestMethod]
+        public void DeserializeBasedOnTypeAnnotations()
+        {
+            var item = new List<Vehicle>()
+            {
+                new Plane{ MaxCapacity = 64 }, new Boat(), new Helicopter()
+            };
+            var serializer = new IonSerializer();
+            var deserialized = serializer.Deserialize<List<Vehicle>>(serializer.Serialize(item));
+            Assert.AreEqual(string.Join(",", item), string.Join(",", deserialized));
         }
 
         [TestMethod]
@@ -698,7 +710,7 @@ namespace Amazon.IonObjectMapper.Test
         {
             // Multiple annotations are ignored, it will only pick the first one.
             IIonValue ionTruck = valueFactory.NewEmptyStruct();
-            ionTruck.AddTypeAnnotation("Truck");
+            ionTruck.AddTypeAnnotation("Amazon.IonObjectMapper.Test.Truck");
             ionTruck.AddTypeAnnotation("SecondAnnotation");
 
             IIonReader reader = IonReaderBuilder.Build(ionTruck);
