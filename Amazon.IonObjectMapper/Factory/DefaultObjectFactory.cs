@@ -14,7 +14,6 @@
 namespace Amazon.IonObjectMapper
 {
     using System;
-    using System.Reflection;
     using Amazon.IonDotnet;
 
     /// <summary>
@@ -25,46 +24,7 @@ namespace Amazon.IonObjectMapper
         /// <inheritdoc/>
         public object Create(IonSerializationOptions options, IIonReader reader, Type targetType)
         {
-            var annotations = reader.GetTypeAnnotations();
-            if (annotations.Length > 0)
-            {
-                var typeName = annotations[0];
-                Type typeToCreate = null;
-
-                if (options.AnnotatedTypeAssemblies != null)
-                {
-                    foreach (string assemblyName in options.AnnotatedTypeAssemblies)
-                    {
-                        if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        typeToCreate = assembly.GetType(assembly.GetName().Name + "." + typeName);
-                        if (typeToCreate != null)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                if (typeToCreate != null && targetType.IsAssignableFrom(typeToCreate))
-                {
-                    return Activator.CreateInstance(typeToCreate);
-                }
-            }
-
             return Activator.CreateInstance(targetType);
-        }
-
-        private static string FullName(string typeName, string assemblyName)
-        {
-            return assemblyName + "." + typeName + "," + assemblyName;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Amazon.IonObjectMapper
         private const BindingFlags BINDINGS = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
         private readonly IonSerializer ionSerializer;
         private readonly IonSerializationOptions options;
-        private readonly Type targetType;
+        private Type targetType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IonObjectSerializer"/> class.
@@ -51,6 +51,45 @@ namespace Amazon.IonObjectMapper
             ParameterInfo[] parameters = null;
             object[] constructorArgs = null;
             Dictionary<string, int> constructorArgIndexMap = null;
+
+            // Map Ion annotation to C# type. We don't check if the type has IonAnnotateType attribute or not,
+            // because the Ion annotation could be written by:
+            // 1. IonAnnotateType attribute
+            // 2. IncludeTypeInformation option
+            // 3. custom TypeAnnotator option
+            var annotations = reader.GetTypeAnnotations();
+            if (annotations.Length > 0)
+            {
+                var typeName = annotations[0];
+                Type typeToCreate = null;
+
+                if (this.options.AnnotatedTypeAssemblies != null)
+                {
+                    foreach (string assemblyName in this.options.AnnotatedTypeAssemblies)
+                    {
+                        if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        if ((typeToCreate = assembly.GetType(typeName)) != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                // Check typeToCreate is a derived class from targetType
+                if (typeToCreate != null && this.targetType.IsAssignableFrom(typeToCreate))
+                {
+                    this.targetType = typeToCreate;
+                }
+            }
 
             // Determine if we are using an annotated constructor.
             var ionConstructors = this.targetType.GetConstructors(BINDINGS).Where(IsIonConstructor).Take(2);
@@ -510,6 +549,13 @@ namespace Amazon.IonObjectMapper
         private IEnumerable<PropertyInfo> GetValidProperties(bool isGetter)
         {
             return this.targetType.GetRuntimeProperties().Where(p => !IsIonIgnore(p) && HasValidAccessModifier(p, isGetter));
+        }
+
+        // Gets the assembly-qualified name of the type, which includes the name of the assembly from which this Type object was loaded.
+        // See https://docs.microsoft.com/en-us/dotnet/api/system.type.assemblyqualifiedname?view=netcore-3.1
+        private string FullName(string typeName, string assemblyName)
+        {
+            return typeName + "," + assemblyName;
         }
     }
 }
