@@ -67,7 +67,7 @@ namespace Amazon.IonObjectMapper
                 {
                     foreach (string assemblyName in this.options.AnnotatedTypeAssemblies)
                     {
-                        if ((typeToCreate = Type.GetType(FullName(typeName, assemblyName))) != null)
+                        if ((typeToCreate = Type.GetType(this.FullName(typeName, assemblyName))) != null)
                         {
                             break;
                         }
