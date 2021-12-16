@@ -16,6 +16,57 @@ namespace Amazon.IonObjectMapper.Test
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    
+    [IonDoNotAnnotateType(ExcludeDescendants=true)]
+    public class Food
+    {
+        public override string ToString()
+        {
+            return "<Food>";
+        }
+    }
+    
+    [IonAnnotateType(ExcludeDescendants=true)]
+    public class Meat : Food
+    {
+        public override string ToString()
+        {
+            return "<Meat>";
+        }
+    }
+    
+    public class Chicken : Meat
+    {
+        public override string ToString()
+        {
+            return "<Chicken>";
+        }
+    }
+    
+    public class Vegetable : Food
+    {
+        public override string ToString()
+        {
+            return "<Vegetable>";
+        }
+    }
+    
+    [IonAnnotateType]
+    public class Fruit : Food
+    {
+        public override string ToString()
+        {
+            return "<Fruit>";
+        }
+    }
+    
+    public class Grape : Fruit
+    {
+        public override string ToString()
+        {
+            return "<Grape>";
+        }
+    }
 
     [IonAnnotateType]
     public class Vehicle
