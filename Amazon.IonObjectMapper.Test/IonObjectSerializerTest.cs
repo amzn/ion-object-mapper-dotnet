@@ -265,6 +265,15 @@ namespace Amazon.IonObjectMapper.Test
         public void RespectAnnotationInheritance()
         {
             var serializer = new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new FixedTypeAnnotationPrefix("testing") });
+            AssertHasNoAnnotations(serializer.Serialize(new House()));
+            AssertHasAnnotation("testing.Cabin", serializer.Serialize(new Cabin()));
+            AssertHasNoAnnotations(serializer.Serialize(new LogCabin()));
+            AssertHasNoAnnotations(serializer.Serialize(new Food()));
+            AssertHasAnnotation("testing.Meat", serializer.Serialize(new Meat()));
+            AssertHasNoAnnotations(serializer.Serialize(new Chicken()));
+            AssertHasNoAnnotations(serializer.Serialize(new Vegetable()));
+            AssertHasAnnotation("testing.Fruit", serializer.Serialize(new Fruit()));
+            AssertHasAnnotation("testing.Grape", serializer.Serialize(new Grape()));
             AssertHasAnnotation("testing.Plane", serializer.Serialize(new Plane()));
             AssertHasNoAnnotations(serializer.Serialize(new Yacht()));
             AssertHasAnnotation("testing.Catamaran", serializer.Serialize(new Catamaran()));
