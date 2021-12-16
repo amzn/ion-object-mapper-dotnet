@@ -2,11 +2,16 @@
 
 ## [0.1.3] - Unreleased
 
+### Added
+- Add support to identify target type from Ion annotation for deserialization (#61)
+- Add tests and test objects for scenarios dealing with `IonAnnotateType` (#64)
+- Add support for `IonAnnotateType` attribute to work on Property. (#65)
+
 ### Fixed
 - The `Format` option will be valued by ObjectMapper now (#56)
 
 ### Changed
-- Change the default serialization format to Ion binary
+- Change the default serialization format to Ion binary (#58)
 
 ## [0.1.2] - 2021-10-29
 
