@@ -208,8 +208,8 @@ namespace Amazon.IonObjectMapper
                 Type itemType = item.GetType();
 
                 // The AnnotatedIonSerializers takes precedence over IonSerializerAttribute
-                var ionAnnotateTypes = (IEnumerable<IonAnnotateTypeAttribute>)itemType.GetCustomAttributes(typeof(IonAnnotateTypeAttribute), false);
-                if (this.TryAnnotatedIonSerializer(writer, item, ionAnnotateTypes))
+                var ionAnnotateType = (IonAnnotateTypeAttribute)Attribute.GetCustomAttribute(itemType, typeof(IonAnnotateTypeAttribute), false);
+                if (ionAnnotateType != null && this.TryAnnotatedIonSerializer(writer, item, ionAnnotateType))
                 {
                     return;
                 }
@@ -435,24 +435,21 @@ namespace Amazon.IonObjectMapper
         ///
         /// <param name="writer">The Ion writer to be used for serialization.</param>
         /// <param name="item">The value to serialize.</param>
-        /// <param name="annotationAttributes">The <see cref="IonAnnotateTypeAttribute"/> to identify custom serializer for serialization.</param>
+        /// <param name="annotationAttribute">The <see cref="IonAnnotateTypeAttribute"/> to identify custom serializer for serialization.</param>
         /// <typeparam name="T">The type of data to serialize.</typeparam>
         ///
         /// <returns>True if the value is serialized to Ion using AnnotatedIonSerializer. Otherwise return false.</returns>
-        internal bool TryAnnotatedIonSerializer<T>(IIonWriter writer, T item, IEnumerable<IonAnnotateTypeAttribute> annotationAttributes)
+        internal bool TryAnnotatedIonSerializer<T>(IIonWriter writer, T item, IonAnnotateTypeAttribute annotationAttribute)
         {
             if (this.options.AnnotatedIonSerializers != null)
             {
-                foreach (IonAnnotateTypeAttribute annotationAttribute in annotationAttributes)
+                string standardizedAnnotation = this.options.AnnotationConvention.Apply(this.options, annotationAttribute, item.GetType());
+                if (this.options.AnnotatedIonSerializers.ContainsKey(standardizedAnnotation))
                 {
-                    string standardizedAnnotation = this.options.AnnotationConvention.Apply(annotationAttribute, item.GetType());
-                    if (this.options.AnnotatedIonSerializers.ContainsKey(standardizedAnnotation))
-                    {
-                        var serializer = this.options.AnnotatedIonSerializers[standardizedAnnotation];
-                        writer.AddTypeAnnotation(standardizedAnnotation);
-                        serializer.Serialize(writer, item);
-                        return true;
-                    }
+                    var serializer = this.options.AnnotatedIonSerializers[standardizedAnnotation];
+                    writer.AddTypeAnnotation(standardizedAnnotation);
+                    serializer.Serialize(writer, item);
+                    return true;
                 }
             }
 

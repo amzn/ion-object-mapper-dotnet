@@ -350,6 +350,37 @@ namespace Amazon.IonObjectMapper.Test
         }
 
         [TestMethod]
+        public void RespectTypeAnnotationForProperty()
+        {
+            var serializer = new IonSerializer();
+            var testStream = serializer.Serialize(TestObjects.a90);
+            var ionValue = StreamToIonValue(Copy(testStream));
+            Assert.IsTrue(ionValue.GetField("brand").HasAnnotation("OEM.Manufacturer"));
+
+            var deserialized = serializer.Deserialize<Supra>(testStream);
+            Assert.AreEqual(TestObjects.a90.ToString(), deserialized.ToString());
+        }
+
+        [TestMethod]
+        public void RespectTypeAnnotationForClassAndProperty()
+        {
+            var serializer = new IonSerializer();
+            var testStream = serializer.Serialize(TestObjects.honda);
+            var ionValue = StreamToIonValue(Copy(testStream));
+            string[] actualAnnotations = ionValue.GetField("engine").GetTypeAnnotationSymbols()
+                .Select(symbolToken => symbolToken.Text).ToArray();
+            string[] expectedAnnotations =
+            {
+                "Amazon.IonObjectMapper.Test.my.custom.engine.type",
+                "Amazon.IonObjectMapper.Test.Engine"
+            };
+            Assert.AreEqual(string.Join(",", expectedAnnotations), string.Join(",", actualAnnotations));
+
+            var deserialized = serializer.Deserialize<Car>(testStream);
+            Assert.AreEqual(TestObjects.honda.ToString(), deserialized.ToString());
+        }
+
+        [TestMethod]
         public void SerializesWithCustomBoolSerializer()
         {
             var serialized = SerializeToIonWithCustomSerializer(new NegationBoolIonSerializer(), true);

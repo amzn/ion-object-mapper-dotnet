@@ -24,10 +24,11 @@ namespace Amazon.IonObjectMapper
         /// Apply annotation convention.
         /// </summary>
         ///
+        /// <param name="options">Serialization options for customizing serializer behavior.</param>
         /// <param name="annotateType">Type to annotate.</param>
         /// <param name="type">.NET Type being annotated.</param>
         ///
         /// <returns>Annotated name.</returns>
-        public string Apply(IonAnnotateTypeAttribute annotateType, Type type);
+        public string Apply(IonSerializationOptions options, IonAnnotateTypeAttribute annotateType, Type type);
     }
 }

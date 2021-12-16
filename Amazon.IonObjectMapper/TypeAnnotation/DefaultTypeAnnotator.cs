@@ -33,9 +33,7 @@ namespace Amazon.IonObjectMapper
 
             if (annotateType != null)
             {
-                annotateType.Prefix ??= options.TypeAnnotationPrefix.Apply(type);
-                annotateType.Name ??= options.TypeAnnotationName.Apply(type);
-                writer.AddTypeAnnotation(options.AnnotationConvention.Apply(annotateType, type));
+                writer.AddTypeAnnotation(options.AnnotationConvention.Apply(options, annotateType, type));
             }
         }
 
