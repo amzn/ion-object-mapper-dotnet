@@ -264,7 +264,9 @@ namespace Amazon.IonObjectMapper
                         continue;
                     }
 
-                    writer.AddTypeAnnotation(this.options.AnnotationConvention.Apply(this.options, ionAnnotateType, property.PropertyType));
+                    // Use the actual type of property at runtime to handle dynamic type
+                    var propertyType = propertyValue != null ? propertyValue.GetType() : property.PropertyType;
+                    writer.AddTypeAnnotation(this.options.AnnotationConvention.Apply(this.options, ionAnnotateType, propertyType));
                 }
 
                 this.ionSerializer.Serialize(writer, propertyValue);
