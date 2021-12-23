@@ -383,9 +383,9 @@ Ion Serialization can be customized in several ways. In order to do this, an `Io
 |`AnnotationConvention`	|`IonTypeAnnotationConvention`	|Fully qualified .NET namespace and class name	|This type will map from the .NET Type name to the Ion annotation. It is therefore possible to specify whatever type or scheme convention you desire. This allows one to specify how to convert an IonAnnotateType attribute into an Ion annotation string.	|
 |`ObjectFactory`	|`ObjectFactory`	|`DefaultObjectFactory`	|The object used to construct types during deserialization.	|
 |`AnnotatedTypeAssemblies`	|`string[]`	|Empty	|The list of assembly names to search when creating types from annotations.	|
-|`IonSerializers`	|`Dictionary<Type, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for a key `Type` a custom Ion seralizer for that type.	|
-|`AnnotatedIonSerializers`	|`Dictionary<string, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for the Ion type annotation, which custom Ion seralizer to use for that type.	|
-|`CustomContext`	|`Dictionary<string, object>`	|Empty	|Custom arbitrary data that can be passed to the IonSerializer at serialization time which can then be used by custom Ion seriliazer to further customize behaviour.	|
+|`IonSerializers`	|`Dictionary<Type, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for a key `Type` a custom Ion serializer for that type.	|
+|`AnnotatedIonSerializers`	|`Dictionary<string, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for the Ion type annotation, which custom Ion serializer to use for that type.	|
+|`CustomContext`	|`Dictionary<string, object>`	|Empty	|Custom arbitrary data that can be passed to the IonSerializer at serialization time which can then be used by custom Ion serializer to further customize behaviour.	|
 
 ### Customizing serialization
 
@@ -394,12 +394,12 @@ We will provide extension points to allow for arbitrarily fine-grained control o
 ```c#
 new IonSerializer(new IonSerializationOptions
 {
-     IonSerializers = new Dictionary<Type, IonSerializer>()
+     IonSerializers = new Dictionary<Type, IIonSerializer>()
     {
         {typeof(string), new MyCustomStringIonSerializer()},
         {typeof(DateTime), new MyCustomDateTimeIonSerializerFactory()}
     },
-    AnnotatedIonSerializers = new Dictionary<string, IonSerializer>()
+    AnnotatedIonSerializers = new Dictionary<string, IIonSerializer>()
     {
         {"complex-number", new MyComplexNumberIonSerializerFactory()}
     }
