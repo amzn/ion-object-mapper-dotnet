@@ -363,29 +363,35 @@ Ion Serialization can be customized in several ways. In order to do this, an `Io
 
 |Property	|Type	|Default	|Description	|
 |---	|---	|---	|---	|
-|`NamingConvention`	|`IonPropertyNamingConvention`	|`CamelCase`	|How fields and property names are converted to Ion. The other supplied options are `TitleCase` and `SnakeCase`.	|
-|`Format`	|`IonSerializationFormat`	|`BINARY`	|The other options are `TEXT` and `PRETTY_TEXT`.	|
-|`IonWriterFactory`	|`IonWriterFactory`	|`DefaultIonWriterFactory`	|Allows complete control over the creation of the `IonWriter`.	|
-|`IonReaderFactory`	|`IonReaderFactory`	|`DefaultIonReaderFactory`	|Allows complete control over the creation of the `IonReader`.	|
-|`MaxDepth`	|`int`	|64	|How far down a nested Ion struct to traverse on deserialization before stopping.	|
-|`IncludeFields`	|`bool`	|FALSE	|Whether of not to include fields	|
-|`IgnoreNulls`	|`bool`	|FALSE	|Whether or not to serialize null fields and properties	|
-|`IgnoreReadOnlyFields`	|`bool`	|FALSE	|Whether or not to serialize readonly fields	|
-|`IgnoreReadOnlyProperties`	|`bool`	|FALSE	|Whether or not to serialize readonly properties	|
-|`PropertyNameCaseInsensitive`	|`bool`	|FALSE	|Whether or not property names are case insensitive	|
-|`IgnoreDefaults`	|`bool`	|FALSE	|Whether or not to ignore fields and properties with default values	|
-|`IncludeTypeInformation`	|`bool`	|FALSE	|Whether or not to include type information on all non-primitive fields.	|
-|`TypeAnnotationPrefix`	|`TypeAnnotationPrefix`	|`FixedTypeAnnotationPrefix`	|By default the type prefix will be the .NET namespace of the type	|
-|`TypeAnnotationName`	|`TypeAnnotationName`	|The .NET class name	|This allows one to specify how to produce an Ion annotation from a .NET type	|
-|`TypeAnnotator`	|``TypeAnnotator``	|`DefaultTypeAnnotator`	|Allows complete control over the type annotation process with full access to the writer, options, and context.	|
-|`PermissiveMode`	|`bool`	|FALSE	|In `PermissiveMode` the serializer will ignore as many errors as it can to deserialize objects. This is so that working with legacy data which might not be in the correct format is parseable, even if it's not perfect.	|
-|`AnnotateGuids`	|bool	|FALSE	|When true, `Guid`s will be written as blobs annotated with "guid128", otherwise we will guess the blob is a `Guid` if the desired type is a `Guid`.	|
-|`AnnotationConvention`	|`IonTypeAnnotationConvention`	|Fully qualified .NET namespace and class name	|This type will map from the .NET Type name to the Ion annotation. It is therefore possible to specify whatever type or scheme convention you desire. This allows one to specify how to convert an IonAnnotateType attribute into an Ion annotation string.	|
-|`ObjectFactory`	|`ObjectFactory`	|`DefaultObjectFactory`	|The object used to construct types during deserialization.	|
-|`AnnotatedTypeAssemblies`	|`string[]`	|Empty	|The list of assembly names to search when creating types from annotations.	|
-|`IonSerializers`	|`Dictionary<Type, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for a key `Type` a custom Ion serializer for that type.	|
-|`AnnotatedIonSerializers`	|`Dictionary<string, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for the Ion type annotation, which custom Ion serializer to use for that type.	|
-|`CustomContext`	|`Dictionary<string, object>`	|Empty	|Custom arbitrary data that can be passed to the IonSerializer at serialization time which can then be used by custom Ion serializer to further customize behaviour.	|
+|[`NamingConvention`](Amazon.IonObjectMapper.Test/NamingConventionTest.cs)	|`IonPropertyNamingConvention`	|`CamelCase`	|How fields and property names are converted to Ion. The other supplied options are `TitleCase` and `SnakeCase`.	|
+|[`Format`](Amazon.IonObjectMapper.Test/FormatTest.cs)	|`IonSerializationFormat`	|`BINARY`	|The other options are `TEXT` and `PRETTY_TEXT`.	|
+|[`WriterFactory`](Amazon.IonObjectMapper.Test/IonWriterFactoryTest.cs)	|`IonWriterFactory`	|`DefaultIonWriterFactory`	|Allows complete control over the creation of the `IonWriter`.	|
+|[`ReaderFactory`](Amazon.IonObjectMapper.Test/IonReaderFactoryTest.cs)	|`IonReaderFactory`	|`DefaultIonReaderFactory`	|Allows complete control over the creation of the `IonReader`.	|
+|[`MaxDepth`](Amazon.IonObjectMapper.Test/MaxDepthTest.cs)	|`int`	|64	|How far down a nested Ion struct to traverse on deserialization before stopping.	|
+|[`IncludeFields`](Amazon.IonObjectMapper.Test/IncludeFieldsTest.cs)	|`bool`	|FALSE	|Whether of not to include fields	|
+|[`IgnoreNulls`](Amazon.IonObjectMapper.Test/IgnoreNullsTest.cs)	|`bool`	|FALSE	|Whether or not to serialize null fields and properties	|
+|[`IgnoreReadOnlyFields`](Amazon.IonObjectMapper.Test/IgnoreReadOnlyFieldsTest.cs)	|`bool`	|FALSE	|Whether or not to serialize readonly fields	|
+|[`IgnoreReadOnlyProperties`](Amazon.IonObjectMapper.Test/IgnoreReadOnlyPropertiesTest.cs)	|`bool`	|FALSE	|Whether or not to serialize readonly properties	|
+|[`PropertyNameCaseInsensitive`](Amazon.IonObjectMapper.Test/PropertyNameCaseInsensitiveTest.cs)	|`bool`	|FALSE	|Whether or not property names are case insensitive	|
+|[`IgnoreDefaults`](Amazon.IonObjectMapper.Test/IgnoreDefaultsTest.cs)	|`bool`	|FALSE	|Whether or not to ignore fields and properties with default values	|
+|[`IncludeTypeInformation`](Amazon.IonObjectMapper.Test/IncludeTypeInformationTest.cs)	|`bool`	|FALSE	|Whether or not to include type information on all non-primitive fields.	|
+|[`TypeAnnotationPrefix`](Amazon.IonObjectMapper.Test/TypeAnnotationPrefixTest.cs)	|`TypeAnnotationPrefix`	|`FixedTypeAnnotationPrefix`	|By default the type prefix will be the .NET namespace of the type	|
+|[`TypeAnnotationName`](Amazon.IonObjectMapper.Test/TypeAnnotationNameTest.cs)	|`TypeAnnotationName`	|The .NET class name	|This allows one to specify how to produce an Ion annotation from a .NET type	|
+|[`TypeAnnotator`](Amazon.IonObjectMapper.Test/TypeAnnotatorTest.cs)	|``TypeAnnotator``	|`DefaultTypeAnnotator`	|Allows complete control over the type annotation process with full access to the writer, options, and context.	|
+|`PermissiveMode`	|`bool`	|FALSE	|In `PermissiveMode` the serializer will ignore as many errors as it can to deserialize objects. This is so that working with legacy data which might not be in the correct format is parseable, even if it's not perfect. This option is not yet implemented.	|
+|[`AnnotateGuids`](Amazon.IonObjectMapper.Test/AnnotateGuidsTest.cs)	|bool	|FALSE	|When true, `Guid`s will be written as blobs annotated with "guid128", otherwise we will guess the blob is a `Guid` if the desired type is a `Guid`.	|
+|[`AnnotationConvention`](Amazon.IonObjectMapper.Test/AnnotationConventionTest.cs)	|`IonTypeAnnotationConvention`	|Fully qualified .NET namespace and class name	|This type will map from the .NET Type name to the Ion annotation. It is therefore possible to specify whatever type or scheme convention you desire. This allows one to specify how to convert an IonAnnotateType attribute into an Ion annotation string.	|
+|[`ObjectFactory`](Amazon.IonObjectMapper.Test/ObjectFactoryTest.cs)	|`ObjectFactory`	|`DefaultObjectFactory`	|The object used to construct types during deserialization.	|
+|[`AnnotatedTypeAssemblies`](Amazon.IonObjectMapper.Test/AnnotatedTypeAssembliesTest.cs)	|`string[]`	|Empty	|The list of assembly names to search when creating types from annotations.	|
+|[`IonSerializers`](Amazon.IonObjectMapper.Test/IonSerializersTest.cs)	|`Dictionary<Type, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for a key `Type` a custom Ion serializer for that type.	|
+|[`AnnotatedIonSerializers`](Amazon.IonObjectMapper.Test/AnnotatedIonSerializersTest.cs)	|`Dictionary<string, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for the Ion type annotation, which custom Ion serializer to use for that type.	|
+|[`CustomContext`](Amazon.IonObjectMapper.Test/CustomContextTest.cs)	|`Dictionary<string, object>`	|Empty	|Custom arbitrary data that can be passed to the IonSerializer at serialization time which can then be used by custom Ion serializer to further customize behaviour.	|
+
+You can run the following command to test any specific Serialization Option, substituting `Format` in `FormatTest` with the option of your choice.
+
+```bash
+dotnet test Amazon.IonObjectMapper.Test -l "console;verbosity=detailed" --filter "FullyQualifiedName=Amazon.IonObjectMapper.Test.FormatTest.Scratch"
+```
 
 ### Customizing serialization
 
