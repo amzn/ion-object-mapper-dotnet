@@ -19,6 +19,7 @@ namespace Amazon.IonObjectMapper.Demo
     using Amazon.IonDotnet;
     using Amazon.IonDotnet.Builders;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Amazon.IonObjectMapper.Test;
     using static Amazon.IonObjectMapper.IonSerializationFormat;
 
     public class UnicodeIonReaderFactory : IIonReaderFactory

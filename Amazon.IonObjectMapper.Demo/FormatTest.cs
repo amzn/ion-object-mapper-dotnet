@@ -18,6 +18,7 @@ namespace Amazon.IonObjectMapper.Demo
     using System.Text;
     using Amazon.IonDotnet;
     using Amazon.IonDotnet.Builders;
+    using Amazon.IonObjectMapper.Test;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using static Amazon.IonObjectMapper.IonSerializationFormat;
 
@@ -29,7 +30,6 @@ namespace Amazon.IonObjectMapper.Demo
         {
             IonSerializer ionSerializer;
             MemoryStream stream;
-            Supra result;
 
             ionSerializer = new IonSerializer(new IonSerializationOptions {Format = IonSerializationFormat.BINARY});
             stream = (MemoryStream)ionSerializer.Serialize(TestObjects.a90);
