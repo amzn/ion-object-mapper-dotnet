@@ -263,6 +263,7 @@ namespace Amazon.IonObjectMapper
                 }
 
                 this.ionSerializer.Serialize(writer, propertyValue);
+                serializedIonFields.Add(ionPropertyName);
             }
 
             // Serialize any fields that satisfy the options/attributes.
