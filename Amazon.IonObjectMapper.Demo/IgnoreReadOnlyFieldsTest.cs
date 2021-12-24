@@ -25,7 +25,7 @@ namespace Amazon.IonObjectMapper.Demo
         public int A = 1;
         
         [IonField]
-        public int B = 2;
+        public readonly int B = 2;
     }
 
     [TestClass]

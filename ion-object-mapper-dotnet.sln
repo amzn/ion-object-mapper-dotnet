@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amazon.IonObjectMapper.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amazon.IonObjectMapper.PerformanceTest", "Amazon.IonObjectMapper.PerformanceTest\Amazon.IonObjectMapper.PerformanceTest.csproj", "{54446BF2-C621-451E-8B49-C53BE4F83DF6}"
 EndProject
-Project("{E29706B1-D547-4BCB-8682-CD02B34CD7CB}") = "Amazon.IonObjectMapper.Demo", "Amazon.IonObjectMapper.Demo\Amazon.IonObjectMapper.Demo.csproj", "{54446BF2-C621-451E-8B49-C53BE4F83DF6}"
+Project("{E29706B1-D547-4BCB-8682-CD02B34CD7CB}") = "Amazon.IonObjectMapper.Demo", "Amazon.IonObjectMapper.Demo\Amazon.IonObjectMapper.Demo.csproj", "{491E55E8-C25C-4437-825D-1A47AA1D8E85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +56,18 @@ Global
 		{54446BF2-C621-451E-8B49-C53BE4F83DF6}.Release|x64.Build.0 = Release|Any CPU
 		{54446BF2-C621-451E-8B49-C53BE4F83DF6}.Release|x86.ActiveCfg = Release|Any CPU
 		{54446BF2-C621-451E-8B49-C53BE4F83DF6}.Release|x86.Build.0 = Release|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Debug|x64.Build.0 = Debug|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Debug|x86.Build.0 = Debug|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Release|x64.ActiveCfg = Release|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Release|x64.Build.0 = Release|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Release|x86.ActiveCfg = Release|Any CPU
+		{491E55E8-C25C-4437-825D-1A47AA1D8E85}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
