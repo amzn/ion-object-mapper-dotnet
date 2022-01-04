@@ -16,7 +16,6 @@ namespace Amazon.IonObjectMapper.Demo
     using System;
     using System.IO;
     using Amazon.IonDotnet;
-    using Amazon.IonDotnet.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Amazon.IonObjectMapper;
     using Amazon.IonObjectMapper.Test;

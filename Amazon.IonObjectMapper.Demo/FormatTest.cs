@@ -15,12 +15,8 @@ namespace Amazon.IonObjectMapper.Demo
 {
     using System;
     using System.IO;
-    using System.Text;
-    using Amazon.IonDotnet;
-    using Amazon.IonDotnet.Builders;
     using Amazon.IonObjectMapper.Test;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static Amazon.IonObjectMapper.IonSerializationFormat;
 
     [TestClass]
     public class FormatTest

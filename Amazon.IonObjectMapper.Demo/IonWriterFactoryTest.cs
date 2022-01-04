@@ -19,7 +19,6 @@ namespace Amazon.IonObjectMapper.Demo
     using Amazon.IonDotnet.Builders;
     using Amazon.IonObjectMapper.Test;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using static Amazon.IonObjectMapper.IonSerializationFormat;
 
     public class JsonIonWriterFactory : IIonWriterFactory
     {

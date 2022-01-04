@@ -15,11 +15,11 @@ namespace Amazon.IonObjectMapper.Demo
 {
     using System;
     using System.IO;
-    using Amazon.IonDotnet.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Amazon.IonObjectMapper;
     using Amazon.IonObjectMapper.Test;
 
+    [IonAnnotateType]
     public class TypeAnnotationPrefixClass 
     {
         public int A { get; set; } = 1;
@@ -45,14 +45,14 @@ namespace Amazon.IonObjectMapper.Demo
 
             MemoryStream stream;
             
-            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new NamespaceTypeAnnotationPrefix(), IncludeTypeInformation = true }).Serialize(typeAnnotationPrefixClass);
+            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new NamespaceTypeAnnotationPrefix() }).Serialize(typeAnnotationPrefixClass);
             Console.WriteLine(Utils.PrettyPrint(stream));
             // 'Amazon.IonObjectMapper.Test.TypeAnnotationPrefixClass'::{
             //     a: 1,
             //     b: 2
             // }
             
-            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new CustomTypeAnnotationPrefix(), IncludeTypeInformation = true }).Serialize(typeAnnotationPrefixClass);
+            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { TypeAnnotationPrefix = new CustomTypeAnnotationPrefix() }).Serialize(typeAnnotationPrefixClass);
             Console.WriteLine(Utils.PrettyPrint(stream));
             // 'custom.TypeAnnotationPrefixClass'::{
             //     a: 1,

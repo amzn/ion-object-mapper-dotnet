@@ -15,12 +15,11 @@ namespace Amazon.IonObjectMapper.Demo
 {
     using System;
     using System.IO;
-    using Amazon.IonDotnet;
-    using Amazon.IonDotnet.Tree;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Amazon.IonObjectMapper;
     using Amazon.IonObjectMapper.Test;
 
+    [IonAnnotateType]
     public class AnnotationConventionClass 
     {
         public int A { get; set; } = 1;
@@ -46,14 +45,14 @@ namespace Amazon.IonObjectMapper.Demo
 
             MemoryStream stream;
             
-            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { AnnotationConvention = new DefaultAnnotationConvention(), IncludeTypeInformation = true }).Serialize(annotationConventionClass);
+            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { AnnotationConvention = new DefaultAnnotationConvention() }).Serialize(annotationConventionClass);
             Console.WriteLine(Utils.PrettyPrint(stream));
             // 'Amazon.IonObjectMapper.Test.AnnotationConventionClass'::{
             //     a: 1,
             //     b: 2
             // }
 
-            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { AnnotationConvention = new BracketAnnotationConvention(), IncludeTypeInformation = true }).Serialize(annotationConventionClass);
+            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { AnnotationConvention = new BracketAnnotationConvention() }).Serialize(annotationConventionClass);
             Console.WriteLine(Utils.PrettyPrint(stream));
             // '<Amazon.IonObjectMapper.Test.AnnotationConventionClass>'::{
             //     a: 1,
