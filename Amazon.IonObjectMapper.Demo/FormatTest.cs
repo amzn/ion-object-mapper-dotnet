@@ -33,8 +33,8 @@ namespace Amazon.IonObjectMapper.Demo
 
             ionSerializer = new IonSerializer(new IonSerializationOptions {Format = IonSerializationFormat.BINARY});
             stream = (MemoryStream)ionSerializer.Serialize(TestObjects.a90);
-            Console.WriteLine(string.Join(", ", stream.ToArray()));
-            // 224, 1, 0, 234, 238, ...
+            Console.WriteLine(BitConverter.ToString(stream.ToArray())); 
+            // E0-01-00-EA-EE-B0...
             
             ionSerializer = new IonSerializer(new IonSerializationOptions {Format = IonSerializationFormat.TEXT});
             stream = (MemoryStream)ionSerializer.Serialize(TestObjects.a90);

@@ -53,11 +53,6 @@ namespace Amazon.IonObjectMapper.Demo
             
             ionSerializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = false });
             stream = (MemoryStream)ionSerializer.Serialize(normalCaseObject);
-            Console.WriteLine(Utils.PrettyPrint(stream));
-            // {
-            //     a: 1,
-            //     b: null
-            // }
 
             abnormalCaseObject = ionSerializer.Deserialize<AbnormalCaseClass>(stream);
             Console.WriteLine(abnormalCaseObject.a == null); // could not deserialize normalCaseObject.A into abnormalCaseObject.a
@@ -69,11 +64,6 @@ namespace Amazon.IonObjectMapper.Demo
 
             ionSerializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });
             stream = (MemoryStream)ionSerializer.Serialize(normalCaseObject);
-            Console.WriteLine(Utils.PrettyPrint(stream));
-            // {
-            //     a: 1,
-            //     b: null
-            // }
 
             abnormalCaseObject = ionSerializer.Deserialize<AbnormalCaseClass>(stream);
             Console.WriteLine(abnormalCaseObject.a); // successfully deserializes normalCaseObject.A into abnormalCaseObject.a
