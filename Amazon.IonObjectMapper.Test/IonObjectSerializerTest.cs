@@ -850,5 +850,23 @@ namespace Amazon.IonObjectMapper.Test
             var deserializedObject = defaultSerializer.Deserialize<ObjectWithPrivateSetter>(stream);
             Assert.IsNull(deserializedObject.val);
         }
+
+        [TestMethod]
+        public void SerializesAndDeserializePropertiesWhenConflictingFieldNamesArePresent()
+        {
+            var stream = defaultSerializer.Serialize(new PropertyNameConflictsWithIonPropertyField
+            {
+                firstString = "ignored",
+                SomeOtherFirstString = "expected"
+            });
+
+            var serialized = StreamToIonValue(stream);
+            Assert.IsFalse(serialized.ContainsField("SomeOtherFirstString"));
+            Assert.IsTrue(serialized.ContainsField("firstString"));
+            Assert.AreEqual(serialized.GetField("firstString").StringValue, "expected");
+
+            var deserialized = defaultSerializer.Deserialize<PropertyNameConflictsWithIonPropertyField>(IonReaderBuilder.Build(serialized));
+            Assert.AreEqual(deserialized.SomeOtherFirstString, "expected");
+        }
     }
 }

@@ -966,4 +966,13 @@ namespace Amazon.IonObjectMapper.Test
             set { val = value; }
         }
     }
+
+    public class PropertyNameConflictsWithIonPropertyField
+    {
+        [IonField]
+        public string firstString;
+        
+        [IonPropertyName("firstString")]
+        public string SomeOtherFirstString { get; set; }
+    }
 }
