@@ -256,10 +256,17 @@ namespace Amazon.IonObjectMapper
                 }
 
                 writer.SetFieldName(ionPropertyName);
-                var ionAnnotateTypes = (IEnumerable<IonAnnotateTypeAttribute>)property.GetCustomAttributes(typeof(IonAnnotateTypeAttribute));
-                if (this.ionSerializer.TryAnnotatedIonSerializer(writer, propertyValue, ionAnnotateTypes))
+                var ionAnnotateType = (IonAnnotateTypeAttribute)Attribute.GetCustomAttribute(property, typeof(IonAnnotateTypeAttribute), false);
+                if (ionAnnotateType != null)
                 {
-                    continue;
+                    if (this.ionSerializer.TryAnnotatedIonSerializer(writer, propertyValue, ionAnnotateType))
+                    {
+                        continue;
+                    }
+
+                    // Use the actual type of property at runtime to handle dynamic type
+                    var propertyType = propertyValue != null ? propertyValue.GetType() : property.PropertyType;
+                    writer.AddTypeAnnotation(this.options.AnnotationConvention.Apply(this.options, ionAnnotateType, propertyType));
                 }
 
                 this.ionSerializer.Serialize(writer, propertyValue);
@@ -293,8 +300,8 @@ namespace Amazon.IonObjectMapper
                 }
 
                 writer.SetFieldName(ionFieldName);
-                var ionAnnotateTypes = (IEnumerable<IonAnnotateTypeAttribute>)field.GetCustomAttributes(typeof(IonAnnotateTypeAttribute));
-                if (this.ionSerializer.TryAnnotatedIonSerializer(writer, fieldValue, ionAnnotateTypes))
+                var ionAnnotateType = (IonAnnotateTypeAttribute)Attribute.GetCustomAttribute(field, typeof(IonAnnotateTypeAttribute), false);
+                if (ionAnnotateType != null && this.ionSerializer.TryAnnotatedIonSerializer(writer, fieldValue, ionAnnotateType))
                 {
                     continue;
                 }

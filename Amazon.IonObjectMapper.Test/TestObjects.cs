@@ -159,6 +159,11 @@ namespace Amazon.IonObjectMapper.Test
     {
         [IonAnnotateType(Name = "Manufacturer", Prefix = "OEM")]
         public string Brand { get; set; } = "Toyota";
+
+        public override string ToString()
+        {
+            return "<Supra>{ " + Brand + " }";
+        }
     }
 
     [IonDoNotAnnotateType(ExcludeDescendants = true)]
@@ -351,6 +356,8 @@ namespace Amazon.IonObjectMapper.Test
         public string Make { get; set; }
         public string Model { get; set; }
         public int YearOfManufacture { get; set; }
+
+        [IonAnnotateType(Name = "my.custom.engine.type")]
         public Engine Engine { get; set; }
 
         [IonIgnore]
@@ -371,10 +378,11 @@ namespace Amazon.IonObjectMapper.Test
 
         public override string ToString()
         {
-            return "<Car>{ Make: " + Make + ", Model: " + Model + ", YearOfManufacture: " + YearOfManufacture + " }";
+            return $"<Car>{{Make: {Make}, Model: {Model}, YearOfManufacture: {YearOfManufacture}, Engine: {Engine}, Weight: {Weight} }}";
         }
     }
 
+    [IonAnnotateType]
     public class Engine
     {
         public int Cylinders { get; set; }
