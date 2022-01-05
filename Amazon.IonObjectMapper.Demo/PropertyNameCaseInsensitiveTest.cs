@@ -16,25 +16,13 @@ namespace Amazon.IonObjectMapper.Demo
     using System;
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Amazon.IonDotnet;
+    using Amazon.IonDotnet.Builders;
+    using Amazon.IonObjectMapper.Test;
 
     public class NormalCaseClass 
     {
-        public int? A { get; set; }
-        
-        public int? B { get; set; }
-
-        [IonField]
-        public int C;
-    }
-
-    public class AbnormalCaseClass 
-    {
-        public int? a { get; set; }
-        
-        public int? B { get; set; }
-
-        [IonField]
-        public int c;
+        public int? ironicCase { get; set; }
     }
 
     [TestClass]
@@ -43,34 +31,24 @@ namespace Amazon.IonObjectMapper.Demo
         [TestMethod]
         public void Scratch()
         {
-            NormalCaseClass normalCaseObject = new NormalCaseClass { A = 1, C = 3 };
+            string ionText = "{iRoNiCcAsE: 3}";
 
-            AbnormalCaseClass abnormalCaseObject;
             MemoryStream stream;
             IonSerializer ionSerializer;
+            IIonReader reader;
+            NormalCaseClass result;
             
-            ionSerializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = false });
-            stream = (MemoryStream)ionSerializer.Serialize(normalCaseObject);
-
-            abnormalCaseObject = ionSerializer.Deserialize<AbnormalCaseClass>(stream);
-            Console.WriteLine(abnormalCaseObject.a == null); // could not deserialize normalCaseObject.A into abnormalCaseObject.a
+            ionSerializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = false });            
+            reader = IonReaderBuilder.Build(ionText);
+            result = ionSerializer.Deserialize<NormalCaseClass>(reader);
+            Console.WriteLine(result.ironicCase == null); // could not deserialize differently-cased text
             // True
-            Console.WriteLine(abnormalCaseObject.B == null);
-            // True
-            Console.WriteLine(abnormalCaseObject.c); // PropertyNameCaseInsensitive does not apply to fields
-            // 0
 
-            ionSerializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });
-            stream = (MemoryStream)ionSerializer.Serialize(normalCaseObject);
-
-            abnormalCaseObject = ionSerializer.Deserialize<AbnormalCaseClass>(stream);
-            Console.WriteLine(abnormalCaseObject.a); // successfully deserializes normalCaseObject.A into abnormalCaseObject.a
-            // 1
-            Console.WriteLine(abnormalCaseObject.B == null);
-            // True
-            Console.WriteLine(abnormalCaseObject.c); // PropertyNameCaseInsensitive does not apply to fields
-            // 0
-
+            ionSerializer = new IonSerializer(new IonSerializationOptions { PropertyNameCaseInsensitive = true });            
+            reader = IonReaderBuilder.Build(ionText);
+            result = ionSerializer.Deserialize<NormalCaseClass>(reader);
+            Console.WriteLine(result.ironicCase); // successfully deserializes differently-cased text
+            // 3
         }
     }
 }
