@@ -33,7 +33,6 @@ namespace Amazon.IonObjectMapper.Demo
         {
             string ionText = "{iRoNiCcAsE: 3}";
 
-            MemoryStream stream;
             IonSerializer ionSerializer;
             IIonReader reader;
             NormalCaseClass result;
