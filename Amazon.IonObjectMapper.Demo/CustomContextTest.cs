@@ -85,9 +85,9 @@ namespace Amazon.IonObjectMapper.Demo
 
             Unicorn unicorn = new Unicorn();
             
-            ionSerializer = new IonSerializer();            
-            stream = (MemoryStream)ionSerializer.Serialize(unicorn);
-            // will throw a System.ArgumentNullException error
+            // ionSerializer = new IonSerializer();            
+            // stream = (MemoryStream)ionSerializer.Serialize(unicorn);
+            // uncommenting the previous two lines will throw a System.ArgumentNullException error
 
             ionSerializer = new IonSerializer(new IonSerializationOptions 
             { 
