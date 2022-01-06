@@ -29,8 +29,10 @@ namespace Amazon.IonObjectMapper.Demo
 
     public class BracketAnnotationConvention : IAnnotationConvention
     {
-        public string Apply(IonAnnotateTypeAttribute annotateType, Type type)
+        public string Apply(IonSerializationOptions options, IonAnnotateTypeAttribute annotateType, Type type)
         {
+            annotateType.Prefix ??= options.TypeAnnotationPrefix.Apply(type);
+            annotateType.Name ??= options.TypeAnnotationName.Apply(type);
             return "<" + annotateType.Prefix + "." + annotateType.Name + ">";
         }
     }
