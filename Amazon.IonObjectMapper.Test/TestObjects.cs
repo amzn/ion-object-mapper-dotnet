@@ -410,7 +410,7 @@ namespace Amazon.IonObjectMapper.Test
 
         public override string ToString()
         {
-            return "<LicensePlate>{ license: " + license + " }";
+            return "<Registration>{ license: " + license + " }";
         }
     }
 

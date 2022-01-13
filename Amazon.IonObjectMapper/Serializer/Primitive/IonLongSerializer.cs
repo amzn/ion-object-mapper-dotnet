@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
@@ -24,7 +24,7 @@ namespace Amazon.IonObjectMapper
         /// <summary>
         /// Ion annotation to distinguish longs from ints.
         /// </summary>
-        internal static readonly string ANNOTATION = "numeric.int32";
+        internal static readonly string ANNOTATION = "numeric.int64";
 
         /// <summary>
         /// Deserialize long value.

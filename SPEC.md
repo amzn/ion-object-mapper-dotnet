@@ -1,6 +1,6 @@
 # Ion Object Mapping in .NET for QLDB
 
-Ion is clumsy to use with QLDB in .NET and [customers have asked](https://amzn-aws.slack.com/archives/G01CFDRUG6R/p1612319039019200) (see Appendix A) for it to be improved. [From our own documentation](https://docs.aws.amazon.com/qldb/latest/developerguide/driver-quickstart-dotnet.html), this is how you create an Ion struct to send an Ion value to the database:
+Ion is clumsy to use with QLDB in .NET and customers have asked for it to be improved. [From our own documentation](https://docs.aws.amazon.com/qldb/latest/developerguide/driver-quickstart-dotnet.html), this is how you create an Ion struct to send an Ion value to the database:
 
 ```c#
 IIonValue ionPerson = valueFactory.NewEmptyStruct();
@@ -34,7 +34,7 @@ Which is arguably still clumsy, possibly incorrect, and definitely dangerous in 
 
 ## Solution
 
-We will enhance the QLDB .NET Driver to allow for .NET objects to be passed to it, rather than `IIonValue`. We will provide standard and comprehensive mappings from objects to Ion and back, but if we miss a case, we will provide extension points allowing for complete control over the Ion serialization processing. This solution is influenced by the new [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json?view=net-5.0) namespace, therefore aligning ourselves with Microsoft’s vision for object serialization and providing developers with a least-surprise API.
+We will enhance the QLDB .NET Driver to allow for .NET objects to be passed to it, rather than `IIonValue`. We will provide standard and comprehensive mappings from objects to Ion and back, but if we miss a case, we will provide extension points allowing for complete control over the Ion serialization processing. This solution is influenced by the new [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json) namespace, therefore aligning ourselves with Microsoft’s vision for object serialization and providing developers with a least-surprise API.
 
 Given a `Car` object defined as follows:
 
@@ -42,7 +42,7 @@ Given a `Car` object defined as follows:
 class Car
 {
     public string Make { get; init; }  // "init" is new keyword meaning you set
-    public string Model { get; init; } //   this property once only
+    public string Model { get; init; } //  this property once only
     public int Year { get; init; }
 }
 ```
@@ -73,7 +73,7 @@ var hondaYears = driver.Execute(tx =>
 
 This leverages [Linq](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/) to operate on the resultant `IEnumerable` returned by the driver. With the `Query<Car>` method it leans on C# reification to deserialize the desired type from the database. By adding these two interfaces the inconvenience of converting to and from Ion can be completely avoided in the client code. 
 
-If finer grained control over the results is required, the `IQuery<ResultT>` object passed to `Execute` can be created in whatever way the client code wants conforming to this inteface:
+If finer grained control over the results is required, the `IQuery<ResultT>` object passed to `Execute` can be created in whatever way the client code wants conforming to this interface:
 
 ```c#
 public interface IQuery<T>
@@ -81,7 +81,7 @@ public interface IQuery<T>
     string Statement { get; }
     ValueHolder[] Parameters { get; }
     T Deserialize(ValueHolder ionValueHolder);
-}1
+}
 ```
 
 So long as the users `IQuery` provides a `Statement` `string`, can supply `Parameters` as `ValueHolder`s (which is a QLDB type which contains the raw Ion text or binary), and can convert from a result `ValueHolder` into a desired `T` representing the
@@ -155,49 +155,7 @@ public class Engine
 
 the `init` keyword is a C# modifier which indicates that the property is only settable at construction time. In reality the Intermediate Language (IL) code just contains a regular setter and so long as properties in general have a getter and setter, the library will be able to use them. By default, all gettable properties will be serialized and all settable properties will be deserialized, but this can be configured as specified later in this document. The properties must have public, internal, or protected internal access modifiers.
 
-### Default behavior when deserializing annotated Ion
-
-Annotated Ion types will by default map to the C# class name in currently loaded assemblies if and only if the **first** type annotation matches the name of the class. The C# class type must also be a subtype of the type passed into the deserialize method.
-
-```c#
-public class DefaultDeserialization
-{
-    public class Car
-    {
-        public override string ToString()
-        {
-            return "<Car>";
-        }
-    }
-    
-    public class Truck : Car
-    {
-        public override string ToString()
-        {
-            return "<Truck>";
-        }
-    }
-    
-    public void DeserializeExample() {
-        // Create Ion struct with annotation that matches Truck Class Type name.
-        
-        string truckIonText = "Truck:: { }";
-
-        IIonReader reader = IonReaderBuilder.Build(truckIonText);
-
-        IonSerializer ionSerializer = new IonSerializer();
-        // This will only attempt to deserialize into a Truck if and only if Truck is a subtype of the input Type, in this case Typeof(car).
-        var car = ionSerializer.Deserialize(reader, Typeof(Car));
-
-        // This will print "<Truck>".
-        string output = car.ToString();
-    }
-}
-```
-
-
-
-### Supported types
+#### Supported types
 
 In addition to all `object` types these types are supported by default:
 
@@ -210,7 +168,31 @@ new IonSerializer().Deserialize<List<Car>>(stream);
 new IonSerializer().Deserialize<Map<string, object>>(stream);
 ```
 
-### Ignoring properties
+#### Naming
+
+By default, object property names are converted by changing the first character to be lowercase (camel case):
+
+```c#
+{
+  make: "Honda",
+  model: "Civic",
+  year: 2010
+}
+```
+
+This can be customized by specifying an option specified later, or by setting an `Attribute` on the property itself for the exact property name to be used:
+
+```c#
+public class Car
+{
+    [IonPropertyName("weightInKg")]
+    public double Weight { get; init; }
+}
+```
+
+If the specified property name conflicts with a field name of the same class, the property will get precedence over the field during serialization and/or deserialization. The annotated property can have any access modifier.
+
+#### Ignoring properties
 
 It is possible to ignore a property with the `Attribute` `IonIgnore`:
 
@@ -222,65 +204,21 @@ public class Car
 }
 ```
 
-### Encoding types
+#### Fields
 
-Sometimes one will need to deserialize streams of different types which share a common subtype. Alternately, sometimes one might want to coerce the deserialized type to a specific type. For this we lean on Ion annotations and another C# `Attribute` `IonAnnotateType`. This attribute can be set on a class and it will then include their type information. Alternately it can be set on a property.
-
-```c#
-[IonAnnotateType]
-public class Car 
-{    
-    [IonAnnotateType("my.custom.engine.type")]
-    public Engine { get; init; }
-}
-public class Honda : Car { }
-public class Toyota : Car { }
-
-public class Engine { }
-public class Hybrid : Engine { }
-
-// this will instantiate Cars, Hondas, or Toyota types depending on the stream
-//  contents
-new IonSerializer().Deserialize<List<Car>>(stream);
-```
-
-The type information will be included in the Ion stream as an [Ion annotation](https://amzn.github.io/ion-docs/docs/spec.html#annot). This will be the fully qualified class and namespace of the desired type to be created. At deserialization time, if the annotation is found but the type or property specified in the annotation to be deserialized is not marked with the `IonAnnotateType` attribute the annotation is ignored and deserialization carries on as normal. For example, this Ion would be produced:
-
-```c#
-com.amazon.vehicles.Honda::{
-    "year": 2010,
-}
-```
-
-It is further possible to specify the exact type annotation string that will be written, although this is optional and the class name will be used as the default. This is to provide compatibility with other systems where C# may not be the same language used for serialization as well as deserialization.
-
-Since `IonAnnotateType` affects the type and all subtypes, there is a counter `IonDoNotAnnotateType` to explicitly turn this off. On `IonAnnotateType` one can set `ExcludeDescendants` which will mean this `Attribute` does not apply to descendants and finally one can set the `Prefix` to a string other than the C# namespace.
-
-### Naming
-
-By default, object property names are converted by changing the first character to be lowercase (camel case):
-
-```c#
- {
-   make: "Honda",
-   model: "Civic",
-   year: 2010
- }
-```
-
-This can be customized by specifying an option specified later, or by setting an `Attribute` on the property itself for the exact property name to be used:
+By default, C# fields are ignored. However, they can be annotated with an `IonField` `Attribute` to be included or by an option specified later. The annotated field can have any access modifier.
 
 ```c#
 public class Car
 {
-     [IonPropertyName("weightInKg")]
-    public double Weight { get; init; }
+    [IonField]
+    private string color;
 }
 ```
 
-If the specified property name conflicts with a field name of the same class, the property will get precedence over the field during serialization and/or deserialization. The annotated property can have any access modifier.
+The Ion property name will be inferred from the field name and **preserved as is**. This can be customized with `IonPropertyName` `Attribute` as for properties.
 
-### Methods
+#### Methods
 
 By default, C# methods are ignored, however, provided the “get” signature is a no-argument method and the “set” signature is a one-argument `void` method, methods can be use to get and set properties. The Ion property name must be specified and will not be inferred from the method name. In the event of a naming conflict between the specified annotated Ion property name and a property or field name of the class (such as the below example), the annotated Ion property name will get precedence over the class's property or field name during serialization and/or deserialization. The annotated method can have any access modifier.
 
@@ -290,42 +228,117 @@ public class Car
     [IonField]
     private string color;
     
+    [IonPropertyName("color")]
+    public string SomeOtherColor { get; set; }
+    
     [IonPropertyGetter("color")]
     public string GetColor() 
     {
-        return "#FF0000";
+        return this.SomeOtherColor;
     }
     
     [IonPropertySetter("color")]
     public void SetColor(string input) 
     {
-        this.color = input;
+        this.SomeOtherColor = input;
     }
 }
 ```
 
-### Fields
+#### Encoding types
 
-By default, C# fields are ignored. However, they can be annotated with an `IonField` `Attribute` to be included or by an option specified later. The annotated field can have any access modifier.
+Sometimes one will need to deserialize streams of different types which share a common parent type. Alternately, sometimes one might want to coerce the deserialized type to a specific type. For this we lean on Ion annotations and another C# `Attribute` `IonAnnotateType`. This attribute can be set on a class and it will then include their type information. Alternately it can be set on a property.
 
 ```c#
-public class Car
+namespace MyApp
 {
-     [IonField]
-    private string color;
+    [IonAnnotateType]
+    public class Car 
+    {    
+        [IonAnnotateType(Name = "my.custom.engine.type")]
+        public Engine { get; init; }
+    }
+    public class Honda : Car { }
+    public class Toyota : Car { }
+    
+    public class Engine
+    {
+        public int Cylinders { get; init; }
+        public DateTime ManufactureDate { get; init; }
+    }
+    public class Hybrid : Engine { }
+    
+    // this will instantiate Cars, Hondas, or Toyota types depending on the stream
+    // contents
+    new IonSerializer().Deserialize<List<Car>>(stream);
 }
 ```
 
-The Ion property name will be inferred from the field name and **preserved as is**. This can be customized with `IonPropertyName` `Attribute` as for properties.
+The type information will be included in the Ion stream as an [Ion annotation](https://amzn.github.io/ion-docs/docs/spec.html#annot). This will be the fully qualified class and namespace of the desired type to be created. At deserialization time, if the annotation is found but the type specified in the annotation to be deserialized is not found in currently loaded assemblies, the annotation is ignored and deserialization carries on as normal. For example, this Ion would be produced:
 
-### Construction
+```c#
+'MyApp.Honda'::{
+   engine: 'MyApp.my.custom.engine.type'::{
+     cylinders: 4,
+     manufactureDate: 2010-01-01T00:00:00-00:00
+  }
+}
+```
+
+It is further possible to specify the exact type annotation string that will be written, although this is optional and the fully qualified class and namespace name will be used as the default. This is to provide compatibility with other systems where C# may not be the same language used for serialization as well as deserialization.
+
+Since `IonAnnotateType` affects the type and all subtypes, there is a counter `IonDoNotAnnotateType` to explicitly turn this off. On `IonAnnotateType` one can set `ExcludeDescendants` which will mean this `Attribute` does not apply to descendants and finally one can set the `Prefix` to a string other than the C# namespace.
+
+#### Default behavior when deserializing annotated Ion
+
+Annotated Ion types will by default map to the C# class name in currently loaded assemblies if and only if the **first** type annotation matches the name of the class. The C# class type must also be a subtype of the type passed into the deserialize method.
+
+```c#
+namespace MyApp
+{
+    public class DefaultDeserialization
+    {
+        public class Car
+        {
+            public override string ToString()
+            {
+                return "<Car>";
+            }
+        }
+        
+        public class Truck : Car
+        {
+            public override string ToString()
+            {
+                return "<Truck>";
+            }
+        }
+        
+        public void DeserializeExample() {
+            // Create Ion struct with annotation that matches Truck Class Namespace and Type name.
+            string truckIonText = "'MyApp.Truck'::{}";
+
+            IIonReader reader = IonReaderBuilder.Build(truckIonText);
+
+            IonSerializer ionSerializer = new IonSerializer();
+            // This will only attempt to deserialize into a Truck if and only if Truck is a subtype of the input Type, in this case Type Car.
+            var car = ionSerializer.Deserialize<Car>(reader);
+
+            // This will print "<Truck>".
+            string output = car.ToString();
+        }
+    }
+}
+```
+
+#### Construction
 
 By default, C# objects are created using the `Activator.CreateInstance(Type)` method which calls the default constructor. If you want to supply a constructor yourself, you can markup a constructor with the `IonConstructor` `Attribute`. Additionally, the parameters to the constructor must be specified using the `IonPropertyName` `Attribute` again:
 
 ```c#
 public class Wheel
 {
-     private string specification;
+    private string specification;
     [IonConstructor]
     public Wheel([IonPropertyName("specification")] string specification)
     {
@@ -338,22 +351,22 @@ public class Wheel
 
 The Ion/.NET type conversion mapping is as per the following table:
 
-|Ion Type	|C# Type	|
-|---	|---	|
-|[`null`](https://amzn.github.io/ion-docs/docs/spec.html#null)	|`null`	|
-|[`bool`](https://amzn.github.io/ion-docs/docs/spec.html#bool)	|`bool`	|
-|[`int`](https://amzn.github.io/ion-docs/docs/spec.html#int)	|`int`	|
-|[`float`](https://amzn.github.io/ion-docs/docs/spec.html#real-numbers)	|`double`	|
-|[`decimal`](https://amzn.github.io/ion-docs/docs/spec.html#real-numbers)	|`decimal `	|
-|[`timestamp`](https://amzn.github.io/ion-docs/docs/spec.html#timestamp)	|`DateTime`	|
-|[`string`](https://amzn.github.io/ion-docs/docs/spec.html#string)	|`string`	|
-|[`symbol`](https://amzn.github.io/ion-docs/docs/spec.html#symbol)	|`SymbolToken` (The Ion type)	|
-|[`blob`](https://amzn.github.io/ion-docs/docs/spec.html#blob)	|`ReadOnlySpan<byte>`	|
-|[`clob`](https://amzn.github.io/ion-docs/docs/spec.html#clob)	|`StreamReader`	|
-|`blob` (annotated)	|`Guid`	|
-|[`struct`](https://amzn.github.io/ion-docs/docs/spec.html#struct)	|`object`	|
-|[`list`](https://amzn.github.io/ion-docs/docs/spec.html#list)	|`IList`	|
-|[`sexp`](https://amzn.github.io/ion-docs/docs/spec.html#sexp)	|`List<object>`	|
+|Ion Type	| C# Type	                                                    |
+|---	|-------------------------------------------------------------|
+|[`null`](https://amzn.github.io/ion-docs/docs/spec.html#null)	| `null`	                                                     |
+|[`bool`](https://amzn.github.io/ion-docs/docs/spec.html#bool)	| `bool`	                                                     |
+|[`int`](https://amzn.github.io/ion-docs/docs/spec.html#int)	| `int`	and `long`                                            |
+|[`float`](https://amzn.github.io/ion-docs/docs/spec.html#real-numbers)	| `float` and `double`	                                       |
+|[`decimal`](https://amzn.github.io/ion-docs/docs/spec.html#real-numbers)	| `decimal` and `BigDecimal` (The Ion type)	                  |
+|[`timestamp`](https://amzn.github.io/ion-docs/docs/spec.html#timestamp)	| `DateTime`	                                                 |
+|[`string`](https://amzn.github.io/ion-docs/docs/spec.html#string)	| `string`	                                                   |
+|[`symbol`](https://amzn.github.io/ion-docs/docs/spec.html#symbol)	| `SymbolToken` (The Ion type)	                               |
+|[`blob`](https://amzn.github.io/ion-docs/docs/spec.html#blob)	| `byte[]`	                                                   |
+|[`clob`](https://amzn.github.io/ion-docs/docs/spec.html#clob)	| clob will be deserialized as `string` using UTF-8 Encoding	 |
+|`blob` (annotated)	| `Guid`	                                                     |
+|[`struct`](https://amzn.github.io/ion-docs/docs/spec.html#struct)	| `object`	                                                   |
+|[`list`](https://amzn.github.io/ion-docs/docs/spec.html#list)	| `IList`	                                                    |
+|[`sexp`](https://amzn.github.io/ion-docs/docs/spec.html#sexp)	| `List<object>`	                                             |
 
 Note that this mapping is largely provided as is by the Amazon.Ion library.
 
@@ -361,41 +374,41 @@ Note that this mapping is largely provided as is by the Amazon.Ion library.
 
 Ion Serialization can be customized in several ways. In order to do this, an `IonSerializationOptions` object can be passed to the `IonSerializer` object.
 
-|Property	|Type	|Default	|Description	|
-|---	|---	|---	|---	|
-|[`NamingConvention`](Amazon.IonObjectMapper.Demo/NamingConventionTest.cs)	|`IonPropertyNamingConvention`	|`CamelCase`	|How fields and property names are converted to Ion. The other supplied options are `TitleCase` and `SnakeCase`.	|
-|[`Format`](Amazon.IonObjectMapper.Demo/FormatTest.cs)	|`IonSerializationFormat`	|`BINARY`	|The other options are `TEXT` and `PRETTY_TEXT`.	|
-|[`WriterFactory`](Amazon.IonObjectMapper.Demo/IonWriterFactoryTest.cs)	|`IonWriterFactory`	|`DefaultIonWriterFactory`	|Allows complete control over the creation of the `IonWriter`.	|
-|[`ReaderFactory`](Amazon.IonObjectMapper.Demo/IonReaderFactoryTest.cs)	|`IonReaderFactory`	|`DefaultIonReaderFactory`	|Allows complete control over the creation of the `IonReader`.	|
-|[`MaxDepth`](Amazon.IonObjectMapper.Demo/MaxDepthTest.cs)	|`int`	|64	|How far down a nested Ion struct to traverse on deserialization before stopping.	|
-|[`IncludeFields`](Amazon.IonObjectMapper.Demo/IncludeFieldsTest.cs)	|`bool`	|FALSE	|Whether of not to include fields	|
-|[`IgnoreNulls`](Amazon.IonObjectMapper.Demo/IgnoreNullsTest.cs)	|`bool`	|FALSE	|Whether or not to serialize null fields and properties	|
-|[`IgnoreReadOnlyFields`](Amazon.IonObjectMapper.Demo/IgnoreReadOnlyFieldsTest.cs)	|`bool`	|FALSE	|Whether or not to serialize readonly fields	|
-|[`IgnoreReadOnlyProperties`](Amazon.IonObjectMapper.Demo/IgnoreReadOnlyPropertiesTest.cs)	|`bool`	|FALSE	|Whether or not to serialize readonly properties	|
-|[`PropertyNameCaseInsensitive`](Amazon.IonObjectMapper.Demo/PropertyNameCaseInsensitiveTest.cs)	|`bool`	|FALSE	|Whether or not property names are case insensitive	|
-|[`IgnoreDefaults`](Amazon.IonObjectMapper.Demo/IgnoreDefaultsTest.cs)	|`bool`	|FALSE	|Whether or not to ignore fields and properties with default values	|
-|[`IncludeTypeInformation`](Amazon.IonObjectMapper.Demo/IncludeTypeInformationTest.cs)	|`bool`	|FALSE	|Whether or not to include type information on all non-primitive fields.	|
-|[`TypeAnnotationPrefix`](Amazon.IonObjectMapper.Demo/TypeAnnotationPrefixTest.cs)	|`TypeAnnotationPrefix`	|`FixedTypeAnnotationPrefix`	|By default the type prefix will be the .NET namespace of the type	|
-|[`TypeAnnotationName`](Amazon.IonObjectMapper.Demo/TypeAnnotationNameTest.cs)	|`TypeAnnotationName`	|The .NET class name	|This allows one to specify how to produce an Ion annotation from a .NET type	|
-|[`TypeAnnotator`](Amazon.IonObjectMapper.Demo/TypeAnnotatorTest.cs)	|``TypeAnnotator``	|`DefaultTypeAnnotator`	|Allows complete control over the type annotation process with full access to the writer, options, and context.	|
-|`PermissiveMode`	|`bool`	|FALSE	|In `PermissiveMode` the serializer will ignore as many errors as it can to deserialize objects. This is so that working with legacy data which might not be in the correct format is parseable, even if it's not perfect. This option is not yet implemented.	|
-|[`AnnotateGuids`](Amazon.IonObjectMapper.Demo/AnnotateGuidsTest.cs)	|bool	|FALSE	|When true, `Guid`s will be written as blobs annotated with "guid128", otherwise we will guess the blob is a `Guid` if the desired type is a `Guid`.	|
-|[`AnnotationConvention`](Amazon.IonObjectMapper.Demo/AnnotationConventionTest.cs)	|`IonTypeAnnotationConvention`	|Fully qualified .NET namespace and class name	|This type will map from the .NET Type name to the Ion annotation. It is therefore possible to specify whatever type or scheme convention you desire. This allows one to specify how to convert an IonAnnotateType attribute into an Ion annotation string.	|
-|[`ObjectFactory`](Amazon.IonObjectMapper.Demo/ObjectFactoryTest.cs)	|`ObjectFactory`	|`DefaultObjectFactory`	|The object used to construct types during deserialization.	|
-|[`AnnotatedTypeAssemblies`](Amazon.IonObjectMapper.Demo/AnnotatedTypeAssembliesTest.cs)	|`string[]`	|Empty	|The list of assembly names to search when creating types from annotations.	|
-|[`IonSerializers`](Amazon.IonObjectMapper.Demo/IonSerializersTest.cs)	|`Dictionary<Type, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for a key `Type` a custom Ion serializer for that type.	|
-|[`AnnotatedIonSerializers`](Amazon.IonObjectMapper.Demo/AnnotatedIonSerializersTest.cs)	|`Dictionary<string, IonSerializer>`	|Empty	|A `Dictionary` of `IonSerializers` which specifies, for the Ion type annotation, which custom Ion serializer to use for that type.	|
-|[`CustomContext`](Amazon.IonObjectMapper.Demo/CustomContextTest.cs)	|`Dictionary<string, object>`	|Empty	|Custom arbitrary data that can be passed to the IonSerializer at serialization time which can then be used by custom Ion serializer to further customize behaviour.	|
+|Property	| Type	                                 | Default	                        | Description	                                                                                                                                                                                                                                                  |
+|---	|---------------------------------------|---------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|[`NamingConvention`](Amazon.IonObjectMapper.Demo/NamingConventionTest.cs)	| `IIonPropertyNamingConvention`	       | `CamelCase`	                    | How fields and property names are converted to Ion. The other supplied options are `TitleCase` and `SnakeCase`.	                                                                                                                                              |
+|[`Format`](Amazon.IonObjectMapper.Demo/FormatTest.cs)	| `IonSerializationFormat`	             | `BINARY`	                       | The other options are `TEXT` and `PRETTY_TEXT`.	                                                                                                                                                                                                              |
+|[`WriterFactory`](Amazon.IonObjectMapper.Demo/IonWriterFactoryTest.cs)	| `IIonWriterFactory`	                  | `DefaultIonWriterFactory`	      | Allows complete control over the creation of the `IIonWriter`.	                                                                                                                                                                                               |
+|[`ReaderFactory`](Amazon.IonObjectMapper.Demo/IonReaderFactoryTest.cs)	| `IIonReaderFactory`	                  | `DefaultIonReaderFactory`	      | Allows complete control over the creation of the `IIonReader`.	                                                                                                                                                                                               |
+|[`MaxDepth`](Amazon.IonObjectMapper.Demo/MaxDepthTest.cs)	| `int`	                                | 64	                             | How far down a nested Ion struct to traverse on deserialization before stopping.	                                                                                                                                                                             |
+|[`IncludeFields`](Amazon.IonObjectMapper.Demo/IncludeFieldsTest.cs)	| `bool`	                               | FALSE	                          | Whether or not to include fields.	                                                                                                                                                                                                                            |
+|[`IgnoreNulls`](Amazon.IonObjectMapper.Demo/IgnoreNullsTest.cs)	| `bool`	                               | FALSE	                          | Whether or not to serialize null fields and properties.	                                                                                                                                                                                                      |
+|[`IgnoreReadOnlyFields`](Amazon.IonObjectMapper.Demo/IgnoreReadOnlyFieldsTest.cs)	| `bool`	                               | FALSE	                          | Whether or not to serialize readonly fields.                                                                                                                                                                                                                  |
+|[`IgnoreReadOnlyProperties`](Amazon.IonObjectMapper.Demo/IgnoreReadOnlyPropertiesTest.cs)	| `bool`	                               | FALSE	                          | Whether or not to serialize readonly properties.	                                                                                                                                                                                                             |
+|[`PropertyNameCaseInsensitive`](Amazon.IonObjectMapper.Demo/PropertyNameCaseInsensitiveTest.cs)	| `bool`	                               | FALSE	                          | Whether or not property names are case insensitive.	                                                                                                                                                                                                          |
+|[`IgnoreDefaults`](Amazon.IonObjectMapper.Demo/IgnoreDefaultsTest.cs)	| `bool`	                               | FALSE	                          | Whether or not to ignore fields and properties with default values.	                                                                                                                                                                                          |
+|[`IncludeTypeInformation`](Amazon.IonObjectMapper.Demo/IncludeTypeInformationTest.cs)	| `bool`	                               | FALSE	                          | Whether or not to include type information on all non-primitive fields.	                                                                                                                                                                                      |
+|[`TypeAnnotationPrefix`](Amazon.IonObjectMapper.Demo/TypeAnnotationPrefixTest.cs)	| `ITypeAnnotationPrefix`	              | `NamespaceTypeAnnotationPrefix`	 | By default the type prefix will be the .NET namespace of the type.	                                                                                                                                                                                           |
+|[`TypeAnnotationName`](Amazon.IonObjectMapper.Demo/TypeAnnotationNameTest.cs)	| `ITypeAnnotationName`	                | `ClassNameTypeAnnotationName`	  | By default the type name will be the class name of the type.                                                                                                                                                                                                  |
+|[`AnnotationConvention`](Amazon.IonObjectMapper.Demo/AnnotationConventionTest.cs)	| `IAnnotationConvention`	              | `DefaultAnnotationConvention`	                               | This type will map from the .NET Type name to the Ion annotation. It is therefore possible to specify whatever type or scheme convention you desire. This allows one to specify how to convert an IonAnnotateType attribute into an Ion annotation string.	   |
+|[`TypeAnnotator`](Amazon.IonObjectMapper.Demo/TypeAnnotatorTest.cs)	| `ITypeAnnotator`	                     | `DefaultTypeAnnotator`	         | Allows complete control over the type annotation process with full access to the writer and options.	                                                                                                                                                         |
+|`PermissiveMode`	| `bool`	                               | FALSE	                          | In `PermissiveMode` the serializer will ignore as many errors as it can to deserialize objects. This is so that working with legacy data which might not be in the correct format is parseable, even if it's not perfect. This option is not yet implemented.	 |
+|[`AnnotateGuids`](Amazon.IonObjectMapper.Demo/AnnotateGuidsTest.cs)	| bool	                                 | FALSE	                          | When true, `Guid`s will be written as blobs annotated with "guid128", otherwise we will guess the blob is a `Guid` if the desired type is a `Guid`.	                                                                                                          |
+|[`ObjectFactory`](Amazon.IonObjectMapper.Demo/ObjectFactoryTest.cs)	| `IObjectFactory`	                     | `DefaultObjectFactory`	         | The object used to construct types during deserialization.	                                                                                                                                                                                                   |
+|[`AnnotatedTypeAssemblies`](Amazon.IonObjectMapper.Demo/AnnotatedTypeAssembliesTest.cs)	| `IEnumerable<string>`	                | Empty	                          | The list of assembly names to search when creating types from annotations.	                                                                                                                                                                                   |
+|[`IonSerializers`](Amazon.IonObjectMapper.Demo/IonSerializersTest.cs)	| `Dictionary<Type, IIonSerializer>`	   | Empty	                          | A `Dictionary` of `IIonSerializer`s which specifies, for a key `Type` a custom Ion serializer for that type.	                                                                                                                                                 |
+|[`AnnotatedIonSerializers`](Amazon.IonObjectMapper.Demo/AnnotatedIonSerializersTest.cs)	| `Dictionary<string, IIonSerializer>`	 | Empty	                          | A `Dictionary` of `IIonSerializer`s which specifies, for the Ion type annotation, which custom Ion serializer to use for that type.	                                                                                                                          |
+|[`CustomContext`](Amazon.IonObjectMapper.Demo/CustomContextTest.cs)	| `Dictionary<string, object>`	         | Empty	                          | Custom arbitrary data that can be passed to the IonSerializer at serialization time which can then be used by custom Ion serializer to further customize behaviour.	                                                                                          |
 
 You can run the following command to test any specific Serialization Option, substituting `Format` in `FormatTest` with the option of your choice.
 
 ```bash
-dotnet test Amazon.IonObjectMapper.Test -l "console;verbosity=detailed" --filter "FullyQualifiedName=Amazon.IonObjectMapper.Test.FormatTest.Scratch"
+dotnet test Amazon.IonObjectMapper.Demo -l "console;verbosity=detailed" --filter "FullyQualifiedName=Amazon.IonObjectMapper.Demo.FormatTest.Scratch"
 ```
 
 ### Customizing serialization
 
-We will provide extension points to allow for arbitrarily fine-grained control over the serialization process. There are a few ways to specify this. To the `IonSerializer`, one can pass in options including a `Dictionary` of `Type` (and Ion type annotation) onto `IonSerializer`. This mapping will take precedence over the default mapping.
+We will provide extension points to allow for arbitrarily fine-grained control over the serialization process. There are a few ways to specify this. To the `IonSerializer`, one can pass in options including a `Dictionary` of `Type` (and Ion type annotation) onto `IIonSerializer`. This mapping will take precedence over the default mapping.
 
 ```c#
 new IonSerializer(new IonSerializationOptions
@@ -412,42 +425,39 @@ new IonSerializer(new IonSerializationOptions
 });
 ```
 
-Note the two possible types here. One can either specify the `IonSerializer` directly which must be an instance of the interface:
+Note the two possible types here. One can either specify the `IIonSerializer` directly which must be an instance of the interface:
 
 ```c#
-public interface IonSerializer<T>
+public interface IIonSerializer
 {
-    void Serialize(IIonWriter writer, T item);
-    T Deserialize(IIonReader reader);
+    void Serialize(IIonWriter writer, object item);
+    object Deserialize(IIonReader reader);
 }
 ```
 
-Alternately, to get access to the Ion serialization options as well as the custom context passed in at serialization time, one should supply an `IonSerializerFactory`:
+Alternately, to get access to the Ion serialization options as well as the custom context passed in at serialization time, one should supply an `IIonSerializerFactory`:
 
 ```c#
-public interface IonSerializerFactory<T, TContext> 
-    where TContext : IonSerializationContext
+public interface IIonSerializerFactory
 {
-    public IonSerializer<T> create(
-        IonSerializationOptions options, 
-        TContext context);
+    IIonSerializer Create(IonSerializationOptions options, Dictionary<string, object> customContext);
 }
 ```
 
-This will then be called to create your `IonSerializer` and give you full access to the options as well as any other data you wish your serializer to know about.
+This will then be called to create your `IIonSerializer` and give you full access to the options as well as any other data you wish your serializer to know about.
 
-In addition to the `Dictionary`, classes and properties can be marked up with `Attributes` specifying either the `IonSerializer` or `IonSerializerFactory` to be used for serialization.
+In addition to the `Dictionary`, classes and properties can be marked up with `Attributes` specifying either the `IIonSerializer` or `IIonSerializerFactory` to be used for serialization.
 
 ```c#
-[IonSerializer(typeof(MyIonCarSerializer))]
+[IonSerializer(Serializer = typeof(MyIonCarSerializer))]
 public class Car
 {
-    [IonSerializerFactory(typeof(MyIonEngineSerializerFactory))]
+    [IonSerializer(Factory = typeof(MyIonEngineSerializerFactory))]
     public Engine engine { get; init; }
 }
 ```
 
-The `IonSerializerAttribute` must specify a `IonSerializer` with a no-arguments public default constructor. The `IonSerializerFactoryAttribute` must specify a `IonSerializerFactory` with a no-arguments public default constructor.
+The `IonSerializerAttribute` must specify a `IIonSerializer` or `IonSerializerFactory` with a no-arguments public default constructor.
 
 ## A Note on Lossy Conversions
 

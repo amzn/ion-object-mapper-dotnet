@@ -247,6 +247,19 @@ namespace Amazon.IonObjectMapper
         /// </summary>
         ///
         /// <param name="reader">The Ion reader to be used for deserialization.</param>
+        /// <typeparam name="T">The type of data to deserialize to.</typeparam>
+        ///
+        /// <returns>The deserialized value.</returns>
+        public T Deserialize<T>(IIonReader reader)
+        {
+            return (T)this.Deserialize(reader, typeof(T));
+        }
+
+        /// <summary>
+        /// Deserialize value from Ion.
+        /// </summary>
+        ///
+        /// <param name="reader">The Ion reader to be used for deserialization.</param>
         /// <param name="type">The target .NET type for deserialization.</param>
         ///
         /// <returns>The deserialized value.</returns>
@@ -264,7 +277,7 @@ namespace Amazon.IonObjectMapper
         /// <param name="ionType">The Ion type of the current Ion field.</param>
         ///
         /// <returns>The deserialized value.</returns>
-        public object Deserialize(IIonReader reader, Type type, IonType ionType)
+        internal object Deserialize(IIonReader reader, Type type, IonType ionType)
         {
             if (reader.CurrentDepth > this.options.MaxDepth)
             {
@@ -414,19 +427,6 @@ namespace Amazon.IonObjectMapper
             }
 
             throw new NotSupportedException($"Data with Ion type {ionType} is not supported for deserialization");
-        }
-
-        /// <summary>
-        /// Deserialize value from Ion.
-        /// </summary>
-        ///
-        /// <param name="reader">The Ion reader to be used for deserialization.</param>
-        /// <typeparam name="T">The type of data to deserialize to.</typeparam>
-        ///
-        /// <returns>The deserialized value.</returns>
-        public T Deserialize<T>(IIonReader reader)
-        {
-            return (T)this.Deserialize(reader, typeof(T));
         }
 
         /// <summary>
