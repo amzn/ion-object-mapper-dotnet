@@ -81,7 +81,12 @@ namespace Amazon.IonObjectMapper.Test
                 Assert.AreEqual(null, Serde(ionSerializer, (object) null));
                 return;
             }
-            
+
+            if (item is byte[] bytes)
+            {
+                Assert.IsTrue(bytes.SequenceEqual(Serde(ionSerializer, bytes)));
+            }
+
             // According to [Ion equivalence](https://amzn.github.io/ion-docs/guides/symbols-guide.html#symboltoken-equivalence),
             // SymbolTokens with the same text are equivalent
             if (item is SymbolToken symbolToken)
