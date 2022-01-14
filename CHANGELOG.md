@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.3] - Unreleased
+## [1.0.0]
 
 ### Added
 - Add support to identify target type from Ion annotation for deserialization (#61)
@@ -11,6 +11,7 @@
 ### Fixed
 - The `Format` option will be valued by ObjectMapper now (#56)
 - Explicitly handle conflicts between IonPropertyName and field names (#29)
+- Fix error when deserializing Ion blob to Nullable<Guid> (#72)
 
 ### Changed
 - Change the default serialization format to Ion binary (#58)
