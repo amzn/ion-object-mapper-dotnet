@@ -198,3 +198,18 @@ public class Car
 }
 ```
 
+
+#### IonClob
+
+Strings can be tagged with this attribute to use a different encoding scheme in the Ion Clob type.
+
+```c#
+public class Car
+{
+    [IonClob(encoding = "Unicode")]
+    private string color;
+
+    [IonClob(encoding = "UTF-8")]
+    private string manufacturer;
+}
+```

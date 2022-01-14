@@ -269,6 +269,14 @@ namespace Amazon.IonObjectMapper
                     writer.AddTypeAnnotation(this.options.AnnotationConvention.Apply(this.options, ionAnnotateType, propertyType));
                 }
 
+                var ionClob = (IonClobAttribute)Attribute.GetCustomAttribute(property, typeof(IonClobAttribute), false);
+                if (ionClob != null)
+                {
+                    var serializer = new IonClobSerializer(ionClob.encoding);
+                    serializer.Serialize(writer, propertyValue as string);
+                    continue;
+                }
+
                 this.ionSerializer.Serialize(writer, propertyValue);
                 serializedIonFields.Add(ionPropertyName);
             }

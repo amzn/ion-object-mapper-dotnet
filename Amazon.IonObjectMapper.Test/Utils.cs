@@ -37,7 +37,7 @@ namespace Amazon.IonObjectMapper.Test
         {
             var stream = new MemoryStream();
             var writer = IonTextWriterBuilder.Build(new StreamWriter(stream));
-            writer.WriteClob(Encoding.ASCII.GetBytes(clob));
+            writer.WriteClob(Encoding.Unicode.GetBytes(clob));
             writer.Flush();
             writer.Finish();
             stream.Position = 0;
