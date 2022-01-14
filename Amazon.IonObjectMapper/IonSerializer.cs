@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
@@ -366,7 +366,7 @@ namespace Amazon.IonObjectMapper
             {
                 if (annotations.Any(s => s.Equals(IonGuidSerializer.ANNOTATION))
                     || typeof(Guid).IsAssignableFrom(type)
-                    || typeof(Nullable<Guid>).IsAssignableFrom(type))
+                    || typeof(Guid?).IsAssignableFrom(type))
                 {
                     var serializer = this.GetPrimitiveSerializer<Guid>(new IonGuidSerializer(this.options));
                     return serializer.Deserialize(reader);

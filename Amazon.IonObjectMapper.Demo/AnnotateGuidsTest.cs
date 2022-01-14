@@ -26,6 +26,13 @@ namespace Amazon.IonObjectMapper.Demo
         public Guid B { get; } = Guid.NewGuid();
     }
 
+    public class AnnotateNullableGuidsClass 
+    {
+        public int A { get; set; } = 1;
+        
+        public Guid? B { get; } = Guid.NewGuid();
+    }
+
     [TestClass]
     public class AnnotateGuidsTest
     {
@@ -33,22 +40,32 @@ namespace Amazon.IonObjectMapper.Demo
         public void Scratch()
         {
             AnnotateGuidsClass annotateGuidsClass = new AnnotateGuidsClass();
+            AnnotateNullableGuidsClass annotateNullableGuidsClass = new AnnotateNullableGuidsClass();
 
             MemoryStream stream;
+            IonSerializer serializer;
             
-            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { AnnotateGuids = true }).Serialize(annotateGuidsClass);
+            serializer = new IonSerializer(new IonSerializationOptions { AnnotateGuids = true });
+            stream = (MemoryStream)serializer.Serialize(annotateGuidsClass);
             Console.WriteLine(Utils.PrettyPrint(stream));
             // {
             //     a: 1,
             //     b: guid128::{{ lkjNEjlW0kmrb2M2lA+jGg== }}
             // }
             
-            stream = (MemoryStream)new IonSerializer(new IonSerializationOptions { AnnotateGuids = false }).Serialize(annotateGuidsClass);
+            stream = (MemoryStream)serializer.Serialize(annotateNullableGuidsClass);
+            serializer.Deserialize<AnnotateNullableGuidsClass>(stream);
+            
+            serializer = new IonSerializer(new IonSerializationOptions { AnnotateGuids = false });
+            stream = (MemoryStream)serializer.Serialize(annotateGuidsClass);
             Console.WriteLine(Utils.PrettyPrint(stream));
             // {
             //     a: 1,
             //     b: {{ lkjNEjlW0kmrb2M2lA+jGg== }}
             // }
+            
+            stream = (MemoryStream)serializer.Serialize(annotateNullableGuidsClass);
+            serializer.Deserialize<AnnotateNullableGuidsClass>(stream);
 
         }
     }
