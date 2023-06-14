@@ -1,4 +1,7 @@
 # Changelog
+## [1.0.1]
+### Changed
+- Upgraded Amazon.IonDotnet reference version to 1.2.2 (#82)
 
 ## [1.0.0]
 
