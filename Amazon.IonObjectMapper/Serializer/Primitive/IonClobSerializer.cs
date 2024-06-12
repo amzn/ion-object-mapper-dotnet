@@ -13,6 +13,7 @@
 
 namespace Amazon.IonObjectMapper
 {
+    using System;
     using System.Text;
     using Amazon.IonDotnet;
 
@@ -21,6 +22,31 @@ namespace Amazon.IonObjectMapper
     /// </summary>
     public class IonClobSerializer : IonSerializer<string>
     {
+        private readonly Encoding encoding;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IonGuidSerializer"/> class.
+        /// </summary>
+        ///
+        /// <param name="encoding">Type of encoding for Clob.</param>
+        public IonClobSerializer(string encodingString = "Unicode")
+        {
+            switch (encodingString)
+            {
+                case "Unicode":
+                    this.encoding = Encoding.Unicode;
+                    break;
+                case "ASCII":
+                    this.encoding = Encoding.ASCII;
+                    break;
+                case "UTF-8":
+                    this.encoding = Encoding.UTF8;
+                    break;
+                default:
+                    throw new Exception("Not a valid encoding");
+            }
+        }
+
         /// <summary>
         /// Deserialize CLOB value.
         /// </summary>
@@ -32,7 +58,7 @@ namespace Amazon.IonObjectMapper
         {
             byte[] clob = new byte[reader.GetLobByteSize()];
             reader.GetBytes(clob);
-            return Encoding.UTF8.GetString(clob);
+            return this.encoding.GetString(clob);
         }
 
         /// <summary>
@@ -43,7 +69,7 @@ namespace Amazon.IonObjectMapper
         /// <param name="item">The CLOB value to serialize.</param>
         public override void Serialize(IIonWriter writer, string item)
         {
-            writer.WriteClob(Encoding.UTF8.GetBytes(item));
+            writer.WriteClob(this.encoding.GetBytes(item));
         }
     }
 }
