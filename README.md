@@ -1,10 +1,12 @@
-## Ion Object Mapper for .NET
+## Ion Object Mapper for .NET (Deprecated)
 
 This is the Ion Object Mapper for .NET, which is a convenience library built to assist
 developers when dealing with data that's in the format of [Amazon Ion](https://amzn.github.io/ion-docs/).
 It is used to easily transform C# classes and objects into Ion format and vice-versa.
 
 [![codecov](https://codecov.io/gh/amzn/ion-object-mapper-dotnet/branch/main/graph/badge.svg?token=w6PsKN4xZ3)](https://codecov.io/gh/amzn/ion-object-mapper-dotnet)
+
+As of 8/20/2024, this library is deprecated and will not receive further updates. Users should consider migrating to [other Ion solutions](https://amazon-ion.github.io/ion-docs/libs.html).
 
 ## Requirements
 
